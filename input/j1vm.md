@@ -73,7 +73,7 @@ This instruction also deletes this value from the top of the DS.
 - CALL: store current address to the RS and jump to the address.
 This instruction makes it possible to implement functions.
 
-- ALU: perform ariphmetic operation
+- ALU: perform arithmetic operation
 
 There are 16 types of ALU instructions, each of them can also manipulate
 DS and RS stacks, change PC and work with memory. For more details
@@ -82,9 +82,9 @@ check the J1 project.
 COMPILER
 --------
 
-If you know Forth, you can use crosscompiler from the J1 project.
+If you know Forth, you can use cross-compiler from the J1 project.
 
-ALternatively, there is a separate project of developer tools for
+Alternatively, there is a separate project of developer tools for
 J1 CPU - [j1vm](http://bitbucket.org/zserge/j1vm)
 
 There is a Forth compiler `j1c` and a simulator (`j1vm`).
@@ -134,7 +134,7 @@ The second stack is a return stack, but it does more than storing
 return addresses when calling functions. You can put your local values
 there when playing with data stack, and fetch them later.
 
-Whan if you need a function like `( a b c d -- a+b c+d )`?
+What if you need a function like `( a b c d -- a+b c+d )`?
 First you call `+` and get `( a b c+d )`. But now you need to 
 remove that `c+d` from the top of the stack! You can move that item
 to the return stack. Use functions `>r` and `r>` to do that.
@@ -153,17 +153,23 @@ position. So, this is your code for the function above:
 If you need to store global variables, you can use memory-access functions: 
 `@` and `!`. They are "fetch" and "store" 
 
-It means, that `100 @` fetches 16-bit value from address 100, and `5 100 !` writes value 5 to address 100. At this moment variables and constants become handy.
+It means, that `100 @` fetches 16-bit value from address 100, and `5 100 !`
+writes value 5 to address 100. At this moment variables and constants become
+handy.
 
-Both variables and constants differ from what you normally see in Forth. To make a global variable you write:
+Both variables and constants differ from what you normally see in Forth. To
+make a global variable you write:
 
 	var my-var
 
-This allocates new variable address in RAM. If you need to make a constant definition write:
+This allocates new variable address in RAM. If you need to make a constant
+definition write:
 
 	equ X 10
 
-Now you can use them in your code: `my-var @` or `X my-var !`. Great thing is that you can use constants like variables if you need to use specific address (e.g. for memory-mapped I/O): 
+Now you can use them in your code: `my-var @` or `X my-var !`. Great thing is
+that you can use constants like variables if you need to use specific address
+(e.g. for memory-mapped I/O): 
 
 	equ GPIO 1234
 	( GPIO & 0x80 )
@@ -172,9 +178,12 @@ Now you can use them in your code: `my-var @` or `X my-var !`. Great thing is th
 Control structures
 ------------------
 
-At this point Forth is just an assembly language with weird syntax. Yes, it's compact, it's easy to learn and it's fast, but it's too much low-level. How do I make a loop? How to branch my code?
+At this point Forth is just an assembly language with weird syntax. Yes, it's
+compact, it's easy to learn and it's fast, but it's too much low-level. How do
+I make a loop? How to branch my code?
 
-It's easy. First, about branches. Internally, they use JZ/JMP instructions. The syntax is like:
+It's easy. First, about branches. Internally, they use JZ/JMP instructions. The
+syntax is like:
 
 	<condition> if <then-branch> else <else-branch> then
 	<condition> if <then-branch> then

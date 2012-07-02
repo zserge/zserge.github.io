@@ -59,8 +59,8 @@ Here's a typical session:
 	i'm using six IRC client and it's the best! <-- Jane reads this
 	wnat to try it?                             <-- and this, too
 
-Another piece of sugar is autoreply. When someone send you a message
-and you press `<tab>` his nickname is written as a recepient of your next
+Another piece of sugar is auto-reply. When someone send you a message
+and you press `<tab>` his nickname is written as a recipient of your next
 message:
 
 	<john> hi!

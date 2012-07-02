@@ -25,7 +25,7 @@ PHILOSOPHY
 ----------
 
 * No .c files, until they are really needed
-* This implies - no build system. You can take any compinations of modules you
+* This implies - no build system. You can take any combinations of modules you
   need and just copy or symlink them to your project directory
 
 
@@ -41,7 +41,7 @@ Let's go deeper. Inside "/inc" folder you should find modules for
 * list-based data structures (list.h)
 * FORTH virtual machine (ivm.h)
 
-For the IVM there is a simple comiler written in Python (see "/utils/ivmc").
+For the IVM there is a simple compiler written in Python (see "/utils/ivmc").
 
 HOW TO USE TESTS
 ----------------

@@ -6,7 +6,7 @@ keywords: log, embedded, variable-length, printf, format
 log.h
 =====
 
-log.h is a ultra-leight logging library for [nikl](nikl.html) framework.
+log.h is a ultra-light logging library for [nikl](nikl.html) framework.
 You can use it to profile your code or debug time-critical parts.
 
 idea
