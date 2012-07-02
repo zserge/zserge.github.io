@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+<url>
+		<loc>/j1vm.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/six.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/projects.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/index.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/jsmn.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/nikl.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/luatesting.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/log.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/blog.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/blog/agile-issue-tracker.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+<url>
+		<loc>/blog/hello.html</loc>
+		<lastmod>2012-07-02</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+</url>
+
+</urlset>

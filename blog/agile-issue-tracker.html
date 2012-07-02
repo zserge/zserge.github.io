@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>my minimalistic agile issue tracker</title>
+		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/style.css" />
+	</head>
+	<script type="text/javascript">
+
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-16690724-5']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+	<body>
+		<div class='menu'>
+			<ul class='menu'>/*
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+				*/
+			</ul>
+		</div>
+		<h1>my minimalistic agile issue tracker</h1>
+<p>Posted on 2012-05-28</p>
+<p>I don't know if you share my point of view, but I have to confess to a hatred
+of issue trackers.  I usually work on small projects with small teams (2-5
+developers), and I don't like monsters like Bugzilla or Redmine filled with the
+burocracy.</p>
+<p>Another thing is that in my head the word <em>"issue"</em> has a bitter taste. I prefer
+the word <em>"task"</em>, because it doesn't make much difference to me when I'm
+implemenging a new long-expected feature or fixing an annoying bug.</p>
+<p>Finally, we live in the world of agile development and my issue tracker should
+be as flexible as I want it to be.</p>
+<p>It's been a long way to realize that the issue track of my dream has always
+been right into my browser.</p>
+<h2>A spreadsheet, really?</h2>
+<p>Right, I picked a Google Docs spreadsheet to track my tasks/issues. Why not?
+It's already working on all platforms, including Android/iOS, it has offline
+mode, and Google Drive makes it even more pleasant.</p>
+<p>Next, I don't need to set up a server or pay for hosting, and several users can
+watch/edit bugs at the same time without any conflicts.</p>
+<p>I can choose what characteristics of a bug are important for this project, and 
+create relevant columns for them.</p>
+<p>A few words about the philosophy.</p>
+<p>I like kanban methodology. I think it's great for small agile projects.
+So I tried to make issue tracking look kanbanish.</p>
+<p>There is a kind of backlog. All open issues that haven't been started yet are
+in the backlog.</p>
+<p>When developers start working on the issue - it's marked as "started".
+When developer claims he fixed it - the issue gets "untested" status.
+Finally, after the fix is approved, the issue is maked as "closed".</p>
+<p>Of course it's not a law, so some really simple issued can omit the "untested"
+status.</p>
+<p>There is one extra status - <em>"blocked"</em>. Issue can be blocked at any stage, by
+any reasons, so this status is somewhat special.</p>
+<p>To visualise progress I use color marks - every status has it's own visual
+style that is applied automatically.</p>
+<p>I'm not trying to reinvent the wheel. If I need to add commens on the issue
+(e.g. why it is blocked, or why it's reopened) I use "Comments" (Alt+F2).  They
+are easy to add, easy to read, and you can comment every cell separately.</p>
+<p>Also, if you want to see only the issue assigned to you - Google Docs "Filters"
+will help you.</p>
+<h2>final form</h2>
+<p>Here's an example of my issue tracker for a tiny project.</p>
+<p>I have three columns: issue ID, short description, whom it's assigned to and
+issue status.  No priorities or deadlines - if they are really important they
+can be part of description, marked with bold font style or written in caps.</p>
+<p>I like the idea I've stolen from .... - to strike-though closed issues. I also
+make font color lighter to distinguish them from the blocked issues.</p>
+<p>I've created a template to create new <del>spreadsheets</del> issue trackers easily,
+so feel free to use it if you like it</p>
+<p>Let your code be bug-free!</p>
+	</body>
+</html>

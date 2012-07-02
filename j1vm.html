@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Tiny virtual machine for Forth language</title>
+		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<meta name="keywords" content="virtual machine, vm, forth, interpreter, compiler, assembler, stack, embedded, small, retro" />
+		<link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/style.css" />
+	</head>
+	<script type="text/javascript">
+
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-16690724-5']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+	<body>
+		<div class='menu'>
+			<ul class='menu'>/*
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+				*/
+			</ul>
+		</div>
+		<h1>IVM</h1>
+<p>IVM (IV Machine or Forth Machine) is a very simple virtual machine
+for small embedded devices. It's a software implementation of
+<a href="http://http://excamera.com/sphinx/fpga-j1.html">J1 Forth CPU</a> and is binary
+compatible with it.
+IVM is a stack machine and is designed to run Forth code, but
+can be used as a general-purpose VM as well.</p>
+<h2>HOW CAN I USE IT?</h2>
+<p>There can be various scenarios, but in general if you:</p>
+<ul>
+<li>want to customize your software without reprogramming the firmware</li>
+<li>want to isolate and control your software</li>
+<li>have enough storage to put virtual machine there (it's about 1K!)</li>
+<li>have storage for the software running inside virtual machine (it's usually 
+  more compact than native code)</li>
+<li>can write critical parts in native code and map them to VM memory-mapped I/O</li>
+<li>can forgive than it run 10 times slower than native code</li>
+</ul>
+<p>...then you should try running IVM.</p>
+<h2>DESIGN</h2>
+<p>IVM is designed to be as small as possible (less than 1K) to fit even the
+smallest micros, and it should bring them to the new level by possibility of
+running external code.</p>
+<p>IVM is very flexible and easy to customize.</p>
+<p>IVM code is stored in the "/inc/ivm.h" file. It has two functions:</p>
+<ul>
+<li>ivm_reset() - brings the VM back to the default state</li>
+<li>ivm_step(op) - executes instruction "op" on the virtual machine</li>
+</ul>
+<p>You need to implement some functionality by your own:</p>
+<ul>
+<li>Fetching instructions. Each instruction is a 2-byte word. Instruction 
+index is stored in the <code>ivm_pc</code> variable</li>
+<li>Memory access. You must implement <code>ivm_mem_put</code> and <code>ivm_mem_get</code> functions
+to read and write to the memory. It is not a part of IVM code, because you can
+use your I/O ports in a memory mapped way, or you might want to cache some
+address range if you use external memory chip. Also, you decide what is the amount
+of RAM available to the VM.</li>
+</ul>
+<h2>INSTRUCTION SET</h2>
+<p>IVM has a simple instruction set compatible with the J1 Forth CPU.</p>
+<p>IVM has two stacks - data stack (DS) and return stack (RS).  Default depth for
+both of them is 16 levels (<strong>WARNING: Original J1 has 32 levels!</strong>)</p>
+<p>Basically, there are 5 types of the instructions:</p>
+<ul>
+<li>
+<p>LIT: put a number on the DS</p>
+</li>
+<li>
+<p>JMP: jump to address</p>
+</li>
+<li>
+<p>JZ: jump to address if the value on the top of the DS is zero. 
+This instruction also deletes this value from the top of the DS.</p>
+</li>
+<li>
+<p>CALL: store current address to the RS and jump to the address.
+This instruction makes it possible to implement functions.</p>
+</li>
+<li>
+<p>ALU: perform ariphmetic operation</p>
+</li>
+</ul>
+<p>There are 16 types of ALU instructions, each of them can also manipulate
+DS and RS stacks, change PC and work with memory. For more details
+check the J1 project.</p>
+<h2>COMPILER</h2>
+<p>If you know Forth, you can use crosscompiler from the J1 project.</p>
+<p>ALternatively, there is a separate project of developer tools for
+J1 CPU - <a href="http://bitbucket.org/zserge/j1vm">j1vm</a></p>
+<p>There is a Forth compiler <code>j1c</code> and a simulator (<code>j1vm</code>).</p>
+<h2>IVM FORTH BASICS</h2>
+<p><strong>Syntax</strong></p>
+<p>Forth has reverse Polish notation. So, to add two number you should
+write <code>2 3 +</code> and to add three numbers - <code>1 2 3 + +</code>.</p>
+<p>This is so, because Forth program is executed from left to right, so if you
+write <code>open read close</code> it will mean firth open, then read and finally close.
+This sounds more intuitive, right?</p>
+<p>Comments in Forth are like:</p>
+<pre><code>( this is a comment )
+\ this is a single line comment
+</code></pre>
+<p><strong>Stacks</strong></p>
+<p><em>IVM has two stacks, so how do they work?</em></p>
+<p>Data stack is a place where temporary values are stored and where
+all the calculations happen. So, if you write <code>2 3 +</code> it means:
+"put 2 on the top of the data stack, then put 3 over it, then run
+ALU function +". Function "+" fetches two items from the top of
+the stack, add them, and puts the result on the data stack as well,
+replacing that two items. So, if stack was like "1 2 3" before 
+calling "+", after that the stack will be "1 5".</p>
+<p>There is a specific notation that helps you to know how functions
+manipulate data stack. It's written like a comment. This is how
+we would describe "+" function: <code>( a b -- a+b )</code>. See? There were 
+<code>a</code> and <code>b</code> on the top, but we replace them with <code>a+b</code> sum.</p>
+<p>How would you call this function: <code>( a b -- b a )</code>? Right, it's <code>swap</code>.
+And this one: <code>( a -- a a )</code> is <code>dup</code>, because it duplicates the top item.
+And this one: <code>( a -- )</code> is <code>drop</code>, because it drops the top item from
+the stack.</p>
+<p><em>But why there are two stacks?</em></p>
+<p>The second stack is a return stack, but it does more than storing
+return addresses when calling functions. You can put your local values
+there when playing with data stack, and fetch them later.</p>
+<p>Whan if you need a function like <code>( a b c d -- a+b c+d )</code>?
+First you call <code>+</code> and get <code>( a b c+d )</code>. But now you need to 
+remove that <code>c+d</code> from the top of the stack! You can move that item
+to the return stack. Use functions <code>&gt;r</code> and <code>r&gt;</code> to do that.
+The first one is "put-to-return-stack" and the second one is
+"fetch-from-return-stack", but it's obvious because of the arrow
+position. So, this is your code for the function above:</p>
+<pre><code>( a b c d -- a+b c+d)
++ ( a b c+d )
+&gt;r ( a b )
++ ( a+b )
+r&gt;  ( a+b c+d )
+</code></pre>
+<p><strong>Memory</strong></p>
+<p>If you need to store global variables, you can use memory-access functions: 
+<code>@</code> and <code>!</code>. They are "fetch" and "store" </p>
+<p>It means, that <code>100 @</code> fetches 16-bit value from address 100, and <code>5 100 !</code> writes value 5 to address 100. At this moment variables and constants become handy.</p>
+<p>Both variables and constants differ from what you normally see in Forth. To make a global variable you write:</p>
+<pre><code>var my-var
+</code></pre>
+<p>This allocates new variable address in RAM. If you need to make a constant definition write:</p>
+<pre><code>equ X 10
+</code></pre>
+<p>Now you can use them in your code: <code>my-var @</code> or <code>X my-var !</code>. Great thing is that you can use constants like variables if you need to use specific address (e.g. for memory-mapped I/O): </p>
+<pre><code>equ GPIO 1234
+( GPIO &amp; 0x80 )
+GPIO @ 128 &amp;
+</code></pre>
+<h2>Control structures</h2>
+<p>At this point Forth is just an assembly language with weird syntax. Yes, it's compact, it's easy to learn and it's fast, but it's too much low-level. How do I make a loop? How to branch my code?</p>
+<p>It's easy. First, about branches. Internally, they use JZ/JMP instructions. The syntax is like:</p>
+<pre><code>&lt;condition&gt; if &lt;then-branch&gt; else &lt;else-branch&gt; then
+&lt;condition&gt; if &lt;then-branch&gt; then
+
+: max ( a b -- max[a,b] )
+    over over ( a b a b )
+    &gt; ( a b a&gt;b )
+    if ( a b )
+        drop ( a )
+    else
+        nip ( b )
+    then
+</code></pre>
+<p>There are several types of loops in the current implementation:</p>
+<pre><code>begin &lt;loop-body&gt; again ( infinite loop )
+begin &lt;loop-body&gt; &lt;condition&gt; until ( do .. while )
+</code></pre>
+	</body>
+</html>
