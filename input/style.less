@@ -1,0 +1,86 @@
+@text-color: #333;
+@body-color: #fff;
+
+@link-color: #b83000;
+
+@menu-color: #b83000;
+@menu-color-hover: #fff;
+
+@h2-line-style: 2px solid #333;
+
+@normal-font: 14pt 'Lustria', serif;
+@h1-font: 27pt;
+@h2-font: 36pt;
+@code-font: 10pt 'Droid Mono', monospace;
+
+body {
+	width: 740px;
+	margin: 0 auto;
+	font: @normal-font;
+	text-align: justify;
+	color: @text-color;
+
+	.menu {
+		width: 100%;
+		background: @body-color;
+		padding: 1em 0;
+		margin: 1em auto;
+		display: block;
+		text-align:center;
+
+		ul {
+			padding: 0;
+			margin: 0 auto;
+			list-style-type: none;
+			padding-bottom: 1em;
+			font-size: 18pt;
+			color: @menu-color;
+			li {
+				padding: 0;
+				margin: 0;
+				display: inline;
+				a {
+					text-decoration: none;
+					border: 0;
+					font-weight: bold;
+					padding: 0 15px;
+					&:hover { color: @menu-color-hover; background: @menu-color; }
+				}
+			}
+		}
+	}
+}
+
+h1 {
+	text-transform: lowercase;
+	text-align: center;
+	font: @h1-font;
+	padding: 24pt 0 12pt 0;
+}
+
+h2 {
+	font: @h2-font;
+	text-align: right;
+	border-bottom: @h2-line-style;
+	//border-bottom: 2px solid @text-color;
+	text-transform: lowercase;
+	padding: 8pt 0 4pt 0;
+}
+
+pre {
+	background: #eee;
+	color: #333;
+	font: @code-font;
+	border-radius: 1em;
+	-webkit-border-radius: 1em;
+	-moz-border-radius: 1em;
+	padding: 1em;
+}
+
+a {
+	color: @link-color;
+	font-weight: bold;
+	text-decoration: none;
+	&:hover { border-bottom:1px dashed; }
+}
+
