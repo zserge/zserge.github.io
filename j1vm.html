@@ -89,15 +89,15 @@ This instruction also deletes this value from the top of the DS.</p>
 This instruction makes it possible to implement functions.</p>
 </li>
 <li>
-<p>ALU: perform ariphmetic operation</p>
+<p>ALU: perform arithmetic operation</p>
 </li>
 </ul>
 <p>There are 16 types of ALU instructions, each of them can also manipulate
 DS and RS stacks, change PC and work with memory. For more details
 check the J1 project.</p>
 <h2>COMPILER</h2>
-<p>If you know Forth, you can use crosscompiler from the J1 project.</p>
-<p>ALternatively, there is a separate project of developer tools for
+<p>If you know Forth, you can use cross-compiler from the J1 project.</p>
+<p>Alternatively, there is a separate project of developer tools for
 J1 CPU - <a href="http://bitbucket.org/zserge/j1vm">j1vm</a></p>
 <p>There is a Forth compiler <code>j1c</code> and a simulator (<code>j1vm</code>).</p>
 <h2>IVM FORTH BASICS</h2>
@@ -132,7 +132,7 @@ the stack.</p>
 <p>The second stack is a return stack, but it does more than storing
 return addresses when calling functions. You can put your local values
 there when playing with data stack, and fetch them later.</p>
-<p>Whan if you need a function like <code>( a b c d -- a+b c+d )</code>?
+<p>What if you need a function like <code>( a b c d -- a+b c+d )</code>?
 First you call <code>+</code> and get <code>( a b c+d )</code>. But now you need to 
 remove that <code>c+d</code> from the top of the stack! You can move that item
 to the return stack. Use functions <code>&gt;r</code> and <code>r&gt;</code> to do that.
@@ -148,21 +148,30 @@ r&gt;  ( a+b c+d )
 <p><strong>Memory</strong></p>
 <p>If you need to store global variables, you can use memory-access functions: 
 <code>@</code> and <code>!</code>. They are "fetch" and "store" </p>
-<p>It means, that <code>100 @</code> fetches 16-bit value from address 100, and <code>5 100 !</code> writes value 5 to address 100. At this moment variables and constants become handy.</p>
-<p>Both variables and constants differ from what you normally see in Forth. To make a global variable you write:</p>
+<p>It means, that <code>100 @</code> fetches 16-bit value from address 100, and <code>5 100 !</code>
+writes value 5 to address 100. At this moment variables and constants become
+handy.</p>
+<p>Both variables and constants differ from what you normally see in Forth. To
+make a global variable you write:</p>
 <pre><code>var my-var
 </code></pre>
-<p>This allocates new variable address in RAM. If you need to make a constant definition write:</p>
+<p>This allocates new variable address in RAM. If you need to make a constant
+definition write:</p>
 <pre><code>equ X 10
 </code></pre>
-<p>Now you can use them in your code: <code>my-var @</code> or <code>X my-var !</code>. Great thing is that you can use constants like variables if you need to use specific address (e.g. for memory-mapped I/O): </p>
+<p>Now you can use them in your code: <code>my-var @</code> or <code>X my-var !</code>. Great thing is
+that you can use constants like variables if you need to use specific address
+(e.g. for memory-mapped I/O): </p>
 <pre><code>equ GPIO 1234
 ( GPIO &amp; 0x80 )
 GPIO @ 128 &amp;
 </code></pre>
 <h2>Control structures</h2>
-<p>At this point Forth is just an assembly language with weird syntax. Yes, it's compact, it's easy to learn and it's fast, but it's too much low-level. How do I make a loop? How to branch my code?</p>
-<p>It's easy. First, about branches. Internally, they use JZ/JMP instructions. The syntax is like:</p>
+<p>At this point Forth is just an assembly language with weird syntax. Yes, it's
+compact, it's easy to learn and it's fast, but it's too much low-level. How do
+I make a loop? How to branch my code?</p>
+<p>It's easy. First, about branches. Internally, they use JZ/JMP instructions. The
+syntax is like:</p>
 <pre><code>&lt;condition&gt; if &lt;then-branch&gt; else &lt;else-branch&gt; then
 &lt;condition&gt; if &lt;then-branch&gt; then
 
