@@ -25,6 +25,7 @@ body .menu {
 
 body .menu ul {
   color: #b83000;
+  display: inline;
   font-size: 18pt;
   list-style-type: none;
   margin: 0 auto;
