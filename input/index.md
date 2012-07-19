@@ -17,8 +17,6 @@ cool stuff.
 
 I also like: music, retro computers and games, esoteric programming languages.
 
-But much more important to me is my special one, Anna.
-
 works
 -----
 
