@@ -1,11 +1,12 @@
 title: blog
-post: This is your brain on mongs
+post: The first post
 date: 2010-03-01
 ---
 
 # {{ page.post }}
 
-My hero is full of keyboards. Get nonsense at <http://automeme.net/>
+This article is just a stub. Normally, it should be a greeting article. Sorry.
 
 Posted on {{ page.date }}
 
+{{ disqus }}
