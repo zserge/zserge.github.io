@@ -2,28 +2,28 @@
 <rss version="2.0">
 <channel>
 <title>Maximum volume yields maximum moustaches</title>
-<link>/blog.html</link>
+<link>http://zserge.com/blog.html</link>
 <description>My name is dragonforce. You killed my dragons. Prepare to scream.</description>
 <language>en-us</language>
-<pubDate>Wed, 25 Jul 2012 10:44:46 -0000</pubDate>
-<lastBuildDate>Wed, 25 Jul 2012 10:44:46 -0000</lastBuildDate>
+<pubDate>Sun, 29 Jul 2012 06:37:38 -0000</pubDate>
+<lastBuildDate>Sun, 29 Jul 2012 06:37:38 -0000</lastBuildDate>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <generator>Poole</generator>
 
 <item>
 		<title>my minimalistic agile issue tracker</title>
-		<link>/blog/agile-issue-tracker.html</link>
+		<link>http://zserge.com/blog/agile-issue-tracker.html</link>
 		<description></description>
 		<pubDate>Mon, 28 May 2012 09:00:00 -0000</pubDate>
-		<guid>/blog/agile-issue-tracker.html</guid>
+		<guid>http://zserge.com/blog/agile-issue-tracker.html</guid>
 </item>
 
 <item>
 		<title>The first post</title>
-		<link>/blog/hello.html</link>
+		<link>http://zserge.com/blog/hello.html</link>
 		<description></description>
 		<pubDate>Mon, 01 Mar 2010 10:00:00 -0000</pubDate>
-		<guid>/blog/hello.html</guid>
+		<guid>http://zserge.com/blog/hello.html</guid>
 </item>
 
 </channel>
