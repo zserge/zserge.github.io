@@ -1,6 +1,6 @@
 title: my minimalistic agile issue tracker
 post: my minimalistic agile issue tracker
-date: 2012-05-28
+date: 2012-08-02
 ---
 
 # {{ page.post }}
