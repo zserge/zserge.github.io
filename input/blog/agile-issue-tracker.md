@@ -78,9 +78,12 @@ Stevens](http://thepursuitofalife.com/minimalist-issue-tracking-for-remote-teams
 distinguish them from the blocked issues.
 
 I've created a template to create new <del>spreadsheets</del> issue trackers
-easily so feel free to use it if you like it. I have no idea of how to get the
+easily so feel free to use it if you like it. <del>I have no idea of how to get the
 direct link to the spreadsheet template on Google Docs so just search for
-"Minimalist Issue Tracker".
+"Minimalist Issue Tracker".</del>
+
+Here's a link to the [template](https://drive.google.com/previewtemplate?id=0Ajtexa2TJWdcdElydTFsTHlYdXI0a1JfNmxvWmk5N2c&mode=public)
+(thank you, Derek!).
 
 Let your code be bug-free!
 
