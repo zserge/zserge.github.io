@@ -6,7 +6,7 @@ date: 2012-08-02
 # {{ page.post }}
 
 I don't know if you share my point of view, but I have to confess: I hate issue
-trackers.  I usually work on small projects with small teams, and I find
+trackers. I usually work on small projects with small teams, and I find
 monsters like Bugzilla or Redmine an overkill.
 
 Another thing is that in my head the word _"issue"_ has a bitter taste. I
@@ -16,7 +16,7 @@ when I'm implementing a new long-expected feature or fixing an annoying bug.
 Finally, we live in the world of agile development and my issue tracker should
 be as flexible as I want it to be.
 
-It's been a long way to realize that the issue track of my dream has always
+It's been a long way to realize that the issue tracker of my dream has always
 been right into my browser.
 
 A spreadsheet, really?
@@ -68,14 +68,14 @@ Here's an example of my issue tracker for a tiny project:
 ![screenshot](images/issue-tracker.png)
 
 I have five columns: issue ID, a special column for short marks that have
-meaning to me only :), a short description, then whom it's assigned to and
+meaning only to me :), a short description, then whom it's assigned to and
 issue status. No priorities or deadlines - if they are really important they
 can be part of description, marked with bold font style or written in caps.
 
 I like the idea I've shamelessly stolen from [Anthony
 Stevens](http://thepursuitofalife.com/minimalist-issue-tracking-for-remote-teams/)
-- to strike-though closed issues. I also make font color lighter to distinguish
-them from the blocked issues.
+- to strike-though closed issues. I also made font color lighter to visually
+distinguish them from the blocked issues.
 
 I've created a template to create new <del>spreadsheets</del> issue trackers
 easily, so feel free to use it if you like it. I have no idea of how to get the
