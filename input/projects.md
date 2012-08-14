@@ -16,9 +16,17 @@ Programming is fun. Here's what I work on in my free time.
 	[[repo](http://bitbucket.org/zserge/gotftp)]
 * j1vm - J1 Forth CPU simulator and compiler 
   [[repo](http://bitbucket.org/zserge/j1vm)]
+* codehound - a fast search tool for a big volumes of source code
+	[[repo](http://bitbucket.org/zserge/codehound)]
+* luatesting - a Go-like unit-testing microframework for Lua
+	[[repo](http://bitbucket.org/zserge/codehound)]
 * [nikl](nikl.html) - micro-framework for programming embedded systems 
   [[repo](http://bitbucket.org/zserge/nikl)]
-* [ivm](j1vm.html) - simple forth virtual machine (a part of [nikl](nikl.html)) 
-  [[repo](http://bitbucket.org/zserge/nikl)]
+	* test - minimal C unit-testing
+	* ini - simple INI-file parser
+	* pt - protothreads implementation
+	* cksum - some minimal C checksum functions
+	* sw16 - tiny 16-bit virtual machine
+	* [ivm](j1vm.html) - simple forth virtual machine
 
 
