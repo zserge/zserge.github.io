@@ -75,11 +75,6 @@ def hook_postconvert_rss():
 		title = p.post
 		link = "%s/%s" % (options.base_url.rstrip("/"), p.url)
 		desc = p.get("description", "")
-		if desc == "":
-			desc = re.sub('<h1>.*</h1>', '', p.html)
-			desc = re.sub('<h2>.*\Z', '', desc, flags=re.S)
-			desc = re.sub('<p>Posted.*\Z', '', desc, flags=re.S)
-			desc = desc + "<a href='%s'>&rarr;</a>" % link
 		date = time.mktime(time.strptime("%s 12" % p.date, "%Y-%m-%d %H"))
 		date = email.utils.formatdate(date)
 		items.append(_RSS_ITEM % (title, link, desc, date, link))

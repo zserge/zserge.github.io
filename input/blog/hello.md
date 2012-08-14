@@ -1,5 +1,6 @@
 title: the first post
 post: the first post
+description: I'm just saying "Hi!"
 date: 2012-08-01
 ---
 

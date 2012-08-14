@@ -1,5 +1,6 @@
 title: my minimalistic agile issue tracker
 post: my minimalistic agile issue tracker
+description: Ever been frustrated by monstrous issue trackers?
 date: 2012-08-02
 ---
 
