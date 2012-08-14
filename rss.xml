@@ -5,26 +5,15 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Tue, 14 Aug 2012 09:08:27 -0000</pubDate>
-<lastBuildDate>Tue, 14 Aug 2012 09:08:27 -0000</lastBuildDate>
+<pubDate>Tue, 14 Aug 2012 09:16:38 -0000</pubDate>
+<lastBuildDate>Tue, 14 Aug 2012 09:16:38 -0000</lastBuildDate>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <generator>Poole</generator>
 
 <item>
 		<title>my minimalistic agile issue tracker</title>
 		<link>http://zserge.com/blog/agile-issue-tracker.html</link>
-		<description>
-<p>I don't know if you share my point of view, but I have a confession to make: I
-hate issue trackers. I usually work on small projects with small teams, and I
-find monsters like Bugzilla or Redmine an overkill.</p>
-<p>Another thing is that in my head the word <em>"issue"</em> has a bitter taste. I
-prefer the word <em>"task"</em> instead, because it doesn't make much difference to me
-when I'm implementing a new long-expected feature or fixing an annoying bug.</p>
-<p>Finally, we live in the world of agile development and my issue tracker should
-be as flexible as I want it to be.</p>
-<p>It took me a lot of time to realize that the issue tracker of my dream has
-always been right into my browser.</p>
-<a href='http://zserge.com/blog/agile-issue-tracker.html'>&rarr;</a></description>
+		<description>Ever been frustrated by monstrous issue trackers?</description>
 		<pubDate>Thu, 02 Aug 2012 09:00:00 -0000</pubDate>
 		<guid>http://zserge.com/blog/agile-issue-tracker.html</guid>
 </item>
@@ -32,22 +21,7 @@ always been right into my browser.</p>
 <item>
 		<title>the first post</title>
 		<link>http://zserge.com/blog/hello.html</link>
-		<description>
-<p>Normally, people don't read 'hello' posts. I consider them useless, they teach
-nothing, mean nothing but still take time to write and to read. So, I strongly
-hope that I will be the only person who read this.</p>
-<p>I started another blog. I already have <a href="http://zserge.wordpress.com">one</a> (in
-Russian), but I hope they both will co-exists in future. Some posts will be
-translated, some will be adopted, others will not. Anyway, I can't promise too
-much, but the idea of this site/blog seems to be inspiring at the moment.</p>
-<p>One day I realized that I'm so happily employed that have an extermely outdated
-CV, and all the stuff I do is just scattered all over the internet, some
-projects took the shelter only on my localhost machine, some ideas were just
-told to a couple of friends and since then are shared by word of mouth.</p>
-<p>That's why I started this site/blog. I will try to gather together here all my
-projects and thoughs, tools and toys, fresh and mossy code, wise and stupid
-ideas. Hope you'll like them.</p>
-<a href='http://zserge.com/blog/hello.html'>&rarr;</a></description>
+		<description>I'm just saying "Hi!"</description>
 		<pubDate>Wed, 01 Aug 2012 09:00:00 -0000</pubDate>
 		<guid>http://zserge.com/blog/hello.html</guid>
 </item>
