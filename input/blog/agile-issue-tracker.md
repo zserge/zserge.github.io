@@ -87,7 +87,7 @@ Here's a link to the [template](https://drive.google.com/previewtemplate?id=0Ajt
 
 Let your code be bug-free!
 
-Posted on {{ page.date }}
+Posted on {{ page.date }} {{ rss }}
 
 {{ disqus }}
 

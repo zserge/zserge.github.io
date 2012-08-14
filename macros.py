@@ -81,9 +81,9 @@ def hook_postconvert_rss():
 	items = "".join(items)
 
 	# --- CHANGE THIS --- #
-	title = "Maximum volume yields maximum moustaches"
+	title = "zserge's blog"
 	link = "%s/blog.html" % options.base_url.rstrip("/")
-	desc = "My name is dragonforce. You killed my dragons. Prepare to scream."
+	desc = "My thoughts on software, simplicity and how to make it work together"
 	date = email.utils.formatdate()
 
 	rss = _RSS % (title, link, desc, date, date, items)
@@ -103,6 +103,8 @@ def lesscss_to_css(src, dst):
 	open(dst, 'w').write(css)
 
 converter = {r'\.less': {lesscss_to_css, 'css'}}
+
+rss = "<span class='rss' style='float: right;'>[[rss](/rss.xml)]</span>"
 
 disqus = """
 <div id="disqus_thread"></div><script type="text/javascript">
