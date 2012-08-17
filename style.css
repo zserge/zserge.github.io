@@ -8,7 +8,7 @@ a:hover { border-bottom: 1px dashed; }
 
 body {
   color: #333;
-  font: 16pt 'Buenard', 'CharisSILRegular', serif;
+  font: 16pt 'Buenard', serif;
   margin: 0 auto;
   text-align: justify;
   width: 740px;
@@ -18,7 +18,7 @@ body .menu {
   background: white;
   color: #b83000;
   display: block;
-  font: 18pt 'Corben', 'CharisSILRegular', serif;
+  font: 18pt 'Quando', serif;
   margin: 9pt auto;
   padding: 9pt 0;
   text-align: center;
@@ -58,7 +58,7 @@ code {
 }
 
 h1 {
-  font-family: 'Quando', 'CharisSILBold', serif;
+  font-family: 'Quando', serif;
   font-size: 28pt;
   padding: 24pt 0 12pt 0;
   text-align: center;
@@ -67,7 +67,7 @@ h1 {
 
 h2 {
   border-bottom: 2px solid #333;
-  font-family: 'Quando', 'CharisSILBold', serif;
+  font-family: 'Quando', serif;
   font-size: 20pt;
   padding: 8pt 0 4pt 0;
   text-align: right;
