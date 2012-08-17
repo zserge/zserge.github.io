@@ -16,17 +16,17 @@ body {
 
 body .menu {
   background: white;
+  color: #b83000;
   display: block;
-  margin: 1em auto;
-  padding: 1em 0;
+  font: 18pt 'Corben', 'CharisSILRegular', serif;
+  margin: 9pt auto;
+  padding: 9pt 0;
   text-align: center;
   width: 100%;
 }
 
 body .menu ul {
-  color: #b83000;
   display: inline;
-  font-size: 18pt;
   list-style-type: none;
   margin: 0 auto;
   padding: 0;
@@ -58,7 +58,8 @@ code {
 }
 
 h1 {
-  font: 27pt;
+  font-family: 'Corben', 'CharisSILBold', serif;
+  font-size: 28pt;
   padding: 24pt 0 12pt 0;
   text-align: center;
   text-transform: lowercase;
@@ -66,7 +67,8 @@ h1 {
 
 h2 {
   border-bottom: 2px solid #333;
-  font: 36pt;
+  font-family: 'Corben', 'CharisSILBold', serif;
+  font-size: 20pt;
   padding: 8pt 0 4pt 0;
   text-align: right;
   text-transform: lowercase;
