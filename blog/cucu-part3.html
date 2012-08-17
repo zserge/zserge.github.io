@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>cucu: a compiler you can understand (3/4)</title>
+		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<link href='/font/stylesheet.css' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33644825-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		 </script>
+	</head>
+	<body>
+		<div class='menu'>/*
+			<ul class='menu'>
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+			</ul>*/
+		</div>
+		<p>Let's talk about compiler backends. C is a portable language, and there is no
+need to rewrite the whole compiler if you want to port it to the new CPU
+architecture.</p>
+<p>Backend is a part of the compiler that generates low-level byte code. Compiler
+itself just calls backend functions. Good backend design makes the compiler
+highly portable.</p>
+<p>I wanted CUCU to be a portable compiler (actually, a cross-compiler).
+So, I deciced to move backend code generator to a separate module.</p>
+<p>But before we dive into the backend code generation, let's think of how we will
+test it.</p>
+<h2>minimal target architecture</h2>
+<p>Our minimal target has two registers (let's call them A and B), and a stack.
+Register A is an accumulator. We could use fixed-size instruction codes, as
+many RISC CPUs do, but there's not much pleasure in decoding hexadecimal
+numbers to find out what the code actually does.</p>
+<p>I chose a simpler way. Every instruction is 8 bytes long (yes, it's huge,
+but who cares - it's a test architecture). And the first 7 bytes of the
+instrction are just ASCII symbols, and the last one is 0x10 ('\n').</p>
+<p>This allows us to use human-readable instruction codes, like <code>A:=A+B</code>,
+<code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory ("add register B 
+to register A", "put 0x1ef8 to register A" and "push the value of register A
+to the stack").</p>
+<ul>
+<li><code>A:=NNNN</code> - put value of 0xNNNN to register A</li>
+<li><code>A:=m[A]</code></li>
+<li>A:=M[A]</li>
+<li><code>m[B]:=A</code></li>
+<li><code>M[B]:=A</code></li>
+<li><code>push A</code></li>
+<li><code>pop B</code></li>
+<li><code>A:=B+A</code></li>
+<li><code>A:=B-A</code></li>
+<li><code>A:=B&amp;A</code></li>
+<li><code>A:=B|A</code></li>
+<li><code>A:=B!=A</code></li>
+<li><code>A:=B==A</code></li>
+<li><code>A:=B&lt;&lt;A</code></li>
+<li><code>A:=B&gt;&gt;A</code></li>
+<li><code>A:=B&lt;A</code></li>
+<li><code>popNNNN</code></li>
+<li><code>sp@NNNN</code></li>
+<li><code>jmpNNNN</code></li>
+<li><code>jpzNNNN</code></li>
+<li><code>call A</code></li>
+</ul>
+<h2>cucu backend design</h2>
+<p>We include "gen.c" file, which is actually a backend implementation.
+Let's start with simple functions: <code>gen_start()</code> and <code>gen_finish()</code>.
+They are used to generate application prologue (like PE header, or ELF header)
+and to post-process byte code.</p>
+<p>Compiler provides the function <code>emit(), that emits byte code to the</code>code[]<code>array. At the very end,</code>code[]` conatins a ready-to-use compiled program.</p>
+<p>So, compiler calls backend function, and backend just calls emit() with the
+specific byte-codes, and this is how we get compiled machine code.</p>
+<p>Now we need to define what are the most common constructions, that backend 
+should implement. Let's start with this simple program:</p>
+<pre><code>int main() {
+    return 0;
+}
+</code></pre>
+<p>Let's talk about calling convention. This is how arguments are passed to the 
+function and how the return value is fetched. We stated before, that arguments
+are placed on the stack (the 1st argument is pushed 1st). Let's make a deal, 
+that the value of the primary register X when function returns is its
+return vakue.</p>
+<p>For the program above I would expect the byte code to be something like:</p>
+<pre><code>mov X, 0
+ret
+</code></pre>
+<p>We add another function to the backend - <code>gen_ret()</code>. It should just produce the
+<code>ret</code> opcode. <code>gen_ret()</code> will be called in two places: when "return" statement
+has been processed (we expect the result of the expression returned to be stored
+in X), and after the function body has been processed. The second case is for 
+safety, because if the programmer forgets to print "return" at the end of the 
+function we should call the "ret" instruction automatically.</p>
+<p>Now, how to put zero to X? We will need another backend function: <code>gen_const(n)</code>
+that puts a numeric constant value <code>n</code> to register X. This function is called
+when out parser finds numeric constant (see <code>prim_expr()</code>).</p>
+<p>So, we need to parse token to convert it to the number, and call gen_const() 
+with that number. Now, when we compiler the program above we will get:</p>
+<pre><code>.start
+    mov X, 0
+    ret
+    ret
+.finish
+</code></pre>
+<p>It works!</p>
+<h2>maths</h2>
+<p>Don't stop here. Let's compile some arithmetic expressions. They are all 
+similar, so I'll show how it's done with an example of addition. Remember how
+parser works? It parses (and theoretically, compiles) the left part of the
+expression, then the right part, and then performs an operation.</p>
+<p>This is how a typical math expression is compiled (remember a joke about an
+elefant, a giraffe and a fridge?):</p>
+<pre><code>..evaluate left part
+push X
+..evaluate right path
+pop Y
+add X, Y
+</code></pre>
+<h2>gen.c template</h2>
+<pre><code>gen_start()
+gen_finish()
+
+gen_const()
+
+gen_call()
+gen_ret()
+
+gen_sym()
+gen_sym_addr()
+gen_loop_start()
+
+gen_push()
+gen_pop()
+
+gen_unref()
+
+gen_array()
+
+gen_patch()
+</code></pre>
+	</body>
+</html>

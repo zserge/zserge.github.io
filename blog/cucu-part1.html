@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>cucu: a compiler you can understand (1/4)</title>
+		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<link href='/font/stylesheet.css' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33644825-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		 </script>
+	</head>
+	<body>
+		<div class='menu'>/*
+			<ul class='menu'>
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+			</ul>*/
+		</div>
+		<h1>cucu: a compiler you can understand (part&nbsp;1)</h1>
+<p>Let talk about the compilers. Have you ever thought of writing your own one?</p>
+<p>I will try to show you how simple it is. The first part will be pretty much
+theoretical, so keep patience.</p>
+<h2>what we're going to achieve?</h2>
+<p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C 
+as possible, so that any CUCU program could be compiled with a C compiler
+without any errors. Of course, to support the whole ANSI C standard is a very 
+difficult task, so I picked a very small C language subset. </p>
+<p>For example, here's a valid CUCU code snippet:</p>
+<pre><code>int cucu_strlen(char *s) {
+    int i = 0;
+    while (s[i]) {
+        i = i + 1;
+    }
+    return i;
+}
+</code></pre>
+<h2>grammar</h2>
+<p>We're about to define a grammar for our language. It's an important step, 
+because everything in our compiler design depends on it.</p>
+<p>So, let's go from top to bottom. Our source file contains a <strong>program</strong>.
+What is a program? It's a list of <strong>variable declarations</strong>, <strong>function
+declarations</strong> and <strong>function definitions</strong>, e.g:</p>
+<pre><code>int func(char *s, int len); /* function declaration */
+int i;                      /* variable declaration */
+
+int func(char *s, int len) { /* function definition */
+    ...
+}
+</code></pre>
+<p>Let's try to write it down in EBNF form (it's absilutely ok, if you don't know
+what EBNF is, it's really intuitive):</p>
+<pre><code>&lt;program&gt; ::= { &lt;var-decl&gt; | &lt;func-decl&gt; | &lt;func-def&gt; } ;
+</code></pre>
+<p>This notation says: "a program is a repeating sequence of variable declarations,
+function declarations and function definitions. But what is all those
+declarations and definitions? Ok, let's go deeper:</p>
+<pre><code>&lt;var-decl&gt; ::= &lt;type&gt; &lt;ident&gt; ";"
+&lt;func-decl&gt; ::= &lt;type&gt; &lt;ident&gt; "( &lt;func-args&gt; ")" ";"
+&lt;func-def&gt; ::= &lt;type&gt; &lt;ident&gt; "(" &lt;func-args&gt; ")" &lt;func-body&gt;
+&lt;func-args&gt; ::= { &lt;type&gt; &lt;ident&gt; "," }
+&lt;type&gt; ::= "int" | "char *"
+</code></pre>
+<p>So, variable declaration is simple: it's a type name followed by the identifier,
+and followed by a semicolon, like we usually do in C, e.g.:</p>
+<pre><code>int i;
+char *s;
+</code></pre>
+<p>Function declaration is a bit more complicated. It's a "type + identifier", 
+and an optional list of function arguments <code>&lt;func-args&gt;</code> inside the braces.</p>
+<p>Function arguments list, in it's turn, is a sequence of comma-separated 
+"type + identifier", like:</p>
+<pre><code>char *s, int from, int to
+</code></pre>
+<p><em>Actually, trailing comma in CUCU is still allowed, but not required. It will
+just simplify our parser code.</em></p>
+<p>The supported types are only <code>int</code> and <code>char *</code>. Identifier is a sequence of 
+letters, digits and an underscore symbol.</p>
+<p>The only thing left is <func-body>. But let's talk about <strong>statements</strong> and 
+<strong>expressions</strong> first.</p>
+<p><em>Statement</em> is a smallest standalone element of the language. Here are valid 
+statements in out language:</p>
+<pre><code>/* These are simple statements */
+i = 2 + 3; /* assignment statement */
+my_func(i); /* function call stament */
+return i; /* return statement */
+
+/* These are compound statements */
+if (x &gt; 0) { .. } else { .. }
+while (x &gt; 0) { .. }
+</code></pre>
+<p><em>Expression</em> is a smaller part of the statement. Usually, it's just the 
+arithmetics. For example in the statement <code>func(x[2], i + j)</code> the expressions
+are <code>x[2]</code> and <code>i+j</code>.</p>
+<p>So, returning back to <func-body>, It's just a valid statement (usually, a
+block statement).</p>
+<pre><code>&lt;func-body&gt; ::= &lt;statement&gt;
+&lt;statement&gt; ::= "{" { &lt;statement&gt; } "}"                /* block statement */
+                | [&lt;type&gt;] &lt;ident&gt; [ "=" &lt;expr&gt; ] ";"  /* assignment */
+                                | "return" &lt;expr&gt; ";"
+                                | "if" "(" &lt;expr&gt; ")" &lt;statement&gt; [ "else" &lt;statement&gt; ]
+                                | "while" "(" &lt;expr&gt; ")" &lt;statement&gt;
+                                | &lt;expr&gt; ";"
+</code></pre>
+<p>Here are possible expressions in CUCU language:</p>
+<pre><code>&lt;expr&gt; ::= &lt;bitwise-expr&gt; 
+           | &lt;bitwise-expr&gt; = &lt;expr&gt;
+&lt;bitwise-expr&gt; ::= &lt;eq-expr&gt;
+                   | &lt;bitwise-expr&gt; &amp; &lt;eq-expr&gt;
+                                     | &lt;bitwise-expr&gt; | &lt;eq-expr&gt;
+&lt;eq-expr&gt; ::= &lt;rel-expr&gt;
+              | &lt;eq-expr&gt; == &lt;rel-expr&gt;
+                            | &lt;eq-expr&gt; != &lt;rel-expr&gt;
+
+&lt;rel-expr&gt; ::= &lt;shift-expr&gt;
+               | &lt;rel-expr&gt; &lt; &lt;shift-expr&gt;
+&lt;shift-expr&gt; ::= &lt;add-expr&gt;
+                 | &lt;shift-expr&gt; &lt;&lt; &lt;add-expr&gt;
+                                 | &lt;shift-expr&gt; &gt;&gt; &lt;add-expr&gt;
+&lt;add-expr&gt; ::= &lt;postfix-expr&gt;
+               | &lt;add-expr&gt; + &lt;postfix-expr&gt;
+                             | &lt;add-expr&gt; - &lt;postfix-expr&gt;
+&lt;postfix-expr&gt; ::= &lt;prim-expr&gt;
+                   | &lt;postfix-expr&gt; [ &lt;expr&gt; ]
+                                     | &lt;postfix-expr&gt; ( &lt;expr&gt; { "," &lt;expr&gt; } )
+&lt;prim-expr&gt; := &lt;number&gt; | &lt;ident&gt; | &lt;string&gt; | "(" &lt;expr&gt; ")"
+</code></pre>
+<p>That's it. Did you notice the recursion in the expression notation?
+Basically, the notation above shows us the precedence of the operators from 
+bottom to top: parens and square brackets are evaluated first, and assignment
+goes the last.</p>
+<h2>lexer</h2>
+<p>Now we are done with grammar, and are ready to start. The first thing to do is
+a lexer. Our compiler takes a stream of bytes as an input, and lexer allows to
+split that stream into smaller tokens, that can be processed later.</p>
+<p>For example, a sequance of bytes "int i = 2+31;" will be split into tokens:</p>
+<pre><code>int
+i
+=
+2
++
+31
+;
+</code></pre>
+<p>The major problem with the lexer is that once byte is read from the stream - it
+can not be "un-read". And what if we've read a byte that can not be added to the
+current token? Where should we store it until the current token is processed?</p>
+<p>So, that's why we need to have a "buffer" (<code>nextc</code>) - a single byte, that was
+read from the stream, but has not yet been pushed to the token string.</p>
+<p>Also, I need to warn you - I use global variables a lot in CUCU code. I know
+it's a bad style, but if I pass all values as function arguments the compiler
+would loose it's simplicity.</p>
+<p>The whole lexer is just a single function <code>readtok()</code>. The algorithm is simple:</p>
+<ul>
+<li>skip leading spaces</li>
+<li>try to read an identifier (a sequence of letters, digits and "_")</li>
+<li>if it's not an identifier - try to read a sequence of special operators, like 
+    "&amp;", "|", "&lt;", "&gt;", "=", "!".</li>
+<li>if it's not an operator - try to read a string literal "...." or '....'</li>
+<li>if failed - maybe it's a comment, like <code>/* ... */</code>?</li>
+<li>if failed again - just read a single byte. It might be another single-byte
+    token, like "(" or "[".</li>
+</ul>
+<p>Here's the whole CUCU sources we've got so far:</p>
+<pre><code>TODO
+</code></pre>
+<p>If we put a C file as the compiler input - it will print us a list of tokens, 
+one per line.</p>
+<p>Ok, have a cup of coffee, and let's go further.</p>
+	</body>
+</html>

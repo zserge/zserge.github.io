@@ -8,7 +8,7 @@ a:hover { border-bottom: 1px dashed; }
 
 body {
   color: #333;
-  font: 14pt 'Lustria', serif;
+  font: 14pt 'CharisSILRegular', serif;
   margin: 0 auto;
   text-align: justify;
   width: 740px;
@@ -49,6 +49,12 @@ body .menu ul li a {
 body .menu ul li a:hover {
   background: #b83000;
   color: white;
+}
+
+code {
+  background: #eee;
+  color: #333;
+  font: 10pt 'Droid Mono', monospace;
 }
 
 h1 {

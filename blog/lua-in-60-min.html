@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>learning lua in 60 minutes</title>
+		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<link href='/font/stylesheet.css' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33644825-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		 </script>
+	</head>
+	<body>
+		<div class='menu'>/*
+			<ul class='menu'>
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+			</ul>*/
+		</div>
+		<p>Lua is my passion.</p>
+<h2>why?</h2>
+<p>So, the first thing to sort out is why you should learn Lua.
+There are many possible answers:</p>
+<ul>
+<li>to write game plugins (WoW, Neverwinter Nights and Crysis use Lua for plugin
+    development, as well as many other popular games)</li>
+<li>to write games (Corona SDK for iOS/Android or LOVE for desktop are well-known
+    game engines using Lua). And, yes, Angry Birds are using Lua, too.</li>
+<li>to add custom logic to nmap, wireshark, nginx, SciTE, conky and other useful tools</li>
+<li>to extend your own software easily with a very lightweight but powerful
+    scripting language</li>
+</ul>
+<h2>what do I need to know before learning Lua?</h2>
+<p>Basic programming skills are required. Any programming language should be fine,
+even BASIC.<br />
+</p>
+<p>Also, you need to have Lua installed if you want to try it yourself. I will not
+describe how to do this, it depends on what platform you're running. You can
+download the Lua sources from <a href="http://www.lua.org/versions.html#5.2">lua.org</a>
+and build them if there is no binary package on your platform. Lua is highly
+portable, so that should be easy.</p>
+<p>If not - try <a href="http://repl.it">repl.it</a> to run Lua in your browser. That will be
+somewhat limited experience, but still better than nothing.</p>
+<h2>language nature</h2>
+<p>Lua is dynamicaly typed. The variables get types on-the-fly according to
+their values (duck-typing).</p>
+<p>Lua is not inspired by C, like many other languages. That's why Lua syntax seems
+sometimes weird.</p>
+<p>Lua has a very small number of language features, but with this minimum set of
+components you can do almost everything.</p>
+<h2>hello world</h2>
+<p>Let's start with a classical "hello world" example:</p>
+<pre><code>-- It's a 'hello world' in Lua
+print "Hello, world"
+print("Goodbye, world");
+</code></pre>
+<p>So, the single line comments start with "--". Also, Lua is very loyal, you can
+ignore semicolons or braces.</p>
+<h2>language basics</h2>
+<p>You can use the following operators in your expressions:</p>
+<ul>
+<li>assignment: <code>x = 0</code>, <code>s="hello"</code>, <code>i, j = 3, 5</code> (multiple assignment)</li>
+<li>arithmetic: +, -, *, /, % (modulo), ^ (raise to power)</li>
+<li>logical: <code>and</code>, <code>or</code>, <code>not</code></li>
+<li>comparison: &gt;, &lt;, ==, &lt;=, &gt;=, ~= (not-equals, yeah, it's unusual)</li>
+<li>string concatenation: <code>x="abc"; y="def"; z=x..y</code></li>
+<li>getting length/size: <code>s="hello"; length=#s</code> (<code>length</code> is 5)</li>
+<li>getting element by its index, like <code>s[2]</code>.</li>
+</ul>
+<p>Control structures are pretty much common for modern programming languages:</p>
+<pre><code>TODO
+</code></pre>
+<p>The language has very few data types. Some of them are very common: nil (the
+absense of value), boolean (true/false), numbers (just numbers, no difference
+between integer or floating-point numbers) and strings (arrays of characters,
+may not be null-terminated).</p>
+<p>The other 4 types (functions, threads, user data and tables) need some
+explaination. </p>
+<p>Function is a data type, too. Functions can be created at runtime, can be
+assigned to variables etc. It make function programming possible.</p>
+<p>Threads are mostly used internally, one thing to keep in mind is that Lua
+threads are different from OS threads, and most likely you won't need this data
+type unless you work with co-routines.</p>
+<p>User data is a low-level data type, allocated somewhere in native code (shared
+libaries written in C or other language), but associated with Lua objects.
+Invisible from inside Lua script.</p>
+<p>And, finally, the most exciting data type - tables. Tables are just hash maps,
+with keys and values. But they are the most important part of the language.</p>
+<h2>tables</h2>
+<p>Let's start with an empty table:</p>
+<pre><code>a = {}
+</code></pre>
+<p>Now we can assign values to keys. Keys can be of any data type, but we'll use
+numbers first:</p>
+<pre><code>a = {}
+a[1] = 5
+a[2] = 7
+a[3] = 9
+-- When using numbers as keys we can construct arrays
+-- The code above is equal to:
+a = {5, 7, 9}
+</code></pre>
+<p>When using strings as keys we can get structures (or records):</p>
+<pre><code>a = {}
+a["width"] = 50
+a["height"] = 75
+-- can be also written as:
+a = {
+    width = 50,
+    height = 75
+}
+</code></pre>
+<p>With string keys we can retrieve values as structure fields:</p>
+<pre><code>w = a["width"]
+-- same as:
+w = a.width
+</code></pre>
+<h2>functions</h2>
+<p>Function can get arbitrary number of arguments, and return an arbitrary number of arguments.
+The missing ones are set to <code>nil</code>. Here's an example of common function syntax:</p>
+<pre><code>function add(x, y)
+    return x + y
+end
+
+sum = add(5, 3)      -- sum is 7
+sum, tmp = add(5, 3) -- sum is 7, tmp is nil
+sum = add(5, 3, 1)   -- sim is still 7, no errors, no warnings
+sum = add(5)         -- an error: arithmetic operation to number and nil
+</code></pre>
+<p>Multiple return values are useful when function needs to return a value and an error code.
+To ignore some of the returning values use special variable name - <code>_</code>:</p>
+<pre><code>-- assume function returns file object, file size and error code
+-- and we don't need to know the size
+file, _, err = open_file()
+</code></pre>
+<p>There can be anonymous function. To call them we should assign them to a variable:</p>
+<pre><code>add = function(x, y) 
+    return x + y 
+end
+
+add(5, 3)
+</code></pre>
+<p>Function can be passed as arguments to other functions, or stored as values inside the tables.
+Which means we can have some kind of OOP.</p>
+<h2>tables as objects</h2>
+	</body>
+</html>
