@@ -8,10 +8,11 @@
 
 @h2-line-style: 2px solid #333;
 
-@normal-font: 14pt 'Lustria', serif;
-@h1-font: 27pt;
-@h2-font: 36pt;
+@h1-font: 'Quando', serif;
+@h2-font: 'Quando', serif;
+@normal-font: 16pt 'Buenard', serif;
 @code-font: 10pt 'Droid Mono', monospace;
+@menu-font: 18pt 'Quando', serif;
 
 body {
 	width: 740px;
@@ -23,18 +24,18 @@ body {
 	.menu {
 		width: 100%;
 		background: @body-color;
-		padding: 1em 0;
-		margin: 1em auto;
+		padding: 9pt 0;
+		margin: 9pt auto;
 		display: block;
 		text-align:center;
+		color: @menu-color;
+		font: @menu-font;
 
 		ul {
 			padding: 0;
 			margin: 0 auto;
 			list-style-type: none;
 			padding-bottom: 1em;
-			font-size: 18pt;
-			color: @menu-color;
 			display: inline;
 			li {
 				padding: 0;
@@ -55,12 +56,14 @@ body {
 h1 {
 	text-transform: lowercase;
 	text-align: center;
-	font: @h1-font;
+	font-family: @h2-font;
+	font-size: 28pt;
 	padding: 24pt 0 12pt 0;
 }
 
 h2 {
-	font: @h2-font;
+	font-family: @h2-font;
+	font-size: 20pt;
 	text-align: right;
 	border-bottom: @h2-line-style;
 	//border-bottom: 2px solid @text-color;
@@ -76,6 +79,12 @@ pre {
 	-webkit-border-radius: 1em;
 	-moz-border-radius: 1em;
 	padding: 1em;
+}
+
+code {
+	background: #eee;
+	color: #333;
+	font: @code-font;
 }
 
 a {
