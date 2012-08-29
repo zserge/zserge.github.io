@@ -39,11 +39,11 @@ a name of the widget's configuration file (widget script).
 
 Then you open that script with any text editor right on your phone/tablet, or
 on the PC if you don't like on-screen keyboards (don't forget to copy the file
-back to the device after you've changed it). It's just a text file, so that
+back to the device after you've modified it). It's just a text file, so that
 should be easy.
 
 The configuration language must be simple yet powerful. I was thinking of using 
-embeddable, and my final choice is - [Scheme][scheme]. I use
+embeddable languages, and my final choice is - [Scheme][scheme]. I use
 [Peter Norvig's toy interpreter][jscheme] written in Java. Even though it's
 very old, and the code is not the state-of-the-art, I still like it, because:
 
@@ -95,8 +95,8 @@ grid-based layout
 -----------------
 
 Grid-based layout is easy to implement, easy to understand and it should work
-for most cases.  You can treat a widget as a regular grid of the given
-width and height.  For example, here's a grid of size 4x2:
+for most cases. You can take a widget as a regular grid of the given
+width and height. For example, here's a grid of size 4x2:
 
 	+--+--+--+--+
 	|  |  |  |  |
