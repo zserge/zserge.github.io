@@ -51,6 +51,12 @@ body .menu ul li a:hover {
   color: white;
 }
 
+body img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 code {
   background: #eee;
   color: #333;
