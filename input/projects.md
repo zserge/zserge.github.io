@@ -8,9 +8,9 @@ my projects
 
 Programming is fun. Here's what I work on in my free time.
 
-* [jsmn](jsmn.html) - JSON parser for small systems
+* [jsmn](/jsmn.html) - JSON parser for small systems
   [[repo](http://bitbucket.org/zserge/jsmn)]
-* [six](six.html) - very simple IRC client 
+* [six](/six.html) - very simple IRC client 
   [[repo](http://bitbucket.org/zserge/six)]
 * gotftp - basic TFTP server written in Go
 	[[repo](http://bitbucket.org/zserge/gotftp)]
@@ -20,7 +20,7 @@ Programming is fun. Here's what I work on in my free time.
 	[[repo](http://bitbucket.org/zserge/codehound)]
 * luatesting - a Go-like unit-testing microframework for Lua
 	[[repo](http://bitbucket.org/zserge/codehound)]
-* [nikl](nikl.html) - micro-framework for programming embedded systems 
+* [nikl](/nikl.html) - micro-framework for programming embedded systems 
   [[repo](http://bitbucket.org/zserge/nikl)]
 	* test - minimal C unit-testing
 	* ini - simple INI-file parser
@@ -28,5 +28,5 @@ Programming is fun. Here's what I work on in my free time.
 	* cksum - some minimal C checksum functions
 	* sw16 - tiny 16-bit virtual machine
 	* [ivm](j1vm.html) - simple forth virtual machine
-
-
+* [textizer](/textizer.html) - a tool for building your own widgets for Android
+* [2](/2.html) - better alternative to "cd"

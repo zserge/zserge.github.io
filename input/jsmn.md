@@ -196,11 +196,27 @@ And this is how you can use jsmn to parse JavaScript code.
 
 To switch to strict mode you should define `JSMN_STRICT` preprocessor variable.
 
+Links
+-----
+
+There are several posts about jsmn around the web:
+
+* [A comparison and microbenchmark of JSON parsers][3] (in Russian)
+* [jsmn example, or parsing JSON with C][4]
+* [Hacker News post][5]
+* [Stack Overflow answer on parsing JSON with ANSI C][6]
+
 Other info
 ----------
 
-This software is distributed under [MIT license](http://www.opensource.org/licenses/mit-license.php),
+This software is distributed under [MIT license][10]
  so feel free to integrate it in your commercial products.
 
 [1]: http://www.json.org/
 [2]: https://bitbucket.org/zserge/jsmn/wiki/Home
+[3]: http://lionet.livejournal.com/118853.html
+[4]: http://alisdair.mcdiarmid.org/2012/08/14/jsmn-example.html
+[5]: http://news.ycombinator.com/item?id=4386834
+[6]: http://stackoverflow.com/questions/10674575/parse-json-in-ansi-c
+[10]: http://www.opensource.org/licenses/mit-license.php
+
