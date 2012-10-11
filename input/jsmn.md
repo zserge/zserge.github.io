@@ -8,67 +8,61 @@ JSMN
 ====
 
 jsmn (pronounced like 'jasmine') is a minimalistic JSON parser in C.  It can be
-easily integrated into resource-limited or embedded projects.
+easily integrated into the resource-limited projects or embedded systems.
 
-You can find more information about JSON format at [json.org][1]
+You can find more information about JSON format at [json.org][1].
 
-Library sources are available at [bitbucket.org/zserge/jsmn][2]
+Library sources are available at [bitbucket.org/zserge/jsmn][2].
 
 Philosophy
 ----------
 
-Most JSON parsers convert JSON string to internal object representation.
-But if you are using C it becomes more tricky. There is no objects or hash 
-tables. That's why most JSON parsers written in C try to reinvent the wheel, 
+Usually JSON parsers convert JSON string to internal object representation.
+But if you are using C it becomes tricky as there is no hash tables, no reflection etc.
+That's why most JSON parsers written in C try to reinvent the wheel, 
 and either invent custom JSON-like objects, custom hash maps, or use callbacks
 like SAX parsers do.
 
-jsmn is parser for those who don't accept it.
-
-jsmn is designed to be	**robust** (it should work fine even with erroneous
-data), **fast** (it should parse data on the fly), **portable** (no superfluous
-dependencies or non-standard C extensions). An of course, **simplicity** is a
-key feature - simple code style, simple algorithm, simple integration into
-other projects.
+jsmn is missing all that functionality, but instead is designed to be
+**robust** (it should work fine even with erroneous data), **fast** (it parses
+data on the fly and is re-entrant), **portable** (no superfluous dependencies
+or non-standard C extensions). And of course, **simplicity** is a key feature.
 
 Features
 --------
 
+* simple
+* highly portable (tested on x86/amd64, ARM, AVR)
 * compatible with C89
 * no dependencies (even libc!)
-* highly portable (tested on x86/amd64, ARM, AVR)
-* about 200 lines of code
-* extremely small code footprint
-* API contains only 2 functions
 * no dynamic memory allocation
+* extremely small code footprint - it's just about 200 LOC
+* API has only 2 functions
 * incremental single-pass parsing
-* library code is covered with unit-tests
+* library code is covered with tests
 
 Design
 ------
 
-The rudimentary jsmn object is a **token**. Let's consider a JSON string:
+jsmn splits JSON string into **tokens**. Let's consider a JSON string:
 
 	'{ "name" : "Jack", "age" : 27 }'
 
-It holds the following tokens:
+jsmn will split it into the following tokens:
 
 * Object: `{ "name" : "Jack", "age" : 27}` (the whole object)
 * Strings: `"name"`, `"Jack"`, `"age"` (keys and some values)
 * Number: `27`
 
-The key moment is that in jsmn, tokens **do not hold any data**, 
+The key moment is that jsmn tokens **do not hold any data**, 
 but just point to the token boundaries in JSON string instead. 
-In the example above jsmn will create tokens like: 
+In the example above jsmn creates tokens like: 
 
 * Object [0..31]
 * String [3..7], String [12..16], String [20..23]
 * Number [27..29].
 
-As you can see, every jsmn token has a type, which indicates the type of 
-corresponding JSON token. 
-
-jsmn supports the following token types:
+Every jsmn token has a type which is one of the following:
 
 * Object - a container of key-value pairs, e.g.:
 	`{ "foo":"bar", "x":0.3 }`
@@ -107,10 +101,10 @@ API
 Token types are described by `jsmntype_t`:
 
 	typedef enum {
-		JSMN_OBJECT,
-		JSMN_ARRAY,
-		JSMN_STRING,
-		JSMN_PRIMITIVE
+		JSMN_PRIMITIVE = 0,
+		JSMN_OBJECT = 1,
+		JSMN_ARRAY = 2,
+		JSMN_STRING = 3
 	} jsmntype_t;
 
 **Note:** Unlike JSON data types, primitive tokens are not divided into
@@ -136,11 +130,11 @@ to simplify string extraction from JSON data.
 
 All job is done by `jsmn_parser` object. You can initialize a new parser using:
 
-	struct jsmn_parser parser;
+	jsmn_parser parser;
 	
 	jsmn_init_parser(&parser);
 
-This will initialize (reset) the parser.
+This will initialize (or reset) the parser.
 
 Later, you can use `jsmn_parse()` function to process JSON string with the 
 parser:
@@ -161,30 +155,31 @@ Return value will be one of these:
 * `JSMN_ERROR_PART` - JSON string is too short, expecting more JSON data
 
 If you get `JSON_ERROR_NOMEM`, you should re-allocate more tokens and call
-`jsmn_parse` once more.  If you read json data from the stream, you can
-periodically call `jsmn_parse` and check if return value is `JSON_ERROR_PART`.
-You will be receiving this error until you reach the end of JSON data.
+`jsmn_parse` once again. If you read JSON data from the stream, you can
+periodically call `jsmn_parse` and check if return value is not 
+`JSON_ERROR_PART` - this will indicate the end of the JSON data.
 
-jsmn stored only offsets inside parser structure, not pointers.
+jsmn stores the offsets inside parser structure, not pointers.
 It means you can use realloc() to get more tokens, or reallocated your
 `js` string when more data arrives.
 
 Non-strict mode
 ---------------
 
-By default jsmn is build in a non-strict mode. It allows you to use it for 
+By default jsmn is working in a non-strict mode. It allows you to use it for 
 other useful formats that JSON. In non-struct mode jsmn accepts:
 
 * non-quoted primitive values other than true/false/null/numbers
 * only primitive values without a root object
 
-It means the following strings will be parsed, too:
+It means the following text will be valid for jsmn:
 
 	server: example.com
 	post: 80
 	message: "hello world"
 
 Looks like a config file, right? 
+And this is how you can use jsmn to parse JavaScript code:
 
 	{
 		server: "example.com",
@@ -192,9 +187,19 @@ Looks like a config file, right?
 		message: "hello world"
 	}
 
-And this is how you can use jsmn to parse JavaScript code.
-
 To switch to strict mode you should define `JSMN_STRICT` preprocessor variable.
+
+Parent links
+------------
+
+In the [benchmark][3] jsmn have shown pretty good results for small objects
+(~4KB).  But for large objects it was terribly slow. This can be fixed by
+storing links to the parent nodes. You will loose about 4 bytes per token, but
+speed will be much higher (by the way, after this little hack jsmn seems to be
+**the fastest** parser in that benchmark).
+
+To enable parent links you should define `JSMN_PARENT_LINKS` before compiling
+jsmn. 
 
 Links
 -----
