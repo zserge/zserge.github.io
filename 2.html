@@ -31,7 +31,67 @@
 			</ul>*/
 		</div>
 		<h1>2</h1>
-<p>"2" helps you to jump between folders in your unix shell.</p>
-<p>Sorry, I will tell you more soon ;)</p>
+<p>"2" helps you to jump between folders in your unix shell.
+It's just my attempt to <em>guess</em> where you want to navigate
+and help you with less typing.</p>
+<h2>how it works</h2>
+<p>Here's a <a href="http://ascii.io/a/1416">screencast</a> to see what I'm talking about.</p>
+<p>A tiny script integrated with your shell populates the directories database
+while you are jumping around.</p>
+<p>Later, when you want to <code>cd</code> somewhere you just type a few letters (hints) -
+"2" will find the most suitable directory path using the fuzzy search and
+brings you there.</p>
+<p>If you want to know more - "2" has two parts (what a coincidence!).
+The first is a piece of a shell script (now <code>zsh</code> and <code>bash</code> are supported).
+This scripts monitors your moves around the filesystem tree and
+provides and alias for "2" and a hotkey for interactive mode (see below what
+it means).</p>
+<p>The second piece is a tool written in Go. It reads and writes the directories
+database and performs the actual search. The reasons I added a separate
+tool is to optimize search speed. But to tell you the truth - I didn't want
+to torture myself with writing a search algorithm in Bash :)</p>
+<h2>install</h2>
+<pre><code>$ hg clone ssh://hg@bitbucket.org/zserge/2
+$ cd 2
+$ go build
+$ sudo cp 2 /usr/local/bin
+$ sudo mkdir /usr/local/share/2
+$ sudo cp bashrc /usr/local/share/2
+$ sudo cp zshrc /usr/local/share/2
+</code></pre>
+<p>Then add the following lines to your <code>.bashrc</code> or <code>.zshrc</code> depending on what
+shell you use:</p>
+<pre><code>export _2IGNORE="/tmp/*"
+source /usr/local/share/2/bashrc # or zshrc
+</code></pre>
+<p>The second line integrates "2" into your shell and the first line
+is used to configure it (to make it ignore some paths)</p>
+<h2>tricks</h2>
+<p>If you want "2" to understand you better first set up the ignored paths.
+I personally don't like it to remember my <code>/tmp</code> and all its subfolders
+because they are located in the <code>tmpfs</code> and there is no sense to store these
+paths in the persistent database. Also, I don't want it to remember my home
+directory (but still remember the subdirectories). </p>
+<p>You can put a list of ignored paths into the <code>_2IGNORE</code> environment variable
+separated by colons. In my case it looks like:</p>
+<pre><code>export _2IGNORE="/tmp/*:/home/serge"
+</code></pre>
+<p>The star at the end of the path means a mask.</p>
+<p>Next, the hints that are closer to the end of the path are more important, thus
+for hint <code>"sys"</code> it's more likely to go to <code>/usr/include/sys</code> than to
+    <code>/sys/kernel/debug</code>.</p>
+<p>Hints are matched in the order you type them. </p>
+<p>Another thing to remember is that extra importance have hints that match the
+parts of the path after the separators: hint <code>"inc"</code> points <code>/usr/include</code>
+more obviously than hint <code>"clu"</code> even though <code>"clu"</code> is closer to the end of
+the path.</p>
+<p>That's all you need to know. Happy "2"-ing!</p>
+<h2>interactive mode</h2>
+<p>If you want to see what path matches your hints the best you can try
+interactive mode. It's still in its very early days, but might help someone.</p>
+<p>To activate interactive mode type Ctrl+2 in zsh or Alt+2 in bash.</p>
+<h2>other info</h2>
+<p>"2" is an open source software and is distributed under MIT license.</p>
+<p>The sources are hosted on <a href="https://bitbucket.org/zserge/2">Bitbucket</a>.</p>
 	</body>
 </html>
