@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>cucu: a compiler you can understand (2/4)</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<title>cucu: a compiler you can understand (2/3)</title>
+		<meta name="description" content="Compilers is fun. Want to write your own one?" />
 		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
@@ -60,7 +60,10 @@ int expect(char *s) {
 types are strongly interconnected. It means we have to write all parser 
 functions at once, keeping in mind the recursion. Let's go again from top
 to bottom. Here's our top-level compiler() functions:</p>
-<pre><code>static void compile() {
+<pre><code>static int typename();
+static void statement();
+
+static void compile() {
     while (tok[0] != 0) { /* until EOF */
         if (typename() == 0) {
             error("Error: type name expected\n");
@@ -96,7 +99,8 @@ it's a variable declaration. If it's followed by a paren - it's a function.
 Function scans function arguments one by one, and if function is not
 followed by a semicolon - it's a definition (function with a body), otherwise - 
 it's just a declaration (just function name and prototype).</p>
-<p>Here, <code>typename()</code> is function that just skips the valid type name:</p>
+<p>Here, <code>typename()</code> is function that just skips the valid type name. We accept
+only <code>int</code> and <code>char</code> and varoius pointers to them (<code>char *</code>):</p>
 <pre><code>static int typename() {
     if (peek("int") || peek("char")) {
         readtok();
@@ -108,7 +112,7 @@ it's just a declaration (just function name and prototype).</p>
 </code></pre>
 <p>The most interesting part is the <code>statement()</code> function. It parses a single 
 statement, which can be a block, a local variable definition/declaration, 
-<code>return</code> statement etc.:</p>
+a <code>return</code> statement etc. Here how it should look like:</p>
 <pre><code>static void statement() {
     if (accept("{")) {
         while (accept("}") == 0) {
@@ -140,7 +144,8 @@ statement, which can be a block, a local variable definition/declaration,
 </code></pre>
 <p>So, if it's a block <code>{ .. }</code> - just read statements until end of block is met.
 If it starts with a type name - it's a local variable. Conditional statements 
-("if/then/else") and loops are just stubs for now. We will write them later.</p>
+("if/then/else") and loops are just stubs for now. Think of how you would
+implement them according to the grammar we use.</p>
 <p>Anyway, most of the statement contain expressions inside. So, we need to make a
 function that parses an expression. Expression parser is a recursive descent 
 parser, so it's a number of functions that call each other recursively until 
@@ -299,7 +304,7 @@ has value of 0x5678).</p>
 <pre><code>struct sym {
     char type;
     int addr;
-    char name[]
+    char name[];
 };
 </code></pre>
 <p>Here <code>type</code> has special meaning. We use a single-letter codes to detect symbol 
@@ -312,6 +317,23 @@ type:</p>
 </ul>
 <p>So far, I've added two functions: <code>sym_find(char *s)</code> to find symbol by its 
 name, and <code>sym_declare()</code> to add a new symbol.</p>
-<p>Now we're are ready to develop backend architecture.</p>
+<p>Now we're are ready to develop <a href="/blog/cucu-part3.html">backend architecture &rarr;</a></p>
+<p><em>Check <a href="/blog/cucu-part1.html">part 1</a> if you missed something</em></p>
+<p>Posted on 2012-10-24 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+<div id="disqus_thread"></div>
+
+<script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+<noscript>
+</noscript>
 	</body>
 </html>

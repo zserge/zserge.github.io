@@ -5,10 +5,34 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Sat, 13 Oct 2012 12:01:29 -0000</pubDate>
-<lastBuildDate>Sat, 13 Oct 2012 12:01:29 -0000</lastBuildDate>
+<pubDate>Tue, 23 Oct 2012 12:16:11 -0000</pubDate>
+<lastBuildDate>Tue, 23 Oct 2012 12:16:11 -0000</lastBuildDate>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <generator>Poole</generator>
+
+<item>
+		<title>a compiler you can unserstand (3/3)</title>
+		<link>http://zserge.com/blog/cucu-part3.html</link>
+		<description>Compilers is fun. Want to write your own one?</description>
+		<pubDate>Thu, 25 Oct 2012 09:00:00 -0000</pubDate>
+		<guid>http://zserge.com/blog/cucu-part3.html</guid>
+</item>
+
+<item>
+		<title>a compiler you can unserstand (2/3)</title>
+		<link>http://zserge.com/blog/cucu-part2.html</link>
+		<description>Compilers is fun. Want to write your own one?</description>
+		<pubDate>Wed, 24 Oct 2012 09:00:00 -0000</pubDate>
+		<guid>http://zserge.com/blog/cucu-part2.html</guid>
+</item>
+
+<item>
+		<title>a compiler you can unserstand (1/3)</title>
+		<link>http://zserge.com/blog/cucu-part1.html</link>
+		<description>Compilers is fun. Want to write your own one?</description>
+		<pubDate>Tue, 23 Oct 2012 09:00:00 -0000</pubDate>
+		<guid>http://zserge.com/blog/cucu-part1.html</guid>
+</item>
 
 <item>
 		<title>textizer: hack your android widgets</title>

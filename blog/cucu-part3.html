@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>cucu: a compiler you can understand (3/4)</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<title>cucu: a compiler you can understand (3/3)</title>
+		<meta name="description" content="Compilers is fun. Want to write your own one?" />
 		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
@@ -30,8 +30,8 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<p>Let's talk about compiler backends. C is a portable language, and there is no
-need to rewrite the whole compiler if you want to port it to the new CPU
+		<p>Let's talk about compiler backends. C should be a portable language, and there
+is no need to rewrite the whole compiler if you want to port it to the new CPU
 architecture.</p>
 <p>Backend is a part of the compiler that generates low-level byte code. Compiler
 itself just calls backend functions. Good backend design makes the compiler
@@ -43,44 +43,46 @@ test it.</p>
 <h2>minimal target architecture</h2>
 <p>Our minimal target has two registers (let's call them A and B), and a stack.
 Register A is an accumulator. We could use fixed-size instruction codes, as
-many RISC CPUs do, but there's not much pleasure in decoding hexadecimal
-numbers to find out what the code actually does.</p>
-<p>I chose a simpler way. Every instruction is 8 bytes long (yes, it's huge,
-but who cares - it's a test architecture). And the first 7 bytes of the
-instrction are just ASCII symbols, and the last one is 0x10 ('\n').</p>
+many RISC CPUs do, but there's not much fun in decoding hexadecimal numbers to
+find out what the code actually does.</p>
+<p>I have chosen a simpler way. Every instruction is 8 bytes long (yes, it's huge,
+but who cares - it's a test imaginary architecture). And the first 7 bytes of
+the instrction are just ASCII symbols, and the last one is 0x10 ('\n').</p>
 <p>This allows us to use human-readable instruction codes, like <code>A:=A+B</code>,
 <code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory ("add register B 
 to register A", "put 0x1ef8 to register A" and "push the value of register A
 to the stack").</p>
 <ul>
 <li><code>A:=NNNN</code> - put value of 0xNNNN to register A</li>
-<li><code>A:=m[A]</code></li>
-<li>A:=M[A]</li>
-<li><code>m[B]:=A</code></li>
-<li><code>M[B]:=A</code></li>
-<li><code>push A</code></li>
-<li><code>pop B</code></li>
-<li><code>A:=B+A</code></li>
-<li><code>A:=B-A</code></li>
-<li><code>A:=B&amp;A</code></li>
-<li><code>A:=B|A</code></li>
-<li><code>A:=B!=A</code></li>
-<li><code>A:=B==A</code></li>
-<li><code>A:=B&lt;&lt;A</code></li>
-<li><code>A:=B&gt;&gt;A</code></li>
-<li><code>A:=B&lt;A</code></li>
-<li><code>popNNNN</code></li>
-<li><code>sp@NNNN</code></li>
-<li><code>jmpNNNN</code></li>
-<li><code>jpzNNNN</code></li>
-<li><code>call A</code></li>
+<li><code>A:=m[A]</code> - put value at address stored in register A to register A (as byte)</li>
+<li><code>A:=M[A]</code> - put value at address stored in register A to register A (as int)</li>
+<li><code>m[B]:=A</code> - store the value of A to address stored in B (as byte)</li>
+<li><code>M[B]:=A</code> - store the value of A to address stored in B (as int)</li>
+<li><code>push A</code> - push the value of A on the stack</li>
+<li><code>pop B</code> - pop the valud from the stack to B</li>
+<li><code>A:=B+A</code> - add A and B</li>
+<li><code>A:=B-A</code> - subtract A and B</li>
+<li><code>A:=B&amp;A</code> - bitwise AND operation</li>
+<li><code>A:=B|A</code> - bitwise OR operation</li>
+<li><code>A:=B!=A</code> - A is 1 if B!=A, and 0 otherwise</li>
+<li><code>A:=B==A</code> - A is 1 if B==A, and 0 otherwise</li>
+<li><code>A:=B&lt;&lt;A</code> - shift left the value of B to A bits</li>
+<li><code>A:=B&gt;&gt;A</code> - shift right the value of B to A bits</li>
+<li><code>A:=B&lt;A</code> - A is 1 if B&lt;A, and 0 othersize</li>
+<li><code>popNNNN</code> - drop NNNN items from the stack</li>
+<li><code>sp@NNNN</code> - put the value at address NNNN on the stack to the register A</li>
+<li><code>jmpNNNN</code> - jump to address NNNN</li>
+<li><code>jpzNNNN</code> - jump to address NNNN if A is zero</li>
+<li><code>call A</code> - call function at address stored in A</li>
+<li><code>ret</code>    - return from the function</li>
 </ul>
 <h2>cucu backend design</h2>
 <p>We include "gen.c" file, which is actually a backend implementation.
 Let's start with simple functions: <code>gen_start()</code> and <code>gen_finish()</code>.
 They are used to generate application prologue (like PE header, or ELF header)
 and to post-process byte code.</p>
-<p>Compiler provides the function <code>emit(), that emits byte code to the</code>code[]<code>array. At the very end,</code>code[]` conatins a ready-to-use compiled program.</p>
+<p>Compiler provides the function <code>emit()</code>, that emits byte code to the <code>code[]</code>
+array. At the very end, <code>code[]</code> conatins a ready-to-use compiled program.</p>
 <p>So, compiler calls backend function, and backend just calls emit() with the
 specific byte-codes, and this is how we get compiled machine code.</p>
 <p>Now we need to define what are the most common constructions, that backend 
@@ -92,64 +94,145 @@ should implement. Let's start with this simple program:</p>
 <p>Let's talk about calling convention. This is how arguments are passed to the 
 function and how the return value is fetched. We stated before, that arguments
 are placed on the stack (the 1st argument is pushed 1st). Let's make a deal, 
-that the value of the primary register X when function returns is its
-return vakue.</p>
+that the value of the register A when function returns is its return value.</p>
+<p>Actually, we will store all values to register A. Register B will be used as
+a temporary register.</p>
 <p>For the program above I would expect the byte code to be something like:</p>
-<pre><code>mov X, 0
+<pre><code>A:=0000
 ret
 </code></pre>
-<p>We add another function to the backend - <code>gen_ret()</code>. It should just produce the
-<code>ret</code> opcode. <code>gen_ret()</code> will be called in two places: when "return" statement
-has been processed (we expect the result of the expression returned to be stored
-in X), and after the function body has been processed. The second case is for 
-safety, because if the programmer forgets to print "return" at the end of the 
-function we should call the "ret" instruction automatically.</p>
-<p>Now, how to put zero to X? We will need another backend function: <code>gen_const(n)</code>
-that puts a numeric constant value <code>n</code> to register X. This function is called
-when out parser finds numeric constant (see <code>prim_expr()</code>).</p>
-<p>So, we need to parse token to convert it to the number, and call gen_const() 
-with that number. Now, when we compiler the program above we will get:</p>
-<pre><code>.start
-    mov X, 0
-    ret
-    ret
-.finish
-</code></pre>
-<p>It works!</p>
+<p>So, we need a function to put immediate numeric value to the register A, and a 
+function to do the return. We will call them <code>gen_const(int)</code> and <code>gen_ret()</code>.</p>
+<p><code>gen_const</code> will be called every time the compiler finds a primary expression 
+which is a number, and <code>gen_ret</code> is called when the compiler finds a return
+statement. Though, some functions can be <code>void</code>, and thus have no explicit
+<code>return</code> statement. So, for safety and simplicity we will add an extra
+<code>get_ret()</code> at the end of every function, even if there has been an explicit
+return before.</p>
+<p><em>Our compiler never claimed to be optimal or fast or safe, so double-return is
+fine for us</em></p>
 <h2>maths</h2>
-<p>Don't stop here. Let's compile some arithmetic expressions. They are all 
-similar, so I'll show how it's done with an example of addition. Remember how
-parser works? It parses (and theoretically, compiles) the left part of the
-expression, then the right part, and then performs an operation.</p>
+<p>Now let's compile some arithmetic expressions. They are all similar, so I'll
+show how it's done with an example of addition. Remember how parser works? It
+parses (and theoretically, compiles) the left part of the expression, then the
+right part, and then performs an operation.</p>
 <p>This is how a typical math expression is compiled (remember a joke about an
 elefant, a giraffe and a fridge?):</p>
 <pre><code>..evaluate left part
-push X
+push A
 ..evaluate right path
-pop Y
-add X, Y
+pop B
+A:=A+B
 </code></pre>
-<h2>gen.c template</h2>
-<pre><code>gen_start()
-gen_finish()
-
-gen_const()
-
-gen_call()
-gen_ret()
-
-gen_sym()
-gen_sym_addr()
-gen_loop_start()
-
-gen_push()
-gen_pop()
-
-gen_unref()
-
-gen_array()
-
-gen_patch()
+<p>After we compiler the left part we need to store the results (register A)
+somewhere. Stack is the most simple way to do it. So, an expression 
+<code>1+2+3</code> will be compiled to:</p>
+<pre><code>A:=0001  -+     -+
+push A    |      |
+A:=0002   | 1+2  |
+pop B     |      |
+A:=A+B   -+      | +3
+push A           |
+A:=0003          |
+pop B            |
+A:=A+B       ----+
 </code></pre>
+<h2>other stuff</h2>
+<p>Work with symbols is easy, too.</p>
+<p>To call a function we put its address to register A,
+then to a <code>gen_call()</code> which emits <code>call A</code>.</p>
+<p>Accessing local symbols is done using <code>gen_stack_addr</code> which
+return the address of the given item on the stack.</p>
+<p>Accessing global symbols is done using <code>gen_sym_addr()</code>.
+Also, when a new symbols is created the compiler might need to 
+generate some code (e.g. when generation assembler code).
+<code>gen_sym</code> is used for such cases.</p>
+<p><code>gen_pop</code> drops N items from the stack (increases stack pointer).</p>
+<p><code>gen_unref</code> is used to unreference pointers. Depending on the type (byte or int)
+it generates <code>A:=m[A]</code> or <code>A:=M[A]</code> code.</p>
+<p><code>gen_array</code> puts the constant array on the stack. Or maybe if there is a
+separate segment for data it should store the array there.</p>
+<p>Finally, <code>gen_patch()</code> is used to patch jump address when compiling if/while
+statement. The reason is that when we meet such statement we must generate a 
+jump instruction, but the address is not known yet - it depends on how many code
+is compiled for the body statetment. So, after the body is compiled
+we patch jump address with the correct value.</p>
+<p>We are done. Let's try the following program:</p>
+<pre><code>int main() {
+    int k;
+    k = 3;
+    if (k == 0) {
+        return 1;
+    }
+    return 0;
+}
+
+jmp0008 # by gen_start(): jump to main(), which is the next instruction at 0x8
+push A  # add space for local variable "k"
+sp@0000 # get the address of the local variable #0 ("k")
+push A  # store it
+A:=0003 # put 3 to A
+pop B   # get the stored earlier address of "k"
+M[B]:=A # put the value of A to "k" as int
+sp@0000 # get the address of "k"
+A:=M[A] # get its value as int
+push A  # store it
+A:=0000 # put 0 to A
+pop B   # get the value of "k" stored earlies
+A:=B==A # compare A and B ("k" and zero)
+jmz0090 # if false (A!=B, k!=0) - jump to 0x90
+A:=0001 # store 1 to A as return value
+pop0001 # free space allocated for "k" on the stack
+ret     # and return
+jmp0090 # "else" branch should be here, instead jump to 0x90 (next instruction)
+A:=0000 # store 0 to A as return value
+pop0001 # free space allocated for "k" on the stack
+ret     # and return
+ret     # remember about double-return for safery? ;)
+</code></pre>
+<p>Yeah, the code is so dirty and bloated. But it works. And which is more
+important, you know now how compilers work and how create your own one.</p>
+<p>But I should warn you...</p>
+<h2>warning</h2>
+<p>Never, please, never do it this way! If you want to write your own compiler -
+use real grown-up tools:</p>
+<ul>
+<li>flex/lex/jlex/...</li>
+<li>yacc/bison/cup...</li>
+<li>ANTLR</li>
+<li>Ragel</li>
+<li>and many others</li>
+</ul>
+<p>Also, it's worth checking real literature, like <a href="http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Dragon Book</a>. Maybe the
+courses from <a href="https://www.coursera.org/course/compilers">coursera.org</a> will be useful for you, too.</p>
+<p>If you need to port existing languages for your own architecture - 
+you'd better learn how to write LLVM backends or GCC backends.</p>
+<p>If you want to read more about toy compilers - check <a href="http://en.wikipedia.org/wiki/Small-C">SmallC</a>.</p>
+<p>If you want to write compiler for a simple language - check PL/0 or Basic or C.</p>
+<p>But please, never write compilers manually for real tasks.</p>
+<h2>final word</h2>
+<p>The full sources of the compiler are available on <a href="https://bitbucket.org/zserge/cucu">my bitbucket page</a>.  They
+are licensed under MIT, feel free to use and modify.  I'm not sure if there is
+any sense in submitting issues to this project, so do it only if you know how
+to fix them :)</p>
+<p>Anyway, compilers is fun. I hope you liked it!</p>
+<p><em>Check <a href="/blog/cucu-part1.html">part 1</a> or <a href="/blog/cucu-part2.html">part 2</a> if
+you missed something</em></p>
+<p>Posted on 2012-10-25 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+<div id="disqus_thread"></div>
+
+<script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+
+<noscript>
+</noscript>
 	</body>
 </html>
