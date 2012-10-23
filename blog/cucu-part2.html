@@ -56,7 +56,7 @@ int expect(char *s) {
 <code>accept()</code> reads the next token, if it's equal to the given string, otherwise it
  returns 0. And <code>expect()</code> helps us to check language syntax.</p>
 <h2>the harder part</h2>
-<p>As you can see from the language grammar, stataments and various expression 
+<p>As you can see from the language grammar, statements and various expression 
 types are strongly interconnected. It means we have to write all parser 
 functions at once, keeping in mind the recursion. Let's go again from top
 to bottom. Here's our top-level compiler() functions:</p>
@@ -94,13 +94,13 @@ static void compile() {
     }
 }
 </code></pre>
-<p>It reads type name, then an indentifier. If it's followed by a semicolon -
+<p>It reads type name, then an identifier. If it's followed by a semicolon -
 it's a variable declaration. If it's followed by a paren - it's a function.
 Function scans function arguments one by one, and if function is not
 followed by a semicolon - it's a definition (function with a body), otherwise - 
 it's just a declaration (just function name and prototype).</p>
 <p>Here, <code>typename()</code> is function that just skips the valid type name. We accept
-only <code>int</code> and <code>char</code> and varoius pointers to them (<code>char *</code>):</p>
+only <code>int</code> and <code>char</code> and various pointers to them (<code>char *</code>):</p>
 <pre><code>static int typename() {
     if (peek("int") || peek("char")) {
         readtok();
@@ -150,7 +150,7 @@ implement them according to the grammar we use.</p>
 function that parses an expression. Expression parser is a recursive descent 
 parser, so it's a number of functions that call each other recursively until 
 primary expression is found. Primary expression as we can see from the grammar
-is a number (constant) or an indentifier (variable or function).</p>
+is a number (constant) or an identifier (variable or function).</p>
 <pre><code>static void prim_expr() {
     if (isdigit(tok[0])) {
         DEBUG(" const-%s ", tok);
@@ -313,7 +313,7 @@ type:</p>
 <li><code>L</code> - is a local variable. <code>addr</code> stores variable location on the stack</li>
 <li><code>A</code> - function argument. <code>addr</code> also stores the location on the stack</li>
 <li><code>U</code> - undefined global variable. <code>addr</code> stores absolute address in RAM.</li>
-<li><code>D</code> - defined global valiable. Same as above.</li>
+<li><code>D</code> - defined global variable. Same as above.</li>
 </ul>
 <p>So far, I've added two functions: <code>sym_find(char *s)</code> to find symbol by its 
 name, and <code>sym_declare()</code> to add a new symbol.</p>

@@ -95,15 +95,15 @@ of letters, digits and an underscore symbol.</p>
 statements in out language:</p>
 <pre><code>/* These are simple statements */
 i = 2 + 3; /* assignment statement */
-my_func(i); /* function call stament */
+my_func(i); /* function call statement */
 return i; /* return statement */
 
 /* These are compound statements */
 if (x &gt; 0) { .. } else { .. }
 while (x &gt; 0) { .. }
 </code></pre>
-<p><em>Expression</em> is a smaller part of the statement. As opposed to stamenents,
-expressions always return a value.  Usually, it's just the arithmetics. For
+<p><em>Expression</em> is a smaller part of the statement. As opposed to statements,
+expressions always return a value.  Usually, it's just the arithmetic. For
 example in the statement <code>func(x[2], i + j)</code> the expressions are <code>x[2]</code> and
 <code>i+j</code>.</p>
 <p>So, looking back at <code>&lt;func-body&gt;</code>. It's just a valid statement (which is
@@ -112,31 +112,31 @@ usually a block statement).</p>
 <pre><code>&lt;func-body&gt; ::= &lt;statement&gt;
 &lt;statement&gt; ::= "{" { &lt;statement&gt; } "}"                /* block statement */
                 | [&lt;type&gt;] &lt;ident&gt; [ "=" &lt;expr&gt; ] ";"  /* assignment */
-                                | "return" &lt;expr&gt; ";"
-                                | "if" "(" &lt;expr&gt; ")" &lt;statement&gt; [ "else" &lt;statement&gt; ]
-                                | "while" "(" &lt;expr&gt; ")" &lt;statement&gt;
-                                | &lt;expr&gt; ";"
+                | "return" &lt;expr&gt; ";"
+                | "if" "(" &lt;expr&gt; ")" &lt;statement&gt; [ "else" &lt;statement&gt; ]
+                | "while" "(" &lt;expr&gt; ")" &lt;statement&gt;
+                | &lt;expr&gt; ";"
 </code></pre>
 <p>Here are possible expressions in CUCU language:</p>
 <pre><code>&lt;expr&gt; ::= &lt;bitwise-expr&gt; 
            | &lt;bitwise-expr&gt; = &lt;expr&gt;
 &lt;bitwise-expr&gt; ::= &lt;eq-expr&gt;
                    | &lt;bitwise-expr&gt; &amp; &lt;eq-expr&gt;
-                                     | &lt;bitwise-expr&gt; | &lt;eq-expr&gt;
+                   | &lt;bitwise-expr&gt; | &lt;eq-expr&gt;
 &lt;eq-expr&gt; ::= &lt;rel-expr&gt;
               | &lt;eq-expr&gt; == &lt;rel-expr&gt;
-                            | &lt;eq-expr&gt; != &lt;rel-expr&gt;
+              | &lt;eq-expr&gt; != &lt;rel-expr&gt;
 &lt;rel-expr&gt; ::= &lt;shift-expr&gt;
                | &lt;rel-expr&gt; &lt; &lt;shift-expr&gt;
 &lt;shift-expr&gt; ::= &lt;add-expr&gt;
                  | &lt;shift-expr&gt; &lt;&lt; &lt;add-expr&gt;
-                                 | &lt;shift-expr&gt; &gt;&gt; &lt;add-expr&gt;
+                 | &lt;shift-expr&gt; &gt;&gt; &lt;add-expr&gt;
 &lt;add-expr&gt; ::= &lt;postfix-expr&gt;
                | &lt;add-expr&gt; + &lt;postfix-expr&gt;
-                             | &lt;add-expr&gt; - &lt;postfix-expr&gt;
+               | &lt;add-expr&gt; - &lt;postfix-expr&gt;
 &lt;postfix-expr&gt; ::= &lt;prim-expr&gt;
                    | &lt;postfix-expr&gt; [ &lt;expr&gt; ]
-                                     | &lt;postfix-expr&gt; ( &lt;expr&gt; { "," &lt;expr&gt; } )
+                   | &lt;postfix-expr&gt; ( &lt;expr&gt; { "," &lt;expr&gt; } )
 &lt;prim-expr&gt; := &lt;number&gt; | &lt;ident&gt; | &lt;string&gt; | "(" &lt;expr&gt; ")"
 </code></pre>
 <p>That's it. Did you notice the recursion in the expression notation?  Basically,
@@ -144,13 +144,13 @@ the notation above shows us the precedence of the operators from bottom to top:
 parens and square brackets are evaluated first, and assignment goes the last.</p>
 <p>For example, according to this grammar an expression <code>8&gt;&gt;1+1</code>
 will be evaluated to 2 (like in <code>8&gt;&gt;(1+1)</code>), not to 5 (like in <code>(8&gt;&gt;1)+1</code>),
-because <code>&gt;&gt;</code> has lower prece than <code>+</code>.</p>
+because <code>&gt;&gt;</code> has lower precedence than <code>+</code>.</p>
 <h2>lexer</h2>
 <p>Now we are done with grammar, and are ready to start. The first thing to do is
 a lexer. Our compiler takes a stream of bytes as an input, and lexer allows to
 split that stream into smaller tokens, that can be processed later. It gives us
 some level of abstraction and simplifies out parser.</p>
-<p>For example, a sequance of bytes "int i = 2+31;" will be split into tokens:</p>
+<p>For example, a sequence of bytes "int i = 2+31;" will be split into tokens:</p>
 <pre><code>int
 i
 =
