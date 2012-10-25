@@ -232,7 +232,7 @@ void readtok() {
             } else if (nextc == '/') {
                 readchr();
                 if (nextc == '*') {
-                    nextc == fgetc(f);
+                    nextc = fgetc(f);
                     while (nextc != '/') {
                         while (nextc != '*') {
                             nextc = fgetc(f);
