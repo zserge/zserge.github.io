@@ -30,3 +30,5 @@ Programming is fun. Here's what I work on in my free time.
 	* [ivm](j1vm.html) - simple forth virtual machine
 * [textizer](/textizer.html) - a tool for building your own widgets for Android
 * [2](/2.html) - better alternative to "cd"
+* [jknav](/jknav.html) - a very simple vi-like j/k navigation and link hinting for Chrome and Firefox
+
