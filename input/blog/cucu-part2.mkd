@@ -36,7 +36,7 @@ functions:
 the harder part
 ---------------
 
-As you can see from the language grammar, stataments and various expression 
+As you can see from the language grammar, statements and various expression 
 types are strongly interconnected. It means we have to write all parser 
 functions at once, keeping in mind the recursion. Let's go again from top
 to bottom. Here's our top-level compiler() functions:
@@ -75,14 +75,14 @@ to bottom. Here's our top-level compiler() functions:
 		}
 	}
 
-It reads type name, then an indentifier. If it's followed by a semicolon -
+It reads type name, then an identifier. If it's followed by a semicolon -
 it's a variable declaration. If it's followed by a paren - it's a function.
 Function scans function arguments one by one, and if function is not
 followed by a semicolon - it's a definition (function with a body), otherwise - 
 it's just a declaration (just function name and prototype).
 
 Here, `typename()` is function that just skips the valid type name. We accept
-only `int` and `char` and varoius pointers to them (`char *`):
+only `int` and `char` and various pointers to them (`char *`):
 
 	static int typename() {
 		if (peek("int") || peek("char")) {
@@ -135,7 +135,7 @@ Anyway, most of the statement contain expressions inside. So, we need to make a
 function that parses an expression. Expression parser is a recursive descent 
 parser, so it's a number of functions that call each other recursively until 
 primary expression is found. Primary expression as we can see from the grammar
-is a number (constant) or an indentifier (variable or function).
+is a number (constant) or an identifier (variable or function).
 
 	static void prim_expr() {
 		if (isdigit(tok[0])) {
@@ -308,7 +308,7 @@ type:
 * `L` - is a local variable. `addr` stores variable location on the stack
 * `A` - function argument. `addr` also stores the location on the stack
 * `U` - undefined global variable. `addr` stores absolute address in RAM.
-* `D` - defined global valiable. Same as above.
+* `D` - defined global variable. Same as above.
 
 So far, I've added two functions: `sym_find(char *s)` to find symbol by its 
 name, and `sym_declare()` to add a new symbol.

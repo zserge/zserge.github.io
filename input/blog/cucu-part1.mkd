@@ -47,7 +47,7 @@ declarations** and **function definitions**, e.g:
 		...
 	}
 
-Let's try to write it down in [EBNF][1] form (it's absilutely ok, if you don't
+Let's try to write it down in [EBNF][1] form (it's absolutely ok, if you don't
 know what EBNF is, it's really intuitive):
 
 	<program> ::= { <var-decl> | <func-decl> | <func-def> } ;
@@ -57,7 +57,7 @@ function declarations and function definitions. But what is all those
 declarations and definitions? Ok, let's go deeper:
 
 	<var-decl> ::= <type> <ident> ";"
-	<func-decl> ::= <type> <ident> "( <func-args> ")" ";"
+	<func-decl> ::= <type> <ident> "(" <func-args> ")" ";"
 	<func-def> ::= <type> <ident> "(" <func-args> ")" <func-body>
 	<func-args> ::= { <type> <ident> "," }
 	<type> ::= "int" | "char *"
@@ -90,15 +90,15 @@ statements in out language:
 
 	/* These are simple statements */
 	i = 2 + 3; /* assignment statement */
-	my_func(i); /* function call stament */
+	my_func(i); /* function call statement */
 	return i; /* return statement */
 
 	/* These are compound statements */
 	if (x > 0) { .. } else { .. }
 	while (x > 0) { .. }
 
-*Expression* is a smaller part of the statement. As opposed to stamenents,
-expressions always return a value.  Usually, it's just the arithmetics. For
+*Expression* is a smaller part of the statement. As opposed to statements,
+expressions always return a value.  Usually, it's just the arithmetic. For
 example in the statement `func(x[2], i + j)` the expressions are `x[2]` and
 `i+j`.
 
@@ -110,10 +110,10 @@ Here's what we have:
 	<func-body> ::= <statement>
 	<statement> ::= "{" { <statement> } "}"                /* block statement */
 	                | [<type>] <ident> [ "=" <expr> ] ";"  /* assignment */
-									| "return" <expr> ";"
-									| "if" "(" <expr> ")" <statement> [ "else" <statement> ]
-									| "while" "(" <expr> ")" <statement>
-									| <expr> ";"
+	                | "return" <expr> ";"
+	                | "if" "(" <expr> ")" <statement> [ "else" <statement> ]
+	                | "while" "(" <expr> ")" <statement>
+	                | <expr> ";"
 
 Here are possible expressions in CUCU language:
 
@@ -121,21 +121,21 @@ Here are possible expressions in CUCU language:
 	           | <bitwise-expr> = <expr>
 	<bitwise-expr> ::= <eq-expr>
 	                   | <bitwise-expr> & <eq-expr>
-										 | <bitwise-expr> | <eq-expr>
+	                   | <bitwise-expr> | <eq-expr>
 	<eq-expr> ::= <rel-expr>
 	              | <eq-expr> == <rel-expr>
-								| <eq-expr> != <rel-expr>
+	              | <eq-expr> != <rel-expr>
 	<rel-expr> ::= <shift-expr>
 	               | <rel-expr> < <shift-expr>
 	<shift-expr> ::= <add-expr>
 	                 | <shift-expr> << <add-expr>
-									 | <shift-expr> >> <add-expr>
+	                 | <shift-expr> >> <add-expr>
 	<add-expr> ::= <postfix-expr>
 	               | <add-expr> + <postfix-expr>
-								 | <add-expr> - <postfix-expr>
+	               | <add-expr> - <postfix-expr>
 	<postfix-expr> ::= <prim-expr>
 	                   | <postfix-expr> [ <expr> ]
-										 | <postfix-expr> ( <expr> { "," <expr> } )
+	                   | <postfix-expr> ( <expr> { "," <expr> } )
 	<prim-expr> := <number> | <ident> | <string> | "(" <expr> ")"
 
 That's it. Did you notice the recursion in the expression notation?  Basically,
@@ -144,7 +144,7 @@ parens and square brackets are evaluated first, and assignment goes the last.
 
 For example, according to this grammar an expression `8>>1+1`
 will be evaluated to 2 (like in `8>>(1+1)`), not to 5 (like in `(8>>1)+1`),
-because `>>` has lower prece than `+`.
+because `>>` has lower precedence than `+`.
 
 lexer
 -----
@@ -154,7 +154,7 @@ a lexer. Our compiler takes a stream of bytes as an input, and lexer allows to
 split that stream into smaller tokens, that can be processed later. It gives us
 some level of abstraction and simplifies out parser.
 
-For example, a sequance of bytes "int i = 2+31;" will be split into tokens:
+For example, a sequence of bytes "int i = 2+31;" will be split into tokens:
 
 	int
 	i
@@ -242,7 +242,7 @@ Here's the whole CUCU sources we've got so far:
 				} else if (nextc == '/') {
 					readchr();
 					if (nextc == '*') {
-						nextc == fgetc(f);
+						nextc = fgetc(f);
 						while (nextc != '/') {
 							while (nextc != '*') {
 								nextc = fgetc(f);
