@@ -17,3 +17,7 @@ Here's [the project page](/jknav.html), and here are
 
 Any advice or comments welcome!
 
+Posted on {{ page.date }} {{ rss }}
+
+{{ disqus }}
+
