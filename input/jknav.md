@@ -15,9 +15,9 @@ Any advice from experienced developers in this area is appreciated ;)
 why not use Vimperator/Vimium?
 ------------------------------
 
-I really like that extensions, they are powerful and behave much like Vim.  On
+I really like those extensions, they are powerful and behave much like Vim.  On
 the other hand, I'm used to native hotkeys, like Ctrl-D to add to bookmarks
-(not scroll half-page down) etc. I'm quiet happy with the default hotkeys,
+(not scroll half-page down) etc. I'm quite happy with the default hotkeys,
 except for j/k, which is much nicer than arrow-up/arrow-down. Also, link
 hinting saves time for me and makes web surfing possible without using mouse at
 all.
