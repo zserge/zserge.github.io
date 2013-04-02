@@ -5,10 +5,18 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Fri, 30 Nov 2012 10:30:41 -0000</pubDate>
-<lastBuildDate>Fri, 30 Nov 2012 10:30:41 -0000</lastBuildDate>
+<pubDate>Tue, 02 Apr 2013 12:45:55 -0000</pubDate>
+<lastBuildDate>Tue, 02 Apr 2013 12:45:55 -0000</lastBuildDate>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <generator>Poole</generator>
+
+<item>
+		<title>AAML - another android markup language</title>
+		<link>http://zserge.com/blog/aaml.html</link>
+		<description>writing android XMLs is easy now</description>
+		<pubDate>Tue, 02 Apr 2013 09:00:00 -0000</pubDate>
+		<guid>http://zserge.com/blog/aaml.html</guid>
+</item>
 
 <item>
 		<title>new project: jknav</title>
