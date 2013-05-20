@@ -5,10 +5,18 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Tue, 02 Apr 2013 12:45:55 -0000</pubDate>
-<lastBuildDate>Tue, 02 Apr 2013 12:45:55 -0000</lastBuildDate>
+<pubDate>Mon, 20 May 2013 02:48:01 -0000</pubDate>
+<lastBuildDate>Mon, 20 May 2013 02:48:01 -0000</lastBuildDate>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <generator>Poole</generator>
+
+<item>
+		<title>logdog - a colorized Android logcat</title>
+		<link>http://zserge.com/blog/logdog.html</link>
+		<description>logdog is a better logcat</description>
+		<pubDate>Mon, 20 May 2013 09:00:00 -0000</pubDate>
+		<guid>http://zserge.com/blog/logdog.html</guid>
+</item>
 
 <item>
 		<title>AAML - another android markup language</title>
