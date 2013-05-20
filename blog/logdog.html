@@ -69,7 +69,7 @@ compdef _logdog logdog
 #
 _logdog() {
     local tag=${COMP_WORDS[COMP_CWORD]}
-    procs="$(adb shell pm list packages $tag | sed -e 's/package://')"
+    procs=$(adb shell ps | tr -d '\r' | awk -v tag=" $tag" '$0 ~ tag { print $9 }')
     COMPREPLY=($(compgen -W "$procs" -- $tag))
 }
 complete -o default -o nospace -F _logdog logdog
