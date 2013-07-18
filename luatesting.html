@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>luatesting - micro-pico-tiny framework for Lua unit testing</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
-		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<title> luatesting - micro-pico-tiny framework for Lua unit testing </title>
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
 		<script type="text/javascript">
 
 			var _gaq = _gaq || [];
@@ -30,24 +30,34 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<h1>Luatesting</h1>
+		
+<h1>Luatesting</h1>
+
 <p>luatesting was born in sin, because the reason to create is was a 
 <a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a> principle
 (Not Invented Here).</p>
+
 <h2>Philosophy</h2>
+
 <p>Yes, I know about <a href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>. 
 But I don't like it. 
 It is good for huge enterprise-level apps. But I don't write 
 enterprise apps.
 It is good for object-oriented languages. But Lua is not that
 object-oriented.</p>
+
 <p>Have you heard about Go language <a href="http://golang.org/pkg/testing/">testing</a>
 package? That's what I kept in mind when writing luatesting.</p>
+
 <h2>Code</h2>
+
 <p>The code repository is stored on 
 <a href="https://bitbucket.org/zserge/luatesting/">bitbucket</a></p>
+
 <p>API is simple - there is just one function: <code>testing.run()</code></p>
+
 <p>You should use it like:</p>
+
 <pre><code>MyTestCase = {}
 function MyTestCase.test_some_stuff(t)
     ....
@@ -59,22 +69,32 @@ end
 local testing = require("luatesting")
 testing.run()
 </code></pre>
+
 <p>When <code>testing.run()</code> is called - all your global tables are scanned, and
 all methods containing the word "test" in the name are called.</p>
+
 <p>Sounds easy?</p>
+
 <h2>How to test</h2>
+
 <p>That was how to organize your test cases. Now let's see how to test a
 single case. </p>
+
 <p>Every test case gets a single parameter - an object, called <code>t</code>.</p>
+
 <p>There is no <code>assertEquals()</code> and friends, just a single object to report
 you test state. The <code>t</code> object has two methods:</p>
+
 <ul>
 <li><code>t.Error(msg)</code> - print a message, mark this test as failed, but continue
-    running this test. There can be several errors in a single test</li>
+running this test. There can be several errors in a single test</li>
 <li><code>t.Fail(msg)</code> - print a message, mark test as failed and terminate it</li>
 </ul>
+
 <p>If nothing was done to the <code>t</code> object - the test is passed successfully.</p>
+
 <p>Here's an example of a test case:</p>
+
 <pre><code>ParserTest = {
     p = parser_create()
 }
@@ -106,16 +126,22 @@ end
 testing = require("luatesting")
 testing.run()
 </code></pre>
+
 <p>Here's good output:</p>
+
 <pre><code>OK: test_single_number
 OK: test_array
 </code></pre>
+
 <p>If something goes wrong you will see messages like this:
     ERR:    Failed to parse 123
     ERR:    Failed to parse 0.123
     FAIL: Error length is not 3</p>
+
 <h2>Other info</h2>
+
 <p>My experience with Lua is VERY little, so if it's not enough Lua-esque - 
 let me know how to improve it. Thanks!</p>
 	</body>
 </html>
+

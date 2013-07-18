@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>six - simple IRC client kept simple</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<title> six - simple IRC client kept simple </title>
+		<meta name="description" content="" />
 		<meta name="keywords" content="irc, simple, client, terminal" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
 		<script type="text/javascript">
 
 			var _gaq = _gaq || [];
@@ -30,38 +30,55 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<h1>six</h1>
-<p>six - simple IRC client kept simple (that's what the name means: sicks -&gt;
+		
+<h1>six</h1>
+
+<p>six - simple IRC client kept simple (that's what the name means: sicks ->
 six). six is really tiny piece of software - only 200 SLOC.</p>
+
 <p>It's mainly inspired by <a href="http://tools.suckless.org/sic">sic</a>.</p>
+
 <h2>install</h2>
+
 <p>Get the sources and compile it. The only dependency is Readline.</p>
+
 <pre><code>hg clone https://bitbucket.org/zserge/six
 cd six
 make
 </code></pre>
+
 <p>If you want to install it - copy <code>six</code> binary to your <code>/usr/local/bin</code>
 folder. I hope one day I will add a <code>make install</code> rule.</p>
+
 <h2>usage</h2>
+
 <p>In short, you can run it like:</p>
+
 <pre><code>six &lt;host&gt;
 </code></pre>
+
 <p>For more automated usage you can specify your nickname, channel name,
 password (if you are not paranoid) or a custom startup script:</p>
+
 <pre><code>six -n john -k pa55w0rd -j "#johnchan" irc.server.net
 
 six -s &lt;commands&gt; irc.server.net
 </code></pre>
+
 <h2>commands</h2>
+
 <p>After your connected to the server and passed authorization step
 you can use these commands:</p>
+
 <ul>
 <li><code>:j channel</code> - join the channel</li>
 <li><code>:l channel</code> - leave the channel</li>
 <li><code>:m nick msg</code> - send message to the user <code>&lt;nick&gt;</code></li>
 <li><code>s nick</code> - set default interlocutor to <code>&lt;nick&gt;</code></li>
 </ul>
+
 <p>Here's a typical session:</p>
+
 <pre><code>:j #johnchan
 hi all!       &lt;-- everyone on #johnchan reads this
 :m jack hi, jack  &lt;-- only Jack reads this
@@ -71,22 +88,32 @@ hi all!       &lt;-- everyone on #johnchan reads this
 i'm using six IRC client and it's the best! &lt;-- Jane reads this
 wnat to try it?                             &lt;-- and this, too
 </code></pre>
+
 <p>Another piece of sugar is auto-reply. When someone send you a message
 and you press <code>&lt;tab&gt;</code> his nickname is written as a recipient of your next
 message:</p>
+
 <pre><code>&lt;john&gt; hi!
 (here you press Tab)
 &gt; :m john _ &lt;-- here's your cursor
 </code></pre>
+
 <p>See?</p>
+
 <h2>bitlbee</h2>
+
 <p>I also like using six with bitlbee. I start it like:</p>
+
 <pre><code>six -s "PRIVMSG root :IDENTIFY myPassw0rd" localhost
 </code></pre>
+
 <p>And then I easily use my jabber in the terminal.</p>
+
 <h2>screenshots</h2>
+
 <p>If your terminal looks nice - <code>six</code> also looks nice ;)</p>
+
 <p>Here's my six+urxvt+tmux</p>
-<p><img alt="screenshot" src="http://zserge.com/images/six.png" /></p>
 	</body>
 </html>
+

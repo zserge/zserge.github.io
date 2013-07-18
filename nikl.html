@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Microframework for embedded systems development</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
-		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<title> Microframework for embedded systems development </title>
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
 		<script type="text/javascript">
 
 			var _gaq = _gaq || [];
@@ -30,41 +30,57 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<h1>nikl</h1>
+		
+<h1>nikl</h1>
+
 <p>Nikl is a micro-framework for small embedded devices like AVR
 microcontrollers.</p>
+
 <h2>HISTORY</h2>
+
 <p>One day I decided to write a real-time OS. It had multitasking, semaphores and
 supported only ARM architecture. Then I tried to port it to use with the AVRs,
 but context switching was slow, memory was very limited and my OS became
 generally useless.</p>
+
 <p>Then, I started another project called avOS, that some kind of a kernel that
 was not real-time, and was widely using protothreads for pseudo-multitasking.
 Later the project was abandoned, but now I'm trying to give it a new born.</p>
+
 <h2>PHILOSOPHY</h2>
+
 <ul>
 <li>No .c files, until they are really needed</li>
 <li>This implies - no build system. You can take any combinations of modules you
-  need and just copy or symlink them to your project directory</li>
+need and just copy or symlink them to your project directory</li>
 </ul>
+
 <h2>STRUCTURE</h2>
+
 <p>You should see "/inc" folder. There is where all the modules are stored.
 Another folder is "/test". This is a folder with unit tests. </p>
+
 <p>Let's go deeper. Inside "/inc" folder you should find modules for</p>
+
 <ul>
 <li>bare-bone unit-testing (test.h)</li>
 <li>list-based data structures (list.h)</li>
 <li>FORTH virtual machine (ivm.h)</li>
 </ul>
+
 <p>For the IVM there is a simple compiler written in Python (see "/utils/ivmc").</p>
+
 <h2>HOW TO USE TESTS</h2>
+
 <p>There is a bunch of unit-testing frameworks. But they all are an overkill for
 tiny embedded systems. If you just need to write a few tests for your device
 and have a possibility to detect which test failed - you can use test.h.</p>
+
 <p>Here's an example of typical usage. Assume we have a board that works with data
 on the SD card. We need to be sure that SD card is valid, and hardware is ready
 to use.  I still doubt if it is a correct usage of unit tests, as it seems like
 we test hardware, but this is how it works for me:</p>
+
 <pre><code>/* Use custom error notification, e.g. show line number on LCD,
  * or send message and line number over UART, or just turn the
  * error indicating LED on */
@@ -100,21 +116,27 @@ test(test_leds(), "LED test");
 
 ...
 </code></pre>
+
 <p>Ain't it simple? You basically write test functions that do some assertions.
 Then you call these functions and if the return value is non-zero - it means
 that the test has failed. In this case TEST_NOTIFY function will be called and
 it's your chance to tell user that something was wrong</p>
+
 <ul>
 <li>your test functions must return 0 at the end to indicate success</li>
 <li>you need to test values using check(condition) macro.</li>
 <li>you need to run your test functions using test(func, descr) function</li>
 <li>if you use your own TEST_NOTIFY implementation you can print test name
-  (msg argument) and line number (line argument), where the error occurred.</li>
+(msg argument) and line number (line argument), where the error occurred.</li>
 </ul>
+
 <h2>HOW TO USE LISTS</h2>
+
 <p>Lists are stolen from linux kernel in a shameless way. They are not so easy-to-use
 as more common <sys/queue.h>, but are more flexible.</p>
+
 <p>To define an object, that can be linked into the list, do:</p>
+
 <pre><code>typedef struct {
     /* My data */
     int value1;
@@ -123,13 +145,19 @@ as more common <sys/queue.h>, but are more flexible.</p>
     list_t list;
 } my_obj;
 </code></pre>
+
 <p>To create a list head, do:</p>
+
 <pre><code>list_t my_obj_list;
 </code></pre>
+
 <p>Next, initialize list:</p>
+
 <pre><code>list_init(&amp;my_obj_list);
 </code></pre>
+
 <p>And now you can do everything you want with your lists:</p>
+
 <pre><code>my_obj *a, *b, *c; /* object to add to the list */
 list_t *tmp; /* list iterator */
 
@@ -146,9 +174,13 @@ list_for_each(&amp;my_obj_list, tmp) {
     printf("%d\n", iterator-&gt;value1);
 }
 </code></pre>
+
 <p>For now only double-linked lists are implemented. Soon single-linked lists and
 queues will be added.</p>
+
 <h2>HOW TO USE IVM</h2>
+
 <p>IVM is not that simple. See IVM.README for more details to how use it.</p>
 	</body>
 </html>
+

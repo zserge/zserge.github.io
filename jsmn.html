@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>The most simple JSON parser in C for small systems</title>
-		<meta name="description" content="Minimalist open-source software for *nix and embedded systems" />
+		<title> The most simple JSON parser in C for small systems </title>
+		<meta name="description" content="" />
 		<meta name="keywords" content="json, parse, c, unix, embedded, KISS, minimal, memory allocation" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
 		<script type="text/javascript">
 
 			var _gaq = _gaq || [];
@@ -30,22 +30,31 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<h1>JSMN</h1>
+		
+<h1>JSMN</h1>
+
 <p>jsmn (pronounced like 'jasmine') is a minimalistic JSON parser in C.  It can be
 easily integrated into the resource-limited projects or embedded systems.</p>
+
 <p>You can find more information about JSON format at <a href="http://www.json.org/">json.org</a>.</p>
+
 <p>Library sources are available at <a href="https://bitbucket.org/zserge/jsmn/wiki/Home">bitbucket.org/zserge/jsmn</a>.</p>
+
 <h2>Philosophy</h2>
+
 <p>Usually JSON parsers convert JSON string to internal object representation.
 But if you are using C it becomes tricky as there is no hash tables, no reflection etc.
 That's why most JSON parsers written in C try to reinvent the wheel, 
 and either invent custom JSON-like objects, custom hash maps, or use callbacks
 like SAX parsers do.</p>
+
 <p>jsmn is missing all that functionality, but instead is designed to be
 <strong>robust</strong> (it should work fine even with erroneous data), <strong>fast</strong> (it parses
 data on the fly and is re-entrant), <strong>portable</strong> (no superfluous dependencies
 or non-standard C extensions). And of course, <strong>simplicity</strong> is a key feature.</p>
+
 <h2>Features</h2>
+
 <ul>
 <li>simple</li>
 <li>highly portable (tested on x86/amd64, ARM, AVR)</li>
@@ -57,51 +66,71 @@ or non-standard C extensions). And of course, <strong>simplicity</strong> is a k
 <li>incremental single-pass parsing</li>
 <li>library code is covered with tests</li>
 </ul>
+
 <h2>Design</h2>
+
 <p>jsmn splits JSON string into <strong>tokens</strong>. Let's consider a JSON string:</p>
+
 <pre><code>'{ "name" : "Jack", "age" : 27 }'
 </code></pre>
+
 <p>jsmn will split it into the following tokens:</p>
+
 <ul>
 <li>Object: <code>{ "name" : "Jack", "age" : 27}</code> (the whole object)</li>
 <li>Strings: <code>"name"</code>, <code>"Jack"</code>, <code>"age"</code> (keys and some values)</li>
 <li>Number: <code>27</code></li>
 </ul>
+
 <p>The key moment is that jsmn tokens <strong>do not hold any data</strong>, 
 but just point to the token boundaries in JSON string instead. 
 In the example above jsmn creates tokens like: </p>
+
 <ul>
 <li>Object [0..31]</li>
 <li>String [3..7], String [12..16], String [20..23]</li>
 <li>Number [27..29].</li>
 </ul>
+
 <p>Every jsmn token has a type which is one of the following:</p>
+
 <ul>
 <li>Object - a container of key-value pairs, e.g.:
-    <code>{ "foo":"bar", "x":0.3 }</code></li>
+<code>{ "foo":"bar", "x":0.3 }</code></li>
 <li>Array - a sequence of values, e.g.:
-    <code>[ 1, 2, 3 ]</code></li>
+<code>[ 1, 2, 3 ]</code></li>
 <li>String - a quoted sequence of chars, e.g.: <code>"foo"</code></li>
 <li>Primitive - a number, a boolean (<code>true</code>, <code>false</code>) or <code>null</code></li>
 </ul>
+
 <p>Besides start/end positions, jsmn tokens for complex types (like arrays
 or objects) also contain a number of child items, so you can easily follow
 object hierarchy.</p>
+
 <p>This approach provides enough information for parsing any JSON data and makes
 it possible to use zero-copy techniques.</p>
+
 <h2>Install</h2>
+
 <p>To clone the repository you should have mercurial installed. Just run:</p>
+
 <pre><code>$ hg clone http://bitbucket.org/zserge/jsmn jsmn
 </code></pre>
+
 <p>Repository layout is simple: jsmn.c and jsmn.h are library files; demo.c is an
 example of how to use jsmn (it is also used in unit tests); test.sh is a test
 script. You will also find README, LICENSE and Makefile files inside.</p>
+
 <p>To build the library, run <code>make</code>. It is also recommended to run <code>make test</code>.
 Let me know, if some tests fail.</p>
+
 <p>If build was successful, you should get a <code>libjsmn.a</code> library.
 The header file you should include is called <code>"jsmn.h"</code>.</p>
+
 <h2>API</h2>
+
 <p>Token types are described by <code>jsmntype_t</code>:</p>
+
 <pre><code>typedef enum {
     JSMN_PRIMITIVE = 0,
     JSMN_OBJECT = 1,
@@ -109,15 +138,19 @@ The header file you should include is called <code>"jsmn.h"</code>.</p>
     JSMN_STRING = 3
 } jsmntype_t;
 </code></pre>
+
 <p><strong>Note:</strong> Unlike JSON data types, primitive tokens are not divided into
 numbers, booleans and null, because one can easily tell the type using the
 first character:</p>
+
 <ul>
 <li><code>'t', 'f'</code> - boolean </li>
 <li><code>'n'</code> - null</li>
 <li><code>'-', '0'..'9'</code> - number</li>
 </ul>
+
 <p>Token is an object of <code>jsmntok_t</code> type:</p>
+
 <pre><code>typedef struct {
     jsmntype_t type; /* Token type */
     int start;       /* Token start position */
@@ -125,77 +158,104 @@ first character:</p>
     int size;        /* Number of child (nested) tokens */
 } jsmntok_t;
 </code></pre>
+
 <p><strong>Note:</strong> string tokens point to the first character after
 the opening quote and the previous symbol before final quote. This was made 
 to simplify string extraction from JSON data.</p>
+
 <p>All job is done by <code>jsmn_parser</code> object. You can initialize a new parser using:</p>
+
 <pre><code>jsmn_parser parser;
 
 jsmn_init_parser(&amp;parser);
 </code></pre>
+
 <p>This will initialize (or reset) the parser.</p>
+
 <p>Later, you can use <code>jsmn_parse()</code> function to process JSON string with the 
 parser:</p>
+
 <pre><code>jsmntok_t tokens[256];
 const char *js;
 js = ...;
 
 r = jsmn_parse(&amp;parser, js, tokens, 256);
 </code></pre>
+
 <p>If something goes wrong, you will get an error returned by <code>jsmn_parse()</code>. 
 Return value will be one of these:</p>
+
 <ul>
 <li><code>JSMN_SUCCESS</code> - everything went fine. String was parsed</li>
 <li><code>JSMN_ERROR_INVAL</code> - bad token, JSON string is corrupted</li>
 <li><code>JSMN_ERROR_NOMEM</code> - not enough tokens, JSON string is too large</li>
 <li><code>JSMN_ERROR_PART</code> - JSON string is too short, expecting more JSON data</li>
 </ul>
+
 <p>If you get <code>JSON_ERROR_NOMEM</code>, you should re-allocate more tokens and call
 <code>jsmn_parse</code> once again. If you read JSON data from the stream, you can
 periodically call <code>jsmn_parse</code> and check if return value is not 
 <code>JSON_ERROR_PART</code> - this will indicate the end of the JSON data.</p>
+
 <p>jsmn stores the offsets inside parser structure, not pointers.
 It means you can use realloc() to get more tokens, or reallocated your
 <code>js</code> string when more data arrives.</p>
+
 <h2>Non-strict mode</h2>
+
 <p>By default jsmn is working in a non-strict mode. It allows you to use it for 
 other useful formats that JSON. In non-struct mode jsmn accepts:</p>
+
 <ul>
 <li>non-quoted primitive values other than true/false/null/numbers</li>
 <li>only primitive values without a root object</li>
 </ul>
+
 <p>It means the following text will be valid for jsmn:</p>
+
 <pre><code>server: example.com
 post: 80
 message: "hello world"
 </code></pre>
+
 <p>Looks like a config file, right? 
 And this is how you can use jsmn to parse JavaScript code:</p>
+
 <pre><code>{
     server: "example.com",
     post: 80,
     message: "hello world"
 }
 </code></pre>
+
 <p>To switch to strict mode you should define <code>JSMN_STRICT</code> preprocessor variable.</p>
+
 <h2>Parent links</h2>
+
 <p>In the <a href="http://lionet.livejournal.com/118853.html">benchmark</a> jsmn have shown pretty good results for small objects
 (~4KB).  But for large objects it was terribly slow. This can be fixed by
 storing links to the parent nodes. You will loose about 4 bytes per token, but
 speed will be much higher (by the way, after this little hack jsmn seems to be
 <strong>the fastest</strong> parser in that benchmark).</p>
+
 <p>To enable parent links you should define <code>JSMN_PARENT_LINKS</code> before compiling
 jsmn. </p>
+
 <h2>Links</h2>
+
 <p>There are several posts about jsmn around the web:</p>
+
 <ul>
 <li><a href="http://lionet.livejournal.com/118853.html">A comparison and microbenchmark of JSON parsers</a> (in Russian)</li>
 <li><a href="http://alisdair.mcdiarmid.org/2012/08/14/jsmn-example.html">jsmn example, or parsing JSON with C</a></li>
 <li><a href="http://news.ycombinator.com/item?id=4386834">Hacker News post</a></li>
 <li><a href="http://stackoverflow.com/questions/10674575/parse-json-in-ansi-c">Stack Overflow answer on parsing JSON with ANSI C</a></li>
 </ul>
+
 <h2>Other info</h2>
+
 <p>This software is distributed under <a href="http://www.opensource.org/licenses/mit-license.php">MIT license</a>
  so feel free to integrate it in your commercial products.</p>
 	</body>
 </html>
+

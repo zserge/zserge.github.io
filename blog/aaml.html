@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>AAML - another android markup language</title>
+		<title> AAML - another android markup language </title>
 		<meta name="description" content="writing android XMLs is easy now" />
-		<meta name="keywords" content="zserge, minimalism, unix, embedded" />
+		<meta name="keywords" content="" />
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/style.css" />
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
 		<script type="text/javascript">
 
 			var _gaq = _gaq || [];
@@ -30,23 +30,32 @@
 				<li><a href="/blog.html">blog</a></li>
 			</ul>*/
 		</div>
-		<h1>AAML - another android markup language</h1>
+		
+<h1>AAML - another android markup language</h1>
+
 <p>Sometimes I do android apps development. I use terminal, tmux and vim - no
 Eclipse, no IntelliJ Idea or other IDEs.</p>
+
 <p>What I don't like in android development is XMLs. It's a lot of typing, and I
 don't like to type a lot. So, here's my attempt to make it easier for those
 who use minimal tools for android development. Maybe it would work for Eclipse,
 too.</p>
+
 <h2>Goals</h2>
+
 <ul>
 <li>Simple syntax: minimal punctuation, no closing tags</li>
 <li>Should suit for most XMLs: layouts, values, strings etc.</li>
 <li>Should have macros support to extend language and to define variables</li>
 <li>Should work on Linux, Macs and probably Windows</li>
 </ul>
+
 <h2>Example</h2>
+
 <p>A piece of code paints a thousand words.</p>
+
 <p>Here's AAML markup you edit manually:</p>
+
 <pre><code>:LinearLayout layout fill, padding 0dp 16dp, orientation vertical
         :EditText
                 layout fill wrap
@@ -63,7 +72,9 @@ too.</p>
                 gravity right
                 text @string/send
 </code></pre>
+
 <p>And here's what you get after converting it to XML:</p>
+
 <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
@@ -95,27 +106,37 @@ too.</p>
                 android:text="@string/send" /&gt;
 &lt;/LinearLayout&gt;
 </code></pre>
+
 <p>Sounds easy, right?</p>
+
 <h2>Implementation</h2>
+
 <p>I've picked Python 3 to write AAML converter (though with python2 it seems to
 be working, too). Basically, AAML has three parts: reader, processor and writer.</p>
+
 <p>Reader is simple: everything that starts with a colon is a new element.
 Indentation level allows to nest elements.  Next, element attributes are comma
 separated and comma is automatically inserted after the end-of-line.  Normally
 the first word in the element is tag name, you should not use newline or comma
 to separate it form the element attributes. That's the whole syntax of AAML.</p>
+
 <p>Writer is simple, too. It just pretty-prints all elements.</p>
+
 <p>Processor expands aliases and macros.</p>
+
 <p>Alias is a single word that is substituted by another word. Useful for defining variables.</p>
+
 <p>Macro is a bit more complex. It has a name and a list of arguments. When
 expanded, first all arguments are expanded (if they are aliases), then a
 suitable macro is looked up in the environment and processed.</p>
+
 <p>Here's how it looks like. To define a macro use <code>def</code> tag (yeah, <code>def</code> is a
 keyword, you can't make an XML element called <code>def</code>). Then you write macro name
 and a number of arguments it supports. Macros can be overloaded, but no support
 for variable number of parameters so far. Then you write macro body. You can
 refer to macro parameters as positional arguments, e.g. <code>$1</code>, <code>$2</code> etc.
 Here's an example of some layout macros:</p>
+
 <pre><code># Aliases
 :def fill fill_parent
 :def wrap match_parent
@@ -132,16 +153,21 @@ Here's an example of some layout macros:</p>
 :TextView
     layout fill match 1
 </code></pre>
+
 <p>There are two more things to mention. Comments are allowed, but should take a
 separate line and start with <code>#</code>. Also, as you use android:id frequently, you
 can use syntax sugar like <code>TextView#my_text</code> to define a new id <code>my_text</code> (as
 an alternative to <code>TextView id "@+id/my_text"</code>).</p>
+
 <h2>Usage</h2>
+
 <p>You can get the sources at
 <a href="https://bitbucket.org/zserge/aaml">https://bitbucket.org/zserge/aaml</a>.
 You need Python to run it. No other dependencies required. If you use Vim there
 is also a tiny syntax highlighting script included (see <code>aaml.vim</code>).</p>
+
 <p>You can process either files or directories, like:</p>
+
 <pre><code># Read from stdin and write to stdout
 $ aaml - -
 # Convert one file
@@ -150,8 +176,10 @@ $ aaml my_layout.aaml my_layout.xml
 # in the directory res
 $ aaml aaml res
 </code></pre>
+
 <p>You can always use <code>custom_rules.xml</code> to build XMLs from aaml files
 automatically with <code>ant debug</code> or <code>ant release</code>:</p>
+
 <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;project&gt;
     &lt;target name="-pre-build"&gt;
@@ -162,16 +190,19 @@ automatically with <code>ant debug</code> or <code>ant release</code>:</p>
     &lt;/target&gt;
 &lt;/project&gt;
 </code></pre>
+
 <p>No need to say that it's pretty much unstable yet and has issues. So, you are
 welcome to report them.</p>
+
 <p>Volunteers needed to add more syntax highlighting modules for Sublime Text,
 Emacs and other popular editors, to suggest standard macros for android
 development and to do testing.</p>
-<p>AAML is free software and distributed under MIT license.</p>
-<p>Posted on 2013-04-02 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
-<div id="disqus_thread"></div>
 
-<script type="text/javascript">
+<p>AAML is free software and distributed under MIT license.</p>
+
+<p>Posted on 2013-04-02 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
         var dsq = document.createElement('script');
@@ -180,9 +211,10 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script>
+    </script></p>
 
 <noscript>
 </noscript>
 	</body>
 </html>
+
