@@ -81,8 +81,8 @@ where to render page title, description, keywords, content:</p>
 <p>Content pages are mostly written in Markdown and consist of two parts: header
 and body. Header defines a list of page variables, like title, description
 etc. Body is a markdown text that can include <code>&lt;% ... %&gt;</code> tags to define custom
-logic. Tag can be either a page variable (like in layout tempaltes) or a shell
-function or command:</p>
+logic. Tag can be either a page variable (like in layout templates) or a shell
+function/command:</p>
 
 <pre><code>title: Test page
 description: My test page geneated with Stash
@@ -136,9 +136,9 @@ date:  18 Jul 2013   =&gt;   export page_date='18 Jul 2013'
 <p>Next, when parsing body the idea is to generate <code>printf</code> and <code>echo</code> statements
 for every piece of text and raw shell commands for every <code>&lt;% .. %&gt;</code> tag:</p>
 
-<pre><code># Title              =&gt;   echo '# Title'
+<pre><code># Title              =&gt;   printf '# Title'
 Hello world. Today is &lt;% date %&gt;.
-                     =&gt;   echo 'Hello world. Today is '; date
+                     =&gt;   printf 'Hello world. Today is '; date
 </code></pre>
 
 <p>Statements are now separated with semicolons, which brings some unobvious limitations:</p>
@@ -146,17 +146,17 @@ Hello world. Today is &lt;% date %&gt;.
 <pre><code>This won't work (semicolons after "do" are not allowed):
 
 &lt;% for i in $(seq 1 10) ; do %&gt; Foo &lt;% echo $i %&gt; &lt;% done %&gt;
-for i in $(seq 1 10) ; do ; echo Foo ; echo $i ; done
+for i in $(seq 1 10) ; do ; printf 'Foo' ; echo $i ; done
 
 This will work:
 
 &lt;% for i in $(seq 1 10) ; do true %&gt; Foo &lt;% echo $i %&gt; &lt;% done %&gt;
-for i in $(seq 1 10) ; do true ; echo Foo ; echo $i ; done
+for i in $(seq 1 10) ; do true ; printf 'Foo' ; echo $i ; done
 </code></pre>
 
 <p>Also beware of semicolons in the end of tag:</p>
 
-<pre><code>&lt;% date; %&gt;
+<pre><code>&lt;% date ; %&gt;
 will be converted to
 date ;;
 and ";;" is an invalid token here
@@ -168,7 +168,7 @@ No need to say that NEVER EVER generate such sites:</p>
 <pre><code>Hello &lt;% sudo rm -rf /usr %&gt; world
 </code></pre>
 
-<p>So, to sum up the whole beauty of this approach here's a long way a page goes
+<p>So, to sum up the whole beauty of this approach here is a long way a page goes
 during generation:</p>
 
 <pre><code>Page -&gt; Shell -&gt; AWK -&gt; Shell -&gt; eval -&gt; Markdown -&gt; HTML
