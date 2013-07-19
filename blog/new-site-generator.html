@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title> moved to new static site generator </title>
+		<meta name="description" content="self done is well done" />
+		<meta name="keywords" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33644825-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		 </script>
+	</head>
+	<body>
+		<div class='menu'>/*
+			<ul class='menu'>
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+			</ul>*/
+		</div>
+		
+<h1>moved to new static site generator</h1>
+
+<p>This website has been powered by <a href="https://bitbucket.org/obensonne/poole">poole</a> for a long time.
+I don't think I have any real reasons to migrate from poole.</p>
+
+<p>Do you know there are static site generators written in UNIX Shell?
+I think it's a good choice for old-school programmers, who
+feel uncomfortable with Ruby, Python and even Node.js.</p>
+
+<p>All that shell madness started with <a href="http://werc.cat-v.org/">werc</a>, a nice tool used by
+<a href="http://suckless.org/">suckless</a> and <a href="http://cat-v.org/">cat-v</a>. Then <a href="http://nibble.develsec.org/projects/sw.html">sw</a> appeared.</p>
+
+<p>I just made another one static site generator in pure UNIX Shell.
+I called it "Sta.sh". This website is now generated with Stash.</p>
+
+<h2>installation</h2>
+
+<pre><code>hg clone https://bitbucket.org/zserge/stash
+</code></pre>
+
+<h2>usage</h2>
+
+<p>Stash is a single script. For the minimal setup the following files should be
+created:</p>
+
+<pre><code>.
+|-- sta.sh
+`-- src
+    |-- index.md
+    `-- layouts
+        `-- default.html
+</code></pre>
+
+<p>Here <code>default.html</code> is a layout template. You can use <code>&lt;% .. %&gt;</code> tags to specify
+where to render page title, description, keywords, content:</p>
+
+<pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt; &lt;%title%&gt; &lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;% content %&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Content pages are mostly written in Markdown and consist of two parts: header
+and body. Header defines a list of page variables, like title, description
+etc. Body is a markdown text that can include <code>&lt;% ... %&gt;</code> tags to define custom
+logic. Tag can be either a page variable (like in layout tempaltes) or a shell
+function or command:</p>
+
+<pre><code>title: Test page
+description: My test page geneated with Stash
+author: Serge Zaitsev
+keywords: stash, static site, generator
+
+# &lt;% title %&gt;
+
+This is a test page. Today is &lt;% date %&gt;.
+
+Generated with [Sta.sh](http://bitbucket.org/zserge/stash) site generator.
+</code></pre>
+
+<p>Now if you run <code>sta.sh</code> you'll get a rendered page src.static/index.html:</p>
+
+<pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt; Test page &lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Test page&lt;/h1&gt;
+    &lt;p&gt;This is a test page. Today is Fri Jul 19 11:52:54 EEST 2013.&lt;/p&gt;
+    &lt;p&gt;Generated with &lt;a href="http://bitbucket.org/zserge/stash"&gt;Sta.sh&lt;/a&gt; site generator.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2>customization</h2>
+
+<p>Stash loads custom.sh script on start and allows you to easily extend it.
+Every function defined in custom.sh can be called from within <code>&lt;% ... %&gt;</code> tags.</p>
+
+<p>Also, there are special "hook" functions: <code>ongen</code> and <code>onexit</code>. The first one
+is called for every page generated, and the second one is called after the
+whole site is processed allowing you to cleanup everything.</p>
+
+<p>I used "hooks" to build a list of blog pages with <code>ongen</code> and then render that
+list into a single blog index page in <code>onexit</code>.</p>
+
+<h2>how it works</h2>
+
+<p>Inside it's ugly. Yet simple. Pages are parsed with AWK. AWK produces shell
+script that generates markdown when executed. During parsing every page
+variable is converted into <code>export</code> statement:</p>
+
+<pre><code>title: Hello world   =&gt;   export page_title='Hello world'
+date:  18 Jul 2013   =&gt;   export page_date='18 Jul 2013'
+</code></pre>
+
+<p>Next, when parsing body the idea is to generate <code>printf</code> and <code>echo</code> statements
+for every piece of text and raw shell commands for every <code>&lt;% .. %&gt;</code> tag:</p>
+
+<pre><code># Title              =&gt;   echo '# Title'
+Hello world. Today is &lt;% date %&gt;.
+                     =&gt;   echo 'Hello world. Today is '; date
+</code></pre>
+
+<p>Statements are now separated with semicolons, which brings some unobvious limitations:</p>
+
+<pre><code>This won't work (semicolons after "do" are not allowed):
+
+&lt;% for i in $(seq 1 10) ; do %&gt; Foo &lt;% echo $i %&gt; &lt;% done %&gt;
+for i in $(seq 1 10) ; do ; echo Foo ; echo $i ; done
+
+This will work:
+
+&lt;% for i in $(seq 1 10) ; do true %&gt; Foo &lt;% echo $i %&gt; &lt;% done %&gt;
+for i in $(seq 1 10) ; do true ; echo Foo ; echo $i ; done
+</code></pre>
+
+<p>Also beware of semicolons in the end of tag:</p>
+
+<pre><code>&lt;% date; %&gt;
+will be converted to
+date ;;
+and ";;" is an invalid token here
+</code></pre>
+
+<p>I'm sure there are much more pitfalls, so do everything with extreme care.
+No need to say that NEVER EVER generate such sites:</p>
+
+<pre><code>Hello &lt;% sudo rm -rf /usr %&gt; world
+</code></pre>
+
+<p>So, to sum up the whole beauty of this approach here's a long way a page goes
+during generation:</p>
+
+<pre><code>Page -&gt; Shell -&gt; AWK -&gt; Shell -&gt; eval -&gt; Markdown -&gt; HTML
+</code></pre>
+
+<h2>summary</h2>
+
+<p>So, now there is one more static site generator in Shell. Less than 100 LOC,
+pure UNIX Shell, extensible, MIT-licensed. Enjoy!</p>
+
+<p>Posted on 2013-07-18 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script></p>
+
+<noscript>
+</noscript>
+	</body>
+</html>
+
