@@ -1,0 +1,75 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"><title>Compilers</title><link rel="stylesheet" type="text/css" href="fonts.css"><link rel="stylesheet" type="text/css" href="styles.css"></head><body><div id="main"><article><section class="title"><h1 style="font-size: 250px">COMPILERS</h1><h2>What I cannot build, I do not understand (R. Feynmann)</h2></section><section><h1>What and why?</h1><ul><li>Compilers, interpreters, translators</li><li>Pretty-printers, code highlighters</li><li>Code analyzers, debuggers, log parsers</li><li>Config generators, config parsers</li><li>Markup languages, macro processors</li></ul><p class="note">*) Making a general purpose language WILL result in a failure</p></section><section class="shout"><!--h1 Это интересно!--><h1>For fun!</h1></section><section><h1>You already did it!</h1><p>Reverse words in a string:</p><code>f("foo bar baz") &rarr; <b>"oof rab zab"</b></code><br><p>RPN calculator:</p><code>f("2 3 + 4 *") &rarr; <b>20</b></code><br><p>Brainfuck:</p><code>f("++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+<<<<-]&gt;++.&gt;+.+++++++..+++.&gt;++.<<+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.]") &rarr; <b>"hello world"</b>
+</code></section><section><h1>Components</h1><p>Interpreter:</p><code>Lexer &rarr; Parser &rarr; Semantic Analyzer &rarr; Interpreter</code><br><br><p>Compiler frontend:</p><code>Lexer &rarr; Parser &rarr; Semantic Analyzer &rarr; ...</code><br><p>Compiler backend:</p><code>... &rarr; Intermediate code generator &rarr; Optimizer &rarr; Code generator</code></section><section><h1>Lexical analyzer</h1><code><pre>class Lexer {
+ Lexer(InputStream input)
+ next(): void
+ peek(): Token
+}</pre></code><p>Input:</p><code>var s = "hello";</code><p>Output:</p><code>[VARIABLE]</code><code>[IDENTIFIER "s"]</code><code>[ASSIGNMENT]</code><code>[STRING "hello"]</code><code>[SEMICOLON]</code></section><section><h1>Syntax analyzer</h1><p>Input:</p><code>var s = f() + x.y;</code><p>Output:</p><pre>assign--localvar--"s"
+   |
+   `-add--field--"x"
+       |     |
+       |     `--"y"
+       |
+       `-call--"f"</pre></section><section><h1>Semantic analyzer</h1><p>Compile-time errors:</p><code>int x = y / 0;</code><p>Type safety:</p><code>int x = "hello";</code><code>double x = 5; int y = 2; float z = x + y;</code><p>Many other warnings/errors:</p><code>int x; if (...) { x = 5; }</code></section><section><h1>Grammar (booooooring)</h1><code> <pre>&lt;expr&gt;    ::= &lt;term&gt; | &lt;expr&gt; "+" &lt;term&gt;
+&lt;term&gt;    ::= &lt;factor&gt; | &lt;term&gt; "*" &lt;term&gt;
+&lt;factor&gt;  ::= &lt;const&gt; | &lt;var&gt; | "(" &lt;expr&gt; ")"
+&lt;var&gt;     ::= "x" | "y" | "z"
+&lt;const&gt;   ::= &lt;digit&gt; | &lt;digit&gt; &lt;const&gt;
+&lt;digit&gt;   ::= "0" | "1" | ... | "9"</pre></code><p>Input:</p><code>x+2*(y+42)</code><span>But not&nbsp;&nbsp;</span><code>x(42)</code><code>42(x)</code><code>x++</code><code>&lt;empty&gt;</code><p>Precedence:</p><code>2+3*4 &rarr; 14</code><code>3*4+2 &rarr; 14</code></section><section class="shout"><h1>Recursion rocks!</h1></section><section><h1>Operators: precedence and association</h1><p>For C89 (a very simple one, only 15 groups of operators):</p><p>Left-to-right:<code>()</code><code>[]</code><code>.</code><code>++</code><code>--</code></p><p>Right-to-left:<code>++</code><code>--</code><code>!</code><code>~</code><code>(&lt;type&gt;)</code><code>*</code><code>&amp;</code><code>sizeof</code></p><p>Left-to-right:<code>*</code><code>/</code><code>%</code></p><p>...</p><p>Right-to-Left:<code>=</code><code>+=</code><code>-=</code><code>*=</code>...</p></section><section class="shout"><h1>Math is hard</h1></section><section><h1>Best (IMHO) grammars</h1><p>Forth:</p><code>: square dup * . ; 5 square</code><p>Lisp:</p><code>(defun square (x) (* x x)) (square 5)</code><p>Tcl:</p><code><pre>proc square {x} {
+ expr {($x*$x)}
+}
+</pre></code></section><section><h1>Worst (IMHO) grammars</h1><p>Perl (can't be parsed except with Perl):<code>open F,shift; @code=grep{/[+-\.,\[\]><]/}split'',<F>; for(my$_=0;$_<@code;++$_){ $cpu[$i]++if$code[$_]eq'+';...</code></p><p>Fortran:<br><code>DO 99 I = 1.10</code><span>means &nbsp;</span><code>DO99I = 1.10;</code><br><code>DO 99 I = 1, 10 &lt;...&gt; 99</code><span>means &nbsp;</span><code>for (i = 1; i &lt; 10; i++);</code></p><p>Batch (.bat):<code>FOR	/F "eol=; tokens=2,3* delims=, " %i in (myfile.txt) do @echo %i %j %k</code></p></section><section class="shout"><h1>And the winner is</h1></section><section><h1>APL</h1><p>Game of Life:</p><code>life←{↑1 ⍵∨.∧3 4=+/,¯1 0 1∘.⊖¯1 0 1∘.⌽⊂⍵}</code><p>Sort words by length:</p><code>X[⍋X+.≠' ';]</code><p>First R prime numbers:</p><code>(~R∊R∘.×R)/R←1↓ιR</code></section><section><h1>Our language: GOTOHELL</h1><p>Example:</p><code><pre>&nbsp;&nbsp;x = 0
+.start
+&nbsp;&nbsp;print 'x equals' x
+&nbsp;&nbsp;if equals x 10 then goto end
+&nbsp;&nbsp;x = add x 1
+.end
+&nbsp;&nbsp;print 'done'</pre></code><p class="note">*) Inspired by...</p></section><section class="shout"><h1>Original BASIC!</h1></section><section><h1>Lexer design: tokens</h1><p>NUMBER <code>/[0-9]+/</code><br/>
+STRING <code>/'.*'/</code> (quotes are ignored) <br/>
+ID <code>/[a-zA-Z_][0-9a-zA-Z_]*/</code><br/>
+LABEL <code>/\.[a-zA-Z_][0-9a-zA-Z_]*/</code><br/></p><p class="note">*) "\n" and whitespace are not considered as tokens</p><p class="note">*) ID token is simplified ("if" and "then" are not valid IDs)</p></section><section data-demo-fn="demoLexer" class="demo"><h1>Lexer design: demo</h1><div class="demo-input"><textarea></textarea><div class="btn demo-btn">Go</div></div><div class="demo-output"></div></section><section><h1>Lexer design: summary</h1><p>Know your BNF grammar!</p><p>Think of lookahead, unicode, "\r\n", ...</p><p>Use flex, ANTLR, Ragel</p><br><ul><li>Regular expressions approach</li><li>State machines approach</li><li>Functional approach</li></ul></section><section><h1>Parser design: recursion</h1><p>Grammar: <code>E := E+E | E*E | id</code> Text: <code>x*y+z</code></p><ol class="pull-left"><li>E</li><li>E + E</li><li>E + id</li><li>E * E + id</li><li>E * id + id</li><li>id * id + id</li></ol><pre class="pull-right">       E
+     / | \
+    E  +  E
+  / | \   |
+ E  *  E  id
+ |     |
+ id    id</pre></section><section><h1>Parser design: recursion</h1><p>Grammar: <code>E := E+E | E*E | id</code> Text: <code>x*y+z</code></p><ol class="pull-left"><li>E</li><li>E + E</li><li>E * E + E</li><li>id * E + E</li><li>id * id + E</li><li>id * id + id</li></ol><pre class="pull-right">       E
+     / | \
+    E  +  E
+  / | \   |
+ E  *  E  id
+ |     |
+ id    id</pre></section><section><h1>Parser design: ambiguity</h1><p><code>x+y+z</code> can be <code>(x+y)*z</code> or <code>x+(y*z)</code></p><p>Another example: <code>if .. then ... if ... then ... else</code></p><p>Solution: use precedence, or rewrite grammar</p></section><section><h1>Parser design: top-down, recursive descent</h1><p>Generators: ANTLR, JavaCC</p><p>Top-down: start from top, go left-to-right</p><p>On each step: accept token or backtrack</p><p>Simple and general method</p><p>Other methods: bottom-up, shift-reduce</p></section><section><h1>Parsing Expression Grammar</h1><p>Same as top-down, but pick the first match</p><p>Eliminates ambiguity!</p><p><code>S ← 'if' C 'then' S 'else' S / 'if' C 'then' S</code></p><p>Unlimited lookahead!</p><p>Memory consumption :(</p></section><section><h1>PEG for GOTOHELL</h1><pre>start = line*
+line = label? statement? "\n"
+statement = if / call
+if = "if" call "then" call
+call = id "=" call
+     / id arg*
+     / arg
+arg = id / string / number</pre><p class="note">*) Simplified, not including whitespace and newline rules</p></section><section data-demo-fn="demoParser" class="demo"><h1>Parser design: demo </h1><div class="demo-input"><textarea class="demo-parser"></textarea><div class="btn demo-btn demo-parser">Go</div></div><div class="demo-output"></div></section><section><h1>Runtime: scope</h1><ul><li>Global</li><li>Static</li><li>Dynamic</li></ul><p>Think of garbage collection, memory management</p><p>Think of closures, accessing parent scope</p><p class="note">GOTOHELL: "Why bother with subroutines when you can type fast?"</p></section><section><h1>Runtime: stack machines</h1><p>Only storage is stack</p><p>Example: <code>func f(x, y) { return x+y; }; f(3, f(4, 5));</code></p><pre>[3]     lit 3
+[3 4]   lit 4
+[3 4 5] lit 5
+[3 9]   call f / add
+[12]    call f / add</pre><p class="note">*) Use accumulator as top of stack</p></section><section><h1>Runtime: optimizations</h1><p>Constant propagation <code>x = 2+3+4 &rarr; mov x,7</code></p><p>Unreachable/dead code elimination</p><p>Tail recursion</p><p>Inlining</p></section><section><h1>Runtime: Garbage collection</h1><p>Reference counter (linux kernel)</p><p>Stop-and-copy (early LISPs)</p><p>Mark-and-sweep (Java, Go, Lua, ...)</p></section><section><h1>Embedding</h1><p>API to call language (like <code>eval</code>)</p><p>API to be called back from language (extend language)</p><p>Low-level API for deep hacking</p><p>Lua is the absolute winner</p><p>Scheme is nice choice (TinyScheme, Guile)</p></section><section data-demo-fn="demoEval" class="demo"><h1>GOTOHELL: demo</h1><div class="demo-input"><textarea>lines = 5
+ i = 0
+.outer if eq lines i then goto end
+   k = 1
+   line = ' '
+   endk = minus lines i
+ .inner1
+     if eq k endk then goto endinner1
+     line = plus line '  '
+     k = plus k 1
+     goto inner1
+ .endinner1
+   k = 0
+   endk = i
+ .inner2
+     if less endk k then goto endinner2
+     line = plus line '  * '
+     k = plus k 1
+     goto inner2
+ .endinner2
+   print line
+   i = plus i 1
+   goto outer
+.end</textarea><div class="btn demo-btn">Go</div></div><pre class="demo-output"></pre></section><section><h1>GOTOHELL: summary</h1><p>Using PEG.js</p><p>Lexer: 28 LOC</p><p>Parser: 16 LOC</p><p>Runtime (if, assign, goto): 38 LOC of JavaScript</p><p>Extended runtime (print, plus, minus, eq, ...): 17 LOC of JavaScript</p><p>https://bitbucket.org/zserge/g2h/</p></section><section><h1>Hey, nerds!</h1><p>Dragon book</p><p>Let's write a compiler</p><p>Coursera.org - Compilers</p><p>Lambda the ultimate</p></section><section><h1>Hey, hackers!</h1><p>SmallC, PL/0, TinyBasic, CC500, CUCU</p><p>Forth, Retro, Io</p><p>Lua, LuaJIT, Squirrel</p><p>TinyScheme, jscheme by P. Norwig</p><p>tcc, llvm</p></section><section class="shout"><h1>Questions?</h1><br><br><p>Serge Zaitsev, http://zserge.com/</p></section></article></div><script src="bespoke.min.js"></script><script src="bespoke-progress.min.js"></script><script src="bespoke-hash.min.js"></script><script src="lexer.js"></script><script src="parser.js"></script><script src="talk.js"></script></body></html>
