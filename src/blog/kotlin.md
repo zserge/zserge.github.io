@@ -26,7 +26,7 @@ So far I've tried (tried, I never learnt these languages properly):
 
 This week I discovered Kotlin, a language made by JetBrains (guys making
 IntelliJ IDEA.  The history of Kotlin starts in 2010, but Android support was
-added in 2012. The ideas behing this language are to make it safer than Java
+added in 2012. The ideas behind this language are to make it safer than Java
 and faster/easier than Scala.
 
 As a demo app I was going to make a theremin-like app that played different
@@ -79,7 +79,7 @@ custom rules:
 
 I'm not good at Ant, but that works if `KOTLIN_HOME` environment variable is
 set correctly (it should point to the `kotlinc` folder). We use post-install
-hook, becauge R.java should be generated and compilerd before compiling kotlin
+hook, because R.java should be generated and compiled before compiling kotlin
 files.
 
 Then, copy Kotlin runtime from `$KOTLIN_HOME/libs` to your project `libs` directory.
@@ -104,7 +104,7 @@ So, let's write some Kotlin. Minimal activity example looks much like Java:
 	}
 
 Semicolons are not needed anymore, methods are functions inside classes,
-inherintance looks a bit different as well as super calls.
+inheritance looks a bit different as well as super calls.
 
 Interesting part here is `savedInstanceState : Bundle?`. Question mark means a
 null-safe type.  Also, parameter name is not recommended to be changed, since
@@ -255,7 +255,7 @@ array, and they are different.
 
 I haven't found a way how to declare a volatile variable.
 
-However, theoretical possibility to make domain-specifity functions and extreme
+However, theoretical possibility to make domain-specific functions and extreme
 flexibility of the language is really amazing.
 
 So, don't be afraid to try Kotlin, the more developers know about it, the
