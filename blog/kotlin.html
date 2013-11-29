@@ -57,7 +57,7 @@ wait for another minute waiting for my HelloWorld to compile.</li>
 
 <p>This week I discovered Kotlin, a language made by JetBrains (guys making
 IntelliJ IDEA.  The history of Kotlin starts in 2010, but Android support was
-added in 2012. The ideas behing this language are to make it safer than Java
+added in 2012. The ideas behind this language are to make it safer than Java
 and faster/easier than Scala.</p>
 
 <p>As a demo app I was going to make a theremin-like app that played different
@@ -111,7 +111,7 @@ custom rules:</p>
 
 <p>I'm not good at Ant, but that works if <code>KOTLIN_HOME</code> environment variable is
 set correctly (it should point to the <code>kotlinc</code> folder). We use post-install
-hook, becauge R.java should be generated and compilerd before compiling kotlin
+hook, because R.java should be generated and compiled before compiling kotlin
 files.</p>
 
 <p>Then, copy Kotlin runtime from <code>$KOTLIN_HOME/libs</code> to your project <code>libs</code> directory.
@@ -137,7 +137,7 @@ class Main(): Activity() {
 </code></pre>
 
 <p>Semicolons are not needed anymore, methods are functions inside classes,
-inherintance looks a bit different as well as super calls.</p>
+inheritance looks a bit different as well as super calls.</p>
 
 <p>Interesting part here is <code>savedInstanceState : Bundle?</code>. Question mark means a
 null-safe type.  Also, parameter name is not recommended to be changed, since
@@ -289,7 +289,7 @@ array, and they are different.</p>
 
 <p>I haven't found a way how to declare a volatile variable.</p>
 
-<p>However, theoretical possibility to make domain-specifity functions and extreme
+<p>However, theoretical possibility to make domain-specific functions and extreme
 flexibility of the language is really amazing.</p>
 
 <p>So, don't be afraid to try Kotlin, the more developers know about it, the
