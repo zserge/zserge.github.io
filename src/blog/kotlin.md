@@ -114,8 +114,8 @@ it's only a warning, so I decided to ignore it when default parameter name is
 meaningless.
 
 Build, install, run - all should work. Build process doesn't feel slow, but
-compiler output (warnings, errors) is a bit hard to read, since at the of the
-build logs there is a long stack trace if your code has errors, so I had to
+compiler output (warnings, errors) is a bit hard to read, since at the end of
+the build logs there is a long stack trace if your code has errors, so I had to
 scroll up to see actual error messages.
 
 ## Kotlin - Attack of the Clones
