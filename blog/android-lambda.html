@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title> Lambda support for Android </title>
+		<meta name="description" content="Bringing java 8 features to android platform" />
+		<meta name="keywords" content="android, lambda, jdk8, java 8, ant, retrolambda" />
+		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-33644825-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		 </script>
+	</head>
+	<body>
+		<div class='menu'>/*
+			<ul class='menu'>
+				<li><a href="/">home</a></li>
+				<li><a href="/projects.html">code</a></li>
+				<li><a href="/blog.html">blog</a></li>
+			</ul>*/
+		</div>
+		
+<h1>Lambda support for Android</h1>
+
+<p><em>Note: big thanks to orfjackal (Esko Luontola), the author of 
+<a href="https://github.com/orfjackal/retrolambda">Retrolambda</a>, for making it
+possible. I just used his tool to produce Android apk.</em></p>
+
+<p>So, you're jealous about new JDK8 upcoming to most Java developers except for
+you, Android coders? Then I have good news - there is a way to use lambdas in
+Android right now (<em>warning: it's still a hack</em>)!</p>
+
+<h2>But I already have local classes!</h2>
+
+<p>Lambdas are very similar to local classes you had since early days of Java. </p>
+
+<p>The code below looks familiar to every Android developer:</p>
+
+<pre><code>// defined in the SDK
+interface OnClickListener {
+    public void onClick(View v);
+}
+
+// your code
+mButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // do something here
+    }
+});
+</code></pre>
+
+<p>That's a bit annoying to write such a bloated code for every single
+asynchronous action (especially if you're using a plain text editor instead of
+an IDE).</p>
+
+<p>Now with Java 8 they introduce
+<a href="http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html">lambdas</a>
+that can be treated as syntax sugar for functional interfaces (interfaces with
+just one abstract method, in Java 8 interfaces may contrain non-abstract
+methods as well).</p>
+
+<p>The code above can be rewritten with lambdas:</p>
+
+<pre><code>mButton.setOnClickListener((View v) -&gt; {
+    // do something here
+});
+</code></pre>
+
+<p>If there is just one statement inside the method then the braces can be omitted.
+Also, if you refer to some variables outside the functional method - no need to
+mark them as <code>final</code> anymore.</p>
+
+<h2>but android supports only Java 6/7</h2>
+
+<p>Java 7 support was added in the KitKat SDK (well, still no support
+for <code>invokedynamic</code> instruction in Dalvik and ART). So, to achieve Java 8
+support we need to backport our code at least to Java 7.</p>
+
+<p>We'll use retrolambda tool to convert our Java 8 compiled classes into Java 7
+bytecode that <code>dx</code> can correctly process.</p>
+
+<h2>setup JDK</h2>
+
+<p>If you're already running JDK8 - you can skip this part. Otherwise, download the
+latest <a href="https://jdk8.java.net/download.html">JDK8</a> and unpack it somewhere.</p>
+
+<p>Modify your Java environment variables to point to the new JDK (e.g.
+<code>$JAVA_HOME</code>, <code>$JDK_HOME</code> etc) and add <code>bin</code> directory to <code>$PATH</code>.</p>
+
+<p>Ensure you're running Java 8:</p>
+
+<pre><code>$ java -version
+$ javac -version
+</code></pre>
+
+<p>Next, install Ant of version 1.9.1 or newer (with added support of JDK8). You
+may install it into separate folder and add <code>bin</code> subdirectory to <code>$PATH</code>.</p>
+
+<p>Download <a href="https://oss.sonatype.org/content/groups/public/net/orfjackal/retrolambda/retrolambda/1.1.2/">retrolambda-1.1.2.jar</a>
+or newer.</p>
+
+<p>Copy some useful classes from JRE8 runtime. I don't know if that can be done
+automatically somehow. I unpacked them to a directory and packed it back into
+jar. These files are needed only at the compilation stage, they are not
+included into the final apk:</p>
+
+<pre><code>$ unzip -x &lt;path to JDK8&gt;/jre/lib/rt.jar java/lang/invoke/\*
+$ jar cvf rt8.jar java
+</code></pre>
+
+<p>Put <code>rt8.jar</code> and <code>retrolambda.jar</code> into your android project directory.</p>
+
+<p>Modify <code>ant.properties</code> file inside your android project adding these lines:</p>
+
+<pre><code>java.target=1.8
+java.source=1.8
+java.compiler.classpath=rt8.jar
+</code></pre>
+
+<p>Here we tell to produce Java 8 code and to include rt8.jar into the classpath.</p>
+
+<p>Create <code>custom_rules.xml</code>:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project&gt;
+    &lt;target name="-post-compile"&gt;
+        &lt;exec executable="java"&gt;
+            &lt;arg value="-Dretrolambda.inputDir=${out.classes.absolute.dir}" /&gt;
+            &lt;arg value="-Dretrolambda.classpath=${out.classes.absolute.dir}:${project.target.android.jar}" /&gt;
+            &lt;arg value="-Dretrolambda.bytecodeVersion=50" /&gt;
+            &lt;arg value="-javaagent:retrolambda.jar" /&gt;
+            &lt;arg value="-jar" /&gt;
+            &lt;arg value="retrolambda.jar" /&gt;
+        &lt;/exec&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre>
+
+<p>Here we add retrolambda processing of the compiled classes before <code>dx</code>-ing
+them.</p>
+
+<p>I used <code>&lt;exec&gt;</code> task, because <code>&lt;java&gt;</code> task put <code>-jar</code> option in the first
+place, but retrolambda requires it to be last argument. Maybe that can be fixed
+somehow, I'm pretty bad at Ant.</p>
+
+<p>Try using lambdas in your code. By the way, I got some other cool things
+working, too:</p>
+
+<pre><code>package com.example.lambda;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        int x = 42;
+        runOnUiThread(() -&gt; {
+            Log.d("MainActivity", "Hello from lambda! x = " + x);
+        });
+
+        try {
+            if (false) {
+                throw new NullPointerException();
+            } else { 
+                throw new InterruptedException();
+            }
+        } catch (NullPointerException|InterruptedException e) {
+            // Multiple exceptions work!
+            Log.e("MainActivity", "Exception: ", e);
+        }
+
+        String s = "fo" + "o";
+
+        // Switch/case for strings works!
+        switch (s) {
+            case "foo":
+                Log.d("MainActivity", "s = foo");
+                break;
+            case "bar":
+                Log.d("MainActivity", "s = bar");
+                break;
+        }
+    }
+}
+</code></pre>
+
+<p>Finally, do <code>ant debug</code> and see if it works.</p>
+
+<p>For those who is using AIDE there is a <a href="https://github.com/evant/gradle-retrolambda">gradle plugin</a>
+that does pretty much the same.</p>
+
+<p>Also, there was another <a href="https://bitbucket.org/tvernum/syntactic/wiki/ConvertingJava8To7">tool</a>
+to convert Java 8 sources, but lambdas are supported only in variable
+declaration. Maybe that can be improved somehow to support lambdas properly.</p>
+
+<p>Anyway, I hope you find it useful and I hope that one day Android will get official
+support for many Java niceties, like <code>invokedynamic</code> or Java 8 features.</p>
+
+<p>Posted on 2014-01-09 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script></p>
+
+<noscript>
+</noscript>
+	</body>
+</html>
+
