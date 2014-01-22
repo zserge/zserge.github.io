@@ -1,5 +1,6 @@
 title: cucu: a compiler you can understand (3/3)
 description: Compilers is fun. Want to write your own one?
+keywords: compiler, programming, C, smallC, easy, tiny, small, tutorial, parser, code, generate, virtal machine
 date: 2012-10-25
 
 Let's talk about compiler backends. C should be a portable language, and there

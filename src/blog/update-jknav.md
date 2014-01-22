@@ -1,5 +1,6 @@
 title: new project: jknav
 description: my attempt to jk-navigation in browsers
+keywords: j/k, jk, vim, nagivation, chrome, plugin, extension, scroll
 date: 2012-11-30
 
 # <% title %>

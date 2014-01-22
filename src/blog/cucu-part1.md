@@ -1,5 +1,6 @@
 title: cucu: a compiler you can understand (1/3)
 description: Compilers is fun. Want to write your own one?
+keywords: compiler, programming, C, smallC, easy, tiny, small, tutorial, lexer
 date: 2012-10-23
 
 cucu: a compiler you can understand (part&nbsp;1)

@@ -1,5 +1,6 @@
 title: textizer: hack your android widgets
 description: Never thought of writing your own android widget?
+keywords: android, home screen, widget, text, minimalism, weather, clock, DIY, hack
 date: 2012-08-25
 
 # <% title %>

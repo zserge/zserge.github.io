@@ -1,5 +1,6 @@
 title: AAML - another android markup language
 description: writing android XMLs is easy now
+keywords: android, xml, markup, language, layout, macros, variables, less
 date: 2013-04-02
 
 # <% title %>

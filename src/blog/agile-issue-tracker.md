@@ -1,5 +1,6 @@
 title: my minimalistic agile issue tracker
 description: Ever been frustrated by monstrous issue trackers?
+keywords: issue tracker, google docs, google drive, minimal
 date: 2012-08-02
 
 # <% title %>
