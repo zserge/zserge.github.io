@@ -5,9 +5,8 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Tue, 04 Feb 2014 16:42:30 +0200</pubDate>
-<lastBuildDate>Tue, 04 Feb 2014 16:42:30 +0200</lastBuildDate>
-<item><title>Lemur - a lovely monkey (UI automation) </title><link>http://zserge.com/blog/lemur.html</link><description> simple UI automation and testing tool for android written in Lua</description><pubDate>Tue, 04 Feb 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/lemur.html</guid></item>
+<pubDate>Thu, 27 Feb 2014 16:31:29 +0200</pubDate>
+<lastBuildDate>Thu, 27 Feb 2014 16:31:29 +0200</lastBuildDate>
 <item><title>Lambda support for Android </title><link>http://zserge.com/blog/android-lambda.html</link><description> Bringing java 8 features to android platform</description><pubDate>Thu, 09 Jan 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-lambda.html</guid></item>
 <item><title>kotlin - a new hope </title><link>http://zserge.com/blog/kotlin.html</link><description> A new language for Android coding</description><pubDate>Thu, 28 Nov 2013 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/kotlin.html</guid></item>
 <item><title>moved to new static site generator </title><link>http://zserge.com/blog/new-site-generator.html</link><description> self done is well done</description><pubDate>Thu, 18 Jul 2013 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/new-site-generator.html</guid></item>

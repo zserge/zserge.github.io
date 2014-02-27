@@ -11,11 +11,9 @@ So, what a library of 1K in size can offer?
 
 ## Minimal assertion
 
-Simple tests with only one assertion type
+Simple tests with only one assertion type and one helpfer function
 
-## Minimal asynchrony
-
-
+## Minimal async tests
 
 ## Minimal spies
 

@@ -1,0 +1,247 @@
+<!DOCTYPE html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width"><title>Go vs Rust</title><link rel="stylesheet" type="text/css" href="fonts.css"><link rel="stylesheet" type="text/css" href="styles.css"></head><body><div id="main"><article><section class="title"><div> <h1>КТО НА ЧТО Go/Rust?</h1><h2>There are only two kinds of programming languages: <br/>those people always bitch about and those nobody uses</h2></div></section><section><h1 class="orange">System programming is broken</h1><ul class="serif"><li>"C is not a high-level language." — Kernighan</li><li>"Fifty years of programming language research, and we end up with C++?"</li><li>"A programming language is low level when its programs require attention to the irrelevant"</li><li>"C - a language which combines the flexibility of assembly language with the power of assembly language"</li></ul></section><section><h1 class="orange">Programming in the large is mostly broken</h1><p> Some people, when confronted with a problem, think...</p><ul class="serif"><li>"I know, I'll use regular expressions." Now they have two problems.</li><li>"I know, I'll use multithreading." Nothhw tpe yawrve o oblems.</li><li>"I know, I'll use Java." Now they have ProblemFactory.</li><li>"I know, I'll use mutexes." Now they have </li><li>"I know, I'll use LISP." And they are never heard from again</li></ul></section><section><h1 class="green">Go (http://golang.org)</h1><p>Developed in: Google, since 2009</p><p>License: BSD-style</p><p>People: Rob Pike, Ken Thompson, Rus Coxx, Brad Fitzpatrik</p><p>Current release: Go 1.3 (stable API since Go 1)</p><p>Go 1 is a stable platform for the growth of programs and projects written in Go.  It is intended that programs written to the Go 1 specification will continue to compile and run correctly, unchanged, over the lifetime of that specification. </p></section><section><h1 class="green">Rust (http://rust-lang.org)</h1><p>Developed in: Mozilla, since 2009</p><p>License: dual MIT/Apache 2 license</p><p>People: Graydon Hoare</p><p>Current release: Rust 0.9 (not stable yet)</p><p>Hey, listen! Rust is alpha-level software with many known bugs, incomplete features and planned future changes. Use at your own risk, expect some instability, disruption and source-level incompatibility for a while yet.</p></section><section><h1 class="orange">Getting started. Building from sources</h1><div class="half delim"><p>Go: 0h16m (old dual-core CPU)</p><p>Binaries are available as well <i>(Windows, Darwin, i386, amd64, arm)</i></p><p>Cross-compiling Go takes 1-2 minutes</p><p>Alternative implementation - gccgo.</p></div><div class="half"><p>Rust: 6h30m, &gt;1.5G RAM is needed</p><p>There is an installer (*.exe) for Windows</p><p>Uses LLVM, cross-compiling is possible</p></div></section><section><h1 class="green">Well-known projects</h1><div class="half delim"><p>Go projects mostly hosted on Google Code and Bitbucket</p><ul><li>Docker</li><li>Martini, Ravel (web frameworks)</li><li>Lime (Sublime clone)</li><li>Otto (js engine)</li></ul></div><div class="half"><p>Rust projects are mostly on Github</p><ul><li>Rustc (Rust compiler)</li><li>Servo (Mozilla engine)</li><li>Zero.rs/Rustboot</li><li>q3</li></ul></div></section><section><h1>Hello world</h1><div class="third"><code class="lang rust"><pre>// C
+#include &lt;stdio.h&gt;
+int main() {
+ printf("hello!\n");
+ return 0;
+}</pre></code></div><div class="third"><code class="lang go"><pre>// Go
+package main
+func main() {
+ println("hello!")
+}</pre></code></div><div class="third"><code class="lang rust"><pre>// Rust
+pub fn main() {
+  println("hello!");
+}</pre></code></div><ul><li>C (gcc): 5 sec / 870 kB / 0.03 sec</li><li>Go: 4 sec / 511 kB / 0.08 sec</li><li>Rust: 9.5 sec / 1897 kB / 0.13 sec</li></ul></section><section><h1>Basic syntax: Add/Sub</h1><div><code class="half lang go">func AddSub(x, y int) (int, int) {
+ return x+y, x-y;
+}
+a, b := AddSub(5, 3)
+</code><code class="half lang rust">fn add_sub(x: int, y: int) -> (int, int) {
+ return (x + y, x - y);
+}
+let (a, b) = add_sub(5, 3);</code></div></section><section><h1>Basic syntax: FizzBuzz</h1><div><code class="half lang go">package main
+
+import "fmt"
+
+func main() {
+ for i := 1; i <= 100; i++ {
+  switch {
+   case i%15==0:
+    fmt.Println("FizzBuzz")
+   case i%3==0:
+    fmt.Println("Fizz")
+   case i%5==0:
+    fmt.Println("Buzz")
+   default: 
+    fmt.Println(i)
+  }
+ }
+}</code><code class="half lang rust">fn main() {
+ for num in 
+  std::iter::range_inclusive(1, 100) {
+  println(
+    match (num % 3 == 0, num % 5 == 0) {
+    (false, false) => num.to_str(),
+    (true, false) => ~"Fizz",
+    (false, true) => ~"Buzz",
+    (true, true) => ~"FizzBuzz"
+  }
+  );
+ }
+}</code></div></section><section><h1>Basic syntax: Sum/Product of an array</h1><div><code class="half lang go">package main
+
+import "fmt"
+
+func main() {
+ arr := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+ sum, prod := 0, 1
+ for _, x := range arr {
+  sum += x
+  prod *= x
+ }
+ fmt.Println(sum, prod)
+}</code><code class="half lang rust">fn main() {
+ let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+ let sum = arr.iter()
+  .fold(0, |a, &b| a + b);
+ let product = arr.iter()
+  .fold(1, |a, &b| a * b);
+ println!("{:d} {:d}", sum, product);
+}</code></div></section><section><h1>Basic syntax: file I/O</h1><div><code class="half lang go">b, err := ioutil.ReadFile("input.txt")
+if err != nil {
+ fmt.Println(err)
+ return
+}</code><code class="half lang rust">let input_file = &Path("input.txt");
+let input = 
+ io::read_whole_file_str(input_file);
+match input {
+ Err(e) => fail!(e),
+ Ok(_) => {}
+}</code></div></section><section><h1>Types: declaration</h1><div><code class="lang">// C
+int *a, *b;
+int (*(*foo)(int ))(const char *);
+
+// Go
+var a, b *int
+var foo func(int) (func(string) int);
+
+// Rust
+let a: &amp;int; let b: &amp;int;
+let foo: fn (int) -> fn (~str) -> int;</code></div></section><section><h1 class="blue">Rust: Type state</h1><p>Type state allows to analyze predicates (like 'init' predicate)</p><code class="lang rust">let s: str;
+if ... {
+ s = "Hello";
+}
+println(s); // predicate 'init' is false</code><p>You can define your own predicates and test them with 'check'</p><code class="lang rust">pred in_range(a: [int], start: uint, end: uint) {
+ start &lt; end && end &gt; vec::len(a)
+}
+fn foo(array: [int], x:int, y:int) -> int : in_range(array, x, y) {}
+</code></section><section><h1 class="green">Concurrency</h1><p>Using channels (Go) and channels/ports (Rust)</p><div><code class="half lang go">c := make(chan int)
+go func() {
+ c &lt;- 10
+}
+x := &lt;- c</code><code class="half lang rust">let (port, chan) = Chan::new();
+do spawn {
+  chan.send(10);
+}
+let x = port.recv();</code></div></section><section><h1 class="green">Goroutines</h1><ul><li>Independently executed functions</li><li>Have their own stacks, growing and shrinking</li><li>Very cheap (&gt;10000 goroutines is still ok)</li><li>Are not OS threads!</li><li>But can be multiplexed onto several OS threads</li></ul></section><section><h1 class="green">Go channels</h1><ul><li>Strongly typed</li><li>Everything can be passed using channels: data, functions, channels...</li><li>Used to synchronize channels</li><li>But mutexes, semaphores, barriers are still available!)</li><li>Can be buffered (like Erlang mailboxes)</li><li>Multiple channels are dispatched with select/case</li></ul></section><section><h1 class="blue">Go channels: example</h1><div><code class="half lang go">func main() {
+ c := foo()
+ for {
+  select {
+  case s := &lt;-c:
+   fmt.Println(s)
+  // Timeout channel is created on every 
+  // loop, on every packet.
+  // Move outside the loop to limit the
+  // whole communication
+  case &lt;-time.After(1 * time.Second):
+   fmt.Println("You're too slow.")
+   return
+  }
+ }
+}</code></div></section><section><h1 class="blue">Rust: concurrency safety</h1><p>Interior types are stored on stack</p><code class="lang rust">let x = "hello";
+let y = x; // copies string</code><p>Boxed pointers (@) are on local task heaps</p><code class="lang rust">let x = @"hello";
+let y = x; // same pointer</code><p>Unique pointers (~) are copied from task to task. Send ~p - lose access to it</p><code class="lang rust">let x = ~"hello";
+let y = x; // copies string
+</code></section><section><h1 class="blue">C interoperability</h1><div><code class="half lang go">// #include &lt;stdio.h&gt;
+// #include &lt;stdlib.h&gt;
+import "C"
+import "unsafe"
+
+func Print(s string) {
+ cs := C.CString(s)
+ C.fputs(cs, (*C.FILE)(C.stdout))
+ C.free(unsafe.Pointer(cs))
+}</code><code class="half lang rust">#[link(name = "c")]
+extern "C" {
+ fn puts(s: *std::libc::c_char) -> 
+  *std::libc::c_int;
+}
+
+fn main() {
+ let s = "hello";
+ s.to_c_str().with_ref(|strptr| {
+  unsafe {
+   puts(strptr);
+  }
+ });
+}</code></div></section><section><h1 class="blue">Rust: zero.rs/no_std</h1><code class="lang rust">#[allow(ctypes)];
+#[no_std];
+mod zero;
+extern {
+  #[fast_ffi]
+  pub fn write(fd: i32, buf: *u8, nbyte: uint) -&gt; uint;
+}
+fn main() {
+  unsafe {
+    let _ = write(0, &amp;"Hello world!\n"[0], 13);
+  }
+}</code><span>Friendly error:</span><code class="lang rust smallfont">rustc: /home/serge/src/ext/rust-0.9/src/llvm/lib/IR/Instructions.cpp:276:
+void llvm::CallInst::init(llvm::Value*, llvm::ArrayRef&lt;llvm::Value*&gt;,
+const llvm::Twine&amp;): Assertion `(Args.size() == FTy-&gt;getNumParams
+() || (FTy-&gt;isVarArg() &amp;&amp; Args.size() &gt; FTy-&gt;getNumParams())) &amp;&amp; 
+"Calling a function with bad signature!"' failed.</code></section><section><h1>Objects</h1><div><code class="half lang go">type Person struct {
+ Name string
+}
+
+func (p *Person) Intro() string {
+ return p.Name
+}
+
+type Woman struct {
+ Person
+}
+
+func (w *Woman) Intro() string {
+ return "Mrs. " + w.Person.Intro()
+}
+
+w := Woman{Person{Name: "Jane"}}
+println(w.Intro())</code><code class="half lang rust">struct Person {
+ name: ~str
+}
+impl Person {
+ fn intro(&amp;self) -&gt; ~str {
+  return self.name.clone();
+ }
+}
+struct Woman {
+ parent: Person
+}
+impl Woman {
+ fn intro(&amp;self) -&gt; ~str {
+  return "Mrs " + self.parent.intro();
+ }
+}
+
+let w = Woman{parent: Person{name: ~"Jane"}};
+println(w.intro());</code></div></section><section><h1 class="blue">Go: interfaces</h1><code class="lang go">// There is a standard io.Reader interface:
+// type Reader interface {
+//   Read(p []byte) (int, error)
+// }
+
+type Foo interface {
+ FooFunc()
+}
+
+type Bar struct {}
+
+func (b *Bar) FooFunc() { }
+func (b *Bar) BarFunc() { }
+
+type Baz struct {}
+
+func (b *Baz) FooFunc() { }
+func (b *Baz) Read(p []byte) (n int, err error) { }
+</code></section><section><h1 class="blue">Rust: traits</h1><code class="lang rust">trait Foo {
+ fn foo(&amp;self); 
+}
+
+struct Bar;
+impl Foo for Bar {
+ fn foo(&amp;self) { ... }
+}
+impl Bar {
+ fn bar(&amp;self) { ... }
+}
+
+struct Baz;
+impl Foo for Baz {
+ fn foo(&amp;self) { ...  }
+}	</code></section><section><h1 class="blue">Go: panic/defer/recover</h1><div><code class="lang go">func f() {
+ defer func() {
+  if err := recover(); err != nil {
+   // catch
+  }
+ }
+ ...
+ panic(err) // throw
+}
+...
+if src, err = os.Open(srcName); err != nil {
+ return
+}
+defer src.Close()
+if dst, err = os.Create(dstName); err != nil {
+ return
+}
+defer dst.Close()
+io.Copy(dst, src)
+</code></div></section><section><h1 class="orange">Trends?</h1><p>No exceptions in both languages</p><p>No classes and inheritance - only composition</p><p>Limited access modifiers</p><p>Lightweight threads and channels</p><p>Powerful stdlib</p><p>Testing out-of-box</p></section><section><h1 class="orange">Minigrep: Go vs Rust</h1><p>Using Rob Pike's approach to regular expressions (recursive)</p><p>Using 1 lightweight thread per file</p><p>Code: 65/72 LOC, 1136/1530 bytes</p><p>Binary size: 1.14MB/2.08MB</p><p>Time (single file search, 100 iterations): 0.81/1.04 sec</p><p>Time (linux kernel sources search): 1m07/4m41</p></section><section><h1 class="green">Go: tools</h1><ul><li>go doc - look into docs without starting browser</li><li>go fix - have you missed somechanges in Go libraries?</li><li>go get - like 'npm install'</li><li>go test - run automated tests</li><li>go fmt - the only one TRUE coding style!</li><li>go build/go run - no makefiles</li></ul></section><section><h1 class="orange">Rust: summary</h1><ul><li>Memory safe and type safe!</li><li>Concurrency!</li><li>Speed?</li><li>Tools?</li></ul></section><section><h1 class="orange">Go: summary</h1></section><section><h1 class="orange">Hey, nerds and geeks!</h1><p>Go</p><ul><li>Programming in Go: Creating Applications for the 21st Century by Mark Summerfield</li><li>http://www.golang-book.com/</li><li>http://golang.cat-v.org</li><li>http://tour.golang.org/</li><li>https://gobyexample.com/</li></ul><p>Rust</p><ul><li>http://www.rustforrubyists.com/book/book.html</li><li>http://www.ibm.com/developerworks/ru/library/l-rust1/index.html</li><li>http://doc.rust-lang.org/doc/master/tutorial.html</li><li>http://twitter.com/rustlang</li></ul></section><section class="title"><div><h1>Questions?</h1><h2>http://zserge.com</h2><h2>http://bit.ly/</h2></div></section></article></div><script src="bespoke.js"></script><script src="bespoke-keys.js"></script><script src="bespoke-progress.min.js"></script><script src="bespoke-hash.js"></script><script src="talk.js"></script></body></html>

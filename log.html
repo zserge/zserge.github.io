@@ -26,6 +26,89 @@
 			</ul>*/
 		</div>
 		
+<h1>log.h</h1>
+
+<p>log.h is a ultra-light logging library for <a href="/nikl.html">nikl</a> framework.
+You can use it to profile your code or debug time-critical parts.</p>
+
+<h2>idea</h2>
+
+<p>Real hackers don't use debuggers, they use <code>printf</code> instead, right?
+But <code>printf</code> is often too heavy for your tiny 8-bit MCU.</p>
+
+<p>Nikl's logger sends only printf payload (e.g. arguments, without even format 
+string) and some information to find the line in the source file and 
+get format string from there. </p>
+
+<p>It allows you to send (let's assume that sending 1 byte takes 1 instruction):</p>
+
+<ul>
+<li><code>TRACE()</code> message: 5 bytes, 10 instructions.</li>
+<li><code>LOG("status =  %d", s);</code> where <code>s=2</code>, s is a 32-bit number: 6 bytes, 20
+instructions.</li>
+</ul>
+
+<h2>protocol</h2>
+
+<p>Data is sent using very simple datagram protocol. Each datagram has the format:</p>
+
+<pre><code>+-----+----------+---------+---------+-----+-----+
+| STX | FILE_TAG | LINE_HI | LINE_LO | ... | ETX |
++-----+----------+---------+---------+-----+-----+
+</code></pre>
+
+<ul>
+<li><code>STX</code> - start of the datagram. <code>STX = 0xFC</code></li>
+<li><code>ETX</code> - end of the datagram. <code>ETX = 0xFD</code></li>
+<li><code>FILE_TAG</code> - label of the source file (1 byte)</li>
+<li><code>LINE_HI</code> and <code>LINE_LO</code> - high and low byte of <code>__LINE__</code> value (2 bytes in total).</li>
+</ul>
+
+<p>After <code>LINE_LO</code> but before <code>ETX</code> byte there is datagram body. Datagram body can
+contain 3 data types:</p>
+
+<ul>
+<li>Integer numbers</li>
+<li>NULL-terminated strings</li>
+<li>Binary data of known length</li>
+</ul>
+
+<p>Let's see how these type are encoded.</p>
+
+<h2>data types</h2>
+
+<p>Integers are passed using variable-length format.
+Everything depends on the 1st byte:</p>
+
+<ul>
+<li><code>0nnnnnnn</code>:  7-bit number</li>
+<li><code>10nnnnnn nnnnnnnn</code>: 14-bit number</li>
+<li><code>110nnnnn nnnnnnnn nnnnnnnn</code>: 21-bit number</li>
+<li><code>11100nnn nnnnnnnn nnnnnnnn nnnnnnnn</code>: 27-bit number</li>
+<li><code>11101nnn nnnnnnnn nnnnnnnn nnnnnnnn nnnnnnnn</code>: 35-bit number</li>
+<li><code>11111100</code> - STX</li>
+<li><code>11111101</code> - ETX</li>
+<li><code>11111011</code> - Zero-terminated string</li>
+<li><code>11111111 ....</code> - variable-length data. Length is a variable-length number. 
+Data comes after length.</li>
+</ul>
+
+<p>Easy, right?</p>
+
+<h2>internals</h2>
+
+<p>Well, sending TRACE() is simple - it's just a function that sends 5 bytes.</p>
+
+<p>LOG() is somewhat more complicated. Normally, LOG() arguments are passed
+comma-separated. As you know, statements in C can be also written separated
+with commas. All we need to do is to wrap each parameter with a function,
+depending on its type. Unfortunatelly, there seems to be no way to do this 
+automatically, so the programmer must to it manually:</p>
+
+<pre><code>LOG("status = %d", _I(status)); /* _I() - for numbers */
+LOG("request = %s", _S(req));   /* _S() - for strings */
+LOG("payload = %v", _D(buf, 512)); /* _D() for binary data */
+</code></pre>
 	</body>
 </html>
 
