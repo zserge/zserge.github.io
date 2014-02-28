@@ -14,6 +14,12 @@ html
 					div 
 						h1 КТО НА ЧТО Go/Rust?
 						h2 There are only two kinds of programming languages: <br/>those people always bitch about and those nobody uses
+
+				section
+					h1.orange Legend
+					p.orange Orange - opinions. May sound trollable
+					p.green Green - facts, code, examples - "con-trollable"
+					p.blue Blue - Code that you may safely ignore if you're bored
 						
 				section
 					h1.orange System programming is broken
@@ -24,7 +30,7 @@ html
 						li "C - a language which combines the flexibility of assembly language with the power of assembly language"
 
 				section
-					h1.orange Programming in the large is mostly broken
+					h1.orange Programming in the large is broken
 					p  Some people, when confronted with a problem, think...
 					ul.serif
 						li "I know, I'll use regular expressions." Now they have two problems.
@@ -49,8 +55,9 @@ html
 					p Current release: Rust 0.9 (not stable yet)
 					p Hey, listen! Rust is alpha-level software with many known bugs, incomplete features and planned future changes. Use at your own risk, expect some instability, disruption and source-level incompatibility for a while yet.
 
+
 				section
-					h1.orange Getting started. Building from sources
+					h1.orange Building ("if it compiles, it is good")
 					.half.delim
 						p Go: 0h16m (old dual-core CPU)
 						p Binaries are available as well <i>(Windows, Darwin, i386, amd64, arm)</i>
@@ -62,7 +69,7 @@ html
 						p Uses LLVM, cross-compiling is possible
 
 				section
-					h1.green Well-known projects
+					h1.orange Best known projects ("show me the code")
 					.half.delim
 						p Go projects mostly hosted on Google Code and Bitbucket
 						ul
@@ -79,7 +86,7 @@ html
 							li q3
 
 				section
-					h1 Hello world
+					h1.green Hello world
 					.third
 						code.lang.rust
 							pre.
@@ -110,7 +117,7 @@ html
 						li Rust: 9.5 sec / 1897 kB / 0.13 sec
 
 				section
-					h1 Basic syntax: Add/Sub
+					h1.green Basic syntax: Add/Sub
 					div
 						code.half.lang.go.
 							func AddSub(x, y int) (int, int) {
@@ -119,12 +126,12 @@ html
 							a, b := AddSub(5, 3)
 
 						code.half.lang.rust.
-							fn add_sub(x: int, y: int) -> (int, int) {
-								return (x + y, x - y);
+							fn add_sub(x: int, y: int) -&gt; (int, int) {
+								(x + y, x - y);
 							}
 							let (a, b) = add_sub(5, 3);
 				section
-					h1 Basic syntax: FizzBuzz
+					h1.green Basic syntax: FizzBuzz
 					div
 						code.half.lang.go.
 							package main
@@ -160,7 +167,7 @@ html
 								}
 							}
 				section
-					h1 Basic syntax: Sum/Product of an array
+					h1.green Basic syntax: Sum/Product of an array
 					div
 						code.half.lang.go.
 							package main
@@ -186,7 +193,7 @@ html
 								println!("{:d} {:d}", sum, product);
 							}
 				section
-					h1 Basic syntax: file I/O
+					h1.green Basic syntax: file I/O
 					div
 						code.half.lang.go.
 							b, err := ioutil.ReadFile("input.txt")
@@ -203,7 +210,7 @@ html
 								Ok(_) => {}
 							}
 				section
-					h1 Types: declaration
+					h1.green Types: declaration
 					div
 						code.lang.
 							// C
@@ -331,7 +338,7 @@ html
 								});
 							}
 				section
-					h1.blue Rust: zero.rs/no_std
+					h1.orange Rust: zero.rs/no_std
 					code.lang.rust.
 						#[allow(ctypes)];
 						#[no_std];
@@ -353,7 +360,7 @@ html
 						() || (FTy-&gt;isVarArg() &amp;&amp; Args.size() &gt; FTy-&gt;getNumParams())) &amp;&amp; 
 						"Calling a function with bad signature!"' failed.
 				section
-					h1 Objects
+					h1.green Objects
 					div
 						code.half.lang.go.
 							type Person struct {
@@ -460,15 +467,6 @@ html
 							io.Copy(dst, src)
 
 				section
-					h1.orange Trends?
-					p No exceptions in both languages
-					p No classes and inheritance - only composition
-					p Limited access modifiers
-					p Lightweight threads and channels
-					p Powerful stdlib
-					p Testing out-of-box
-
-				section
 					h1.orange Minigrep: Go vs Rust
 					p Using Rob Pike's approach to regular expressions (recursive)
 					p Using 1 lightweight thread per file
@@ -488,15 +486,34 @@ html
 						li go build/go run - no makefiles
 
 				section
+					h1.orange Trends?
+					p No exceptions in both languages
+					p No classes and inheritance - only composition
+					p Limited access modifiers
+					p Lightweight threads and channels
+					p Powerful stdlib
+					p Testing out-of-box
+
+				section
 					h1.orange Rust: summary
 					ul
 						li Memory safe and type safe!
 						li Concurrency!
-						li Speed?
+						li Lots of experimental cool ideas!
+						li Pointers?
+						li Docs?
 						li Tools?
+						li Speed?
 
 				section
 					h1.orange Go: summary
+					li Easy! Small! Fast!
+					li Goroutines! Safe pointers! GC! UTF-8!
+					li Tools! It's all practical!
+					li Web! Web?
+					li Bare metal runtime? Android? MIPS? UI toolkits?
+					li Generics?
+					li Google? :)
 
 				section
 					h1.orange Hey, nerds and geeks!
@@ -507,6 +524,8 @@ html
 						li http://golang.cat-v.org
 						li http://tour.golang.org/
 						li https://gobyexample.com/
+				section
+					h1.orange Hey, nerds and geeks!
 					p Rust
 					ul
 						li http://www.rustforrubyists.com/book/book.html
@@ -517,7 +536,7 @@ html
 					div
 						h1 Questions?
 						h2 http://zserge.com
-						h2 http://bit.ly/
+						h2 http://bit.ly/1dEe4n3
 
 		script(src="bespoke.js").
 		script(src="bespoke-keys.js").
