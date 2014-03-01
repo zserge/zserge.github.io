@@ -1,0 +1,275 @@
+Basic
+=====
+
+# Hello world
+
+# Common syntax
+
+Types are pascal-like
+Braces are required
+Parens can be omitted
+
+# Add numbers
+func AddSub(x, y int) (int, int) {
+	return x+y, x-y;
+}
+a, b := AddSub(5, 3)
+
+fn add_sub(x: int, y: int) -> (int, int) {
+	return (x + y, x - y);
+}
+let (a, b) = add_sub(5, 3);
+
+# FizzBuzz
+
+package main
+ 
+import "fmt"
+ 
+func main() {
+	for i := 1; i <= 100; i++ {
+		switch {
+			case i%15==0:
+				fmt.Println("FizzBuzz")
+			case i%3==0:
+				fmt.Println("Fizz")
+			case i%5==0:
+				fmt.Println("Buzz")
+			default: 
+				fmt.Println(i)
+		}
+	}
+}
+
+fn main() {
+	for num in std::iter::range_inclusive(1, 100) {
+		println(
+				match (num % 3 == 0, num % 5 == 0) {
+				(false, false) => num.to_str(),
+				(true, false) => ~"Fizz",
+				(false, true) => ~"Buzz",
+				(true, true) => ~"FizzBuzz"
+			}
+		);
+	}
+}
+
+# Sum and product of array
+
+package main
+
+import "fmt"
+
+func main() {
+	arr := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	sum, prod := 0, 1
+	for _, x := range arr {
+		sum += x
+		prod *= x
+	}
+	fmt.Println(sum, prod)
+}
+
+fn main() {
+	let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+	let sum = arr.iter().fold(0, |a, &b| a + b);
+	let product = arr.iter().fold(1, |a, &b| a * b);
+	println!("{:d} {:d}", sum, product);
+}
+
+# Read file
+
+b, err := ioutil.ReadFile("input.txt")
+if err != nil {
+	fmt.Println(err)
+	return
+}
+
+let input_file = &Path("input.txt");
+let input = io::read_whole_file_str(input_file);
+match input {
+	Err(e) => fail!(e),
+	Ok(_) => {}
+}
+
+Types
+=====
+
+# Pascal did it right!
+
+// C
+int *a, *b;
+int (*(*foo)(int ))(const char *);
+// Go
+var a, b *int
+var foo func(int) (func(string) int);
+// Rust
+let a: &int; let b: &int;
+let foo: fn (int) -> fn (~str) -> int;
+
+Concurrency
+===========
+
+# CSP
+
+c := make(chan int)
+go func() {
+	c <- 10
+}
+x := <- c
+
+let (port, chan) = Chan::new();
+do spawn {
+    chan.send(10);
+}
+let x = port.recv();
+
+Concurrency safety in rust
+==========================
+
+Typestate: init predicate
+
+Interior types are stored on stack
+	let x = "hello";
+	let y = x; // copies string
+Unique pointers (~) are copied from task to task
+	let x = ~"hello";
+	let y = x; // copies string
+Boxed pointers (@) are on local task heaps
+	let x = @"hello";
+	let y = x; // same pointer
+
+Send @p - impossible
+Send ~p - lose access to it
+
+C interoperability
+==================
+
+// #include <stdio.h>
+// #include <stdlib.h>
+import "C"
+import "unsafe"
+
+func Print(s string) {
+    cs := C.CString(s)
+    C.fputs(cs, (*C.FILE)(C.stdout))
+    C.free(unsafe.Pointer(cs))
+}
+
+#[link(name = "c")]
+extern "C" {
+	fn puts(s: *std::libc::c_char) -> *std::libc::c_int;
+}
+
+fn main() {
+	let s = "hello";
+	s.to_c_str().with_ref(|strptr| {
+		unsafe {
+			puts(strptr);
+		}
+	});
+}
+
+# zero.rs
+
+#[allow(ctypes)];
+#[no_std];
+
+mod zero;
+
+extern {
+    #[fast_ffi]
+    pub fn write(fd: i32, buf: *u8, nbyte: uint) -> uint;
+}
+
+fn main() {
+    unsafe {
+        let _ = write(0, &"Hello world!\n"[0], 13);
+    }
+}
+
+rustc: /home/serge/src/ext/rust-0.9/src/llvm/lib/IR/Instructions.cpp:276: void llvm::CallInst::init(llvm::Value*, llvm::ArrayRef<llvm::Value*>, const llvm::Twine&): Assertion `(Args.size() == FTy->getNumParams() || (FTy->isVarArg() && Args.size() > FTy->getNumParams())) && "Calling a function with bad signature!"' failed.
+
+Rust memory
+===========
+
+Owned (~)/borrowed(&) pointers - lifetime is checked at compile-time
+Managed pointers (@)
+Stack
+	let x = Point{x:0, y:0};
+
+Saving pointers doesn't save array bounds
+
+Rust traits
+===========
+
+Rust summary
+============
+
+Go advanced
+===========
+
+# go slices
+
+# go interfaces
+
+# GAE
+
+# go can't be called from C
+
+# go defer
+
+# go util, go fix, go fmt, go get
+
+# go web
+
+Go summary
+==========
+
+
+Basic syntax: variables, int, string
+Basic syntax: modules
+t
+Basic syntax: if, for
+Basic syntax: func
+Basic syntax: arrays
+Basic syntax: structs, Objects, methods
+
+Rust: zero.rs
+Ruse: C
+Go: CGO
+
+Rust: minigrep
+Go: minigrep
+
+Go:
+	* dead code error, type error, unused module error
+	* human readable errors
+	* go syntax is clear and parser is part of stdlib
+	* No generics (rust has generics)
+
+Rust:
+	* safe, concurrent, fast
+	* memory: null-safety, mutability
+	* threading: no shared state, lightweight threads
+	* at the cost of writing code
+	* rust is popular with ruby
+	* safety is evil
+
+If we look at the Rust compiler, which itself is written in Rust, we find that of the 111 source code files (i.e. the src/librustc directory tree, which excludes the library and runtime support), 33 of them contain the word "unsafe". 30% of the code being potentially unsafe may seem like a lot, even for a compiler
+
+struct element {
+	value: int,
+	next: Option<~element>,
+}
+match next {
+	Some(e) => io::println(fmt!("%d", next.value)),
+	None    => io::println("No value here"),
+}
+
+Rust
+	sugar
+		do each([1, 2, 3]) |n| {
+		}
+		each([1, 2, 3], |n| {
+		});
