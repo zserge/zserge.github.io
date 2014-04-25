@@ -5,8 +5,9 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Sat, 01 Mar 2014 20:12:00 +0200</pubDate>
-<lastBuildDate>Sat, 01 Mar 2014 20:12:00 +0200</lastBuildDate>
+<pubDate>Fri, 25 Apr 2014 23:21:49 +0300</pubDate>
+<lastBuildDate>Fri, 25 Apr 2014 23:21:49 +0300</lastBuildDate>
+<item><title>mucks: automating screen and tmux </title><link>http://zserge.com/blog/mucks.html</link><description> mucks - a session manager for screen and tmux</description><pubDate>Fri, 25 Apr 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/mucks.html</guid></item>
 <item><title>Lambda support for Android </title><link>http://zserge.com/blog/android-lambda.html</link><description> Bringing java 8 features to android platform</description><pubDate>Thu, 09 Jan 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-lambda.html</guid></item>
 <item><title>kotlin - a new hope </title><link>http://zserge.com/blog/kotlin.html</link><description> A new language for Android coding</description><pubDate>Thu, 28 Nov 2013 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/kotlin.html</guid></item>
 <item><title>moved to new static site generator </title><link>http://zserge.com/blog/new-site-generator.html</link><description> self done is well done</description><pubDate>Thu, 18 Jul 2013 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/new-site-generator.html</guid></item>
