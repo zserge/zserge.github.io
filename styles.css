@@ -1,13 +1,10 @@
 body {
-	width: 740px;
+	width: 90%;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (min-width: 800px) {
 	body {
-		width: 90%;
-	}
-	body .menu {
-		font-size: 0.7em;
+		width: 740px;
 	}
 }
 
@@ -79,6 +76,7 @@ pre {
   -moz-border-radius: 1em;
   padding: 1em;
 	font: 0.7em 'Droid Mono', monospace;
+	overflow-y: auto;
 }
 a {
   color: #b83000;
