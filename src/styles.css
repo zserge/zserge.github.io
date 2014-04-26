@@ -1,20 +1,24 @@
 body {
-  width: 740px;
+	width: 90%;
+}
+body {
   margin: 0 auto;
-  font: 16pt 'Buenard', serif;
+  font-family: 'Buenard', serif;
+	font-size: 1.3em;
   text-align: justify;
   color: #333333;
 }
 body .menu {
   width: 100%;
   background: #ffffff;
-  padding: 9pt 0;
-  margin: 9pt auto;
+  padding: 0.5em 0;
+  margin: 0.5em auto;
   display: block;
   text-align: center;
   color: #b83000;
-  font: 18pt 'Quando', serif;
+  font-family: 'Quando', serif;
 }
+
 body .menu ul {
   padding: 0;
   margin: 0 auto;
@@ -31,16 +35,31 @@ body .menu ul li a {
   text-decoration: none;
   border: 0;
   font-weight: bold;
-  padding: 0 15px;
+  padding: 0 0.1em;
 }
 body .menu ul li a:hover {
   color: #ffffff;
   background: #b83000;
 }
+
+@media screen and (min-width: 800px) {
+	body {
+		width: 740px;
+	}
+	body .menu {
+		padding: 9pt 0;
+		margin: 9pt auto;
+	}
+	body .menu ul li a {
+		padding: 0 15px;
+	}
+}
+
 body img {
   display: block;
   margin-left: auto;
   margin-right: auto;
+	max-width: 100%;
 }
 h1 {
   text-transform: lowercase;
@@ -58,18 +77,14 @@ h2 {
   padding: 8pt 0 4pt 0;
 }
 pre {
-  background: #eee;
-  color: #333;
-  font: 10pt 'Droid Mono', monospace;
+	background: #eee;
+	color: #333;
   border-radius: 1em;
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   padding: 1em;
-}
-code {
-  background: #eee;
-  color: #333;
-  font: 10pt 'Droid Mono', monospace;
+	font: 0.7em 'Droid Mono', monospace;
+	overflow-y: auto;
 }
 a {
   color: #b83000;
