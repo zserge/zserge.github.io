@@ -1,5 +1,6 @@
 title: jknav for Chrome and Firefox
 keywords: jk, hjkl, vi-like, firefox, chrome, extension, vimperator, vimium
+description: use j/k navigation in your browser - keep your hands on the home row
 
 jknav
 =====

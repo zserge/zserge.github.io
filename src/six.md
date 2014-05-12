@@ -1,5 +1,6 @@
 title: six - simple IRC client kept simple
 keywords: irc, simple, client, terminal
+description: minimal IRC client inspired by suckless' sic
 
 six
 ===

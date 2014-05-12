@@ -1,5 +1,6 @@
 title: zserge's blog
 keywords: software, minimalism, linux, embedded, avr, android, golang, KISS
+description: Thoughts about linux, android, web and other things
 
 This is my blog.
 

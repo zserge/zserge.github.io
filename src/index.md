@@ -1,5 +1,6 @@
 title: zserge's home page: as simple as it should be
 keywords: software, minimalism, linux, embedded, avr, android, golang, KISS
+description: Home page of Serge Zaitsev
 
 zserge's home page
 ==================
