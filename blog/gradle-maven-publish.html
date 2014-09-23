@@ -34,7 +34,7 @@ java library). And of course you want to share it with the community.</p>
 
 <p>Here's a quick guide for those who never published their libraries before.</p>
 
-<h1>What is maven central?</h1>
+<h2>What is maven central?</h2>
 
 <p>In java world libraries are usually stored in a big repository called Maven
 Central. You may think of it as of the NPM repository for Node.js or as of
@@ -45,7 +45,7 @@ PyPI for Python.</p>
 tools like <a href="http://gradleplease.appspot.com/">Gradle, Please</a>. Finally, gradle
 uses this repo if you included <code>mavenCentral()</code> into your repositories section.</p>
 
-<h1>Registration</h1>
+<h2>Registration</h2>
 
 <p>First, you will have to register. No, don't try to find a 'Register' link on
 the Maven Central website. Instead, you should register on the Sonatype
@@ -73,7 +73,7 @@ manually.</p>
 <p>After that you will receive a confirmation that your configuration has been
 prepared and you can publish your library.</p>
 
-<h1>Gradle setup</h1>
+<h2>Gradle setup</h2>
 
 <p>There are many possible ways of how to set up your gradle for maven publishing.
 I used a file I found in some other repository and I like it's separated from
@@ -239,7 +239,7 @@ contains some private information.</p>
 
 <p>Now you're almost ready to publish.</p>
 
-<h1>Ensure you have gpg set up</h1>
+<h2>Ensure you have gpg set up</h2>
 
 <p>You should sign your package with GPG. If you never used it - first create the
 GPG keys:</p>
@@ -267,11 +267,11 @@ were published:</p>
 <pre><code>$ gpg --keyserver hkp://pgp.mit.edu --search-keys johndoe@example.com # Use your email
 </code></pre>
 
-<h1>Pushing the archives</h1>
+<h2>Pushing the archives</h2>
 
 <p>Now you can do:</p>
 
-<pre><code>$ gradle updateArchives
+<pre><code>$ gradle uploadArchives
 </code></pre>
 
 <p>Your library will be built, signed and pushed to the sonatype repo. Please,
@@ -299,6 +299,18 @@ but the search.maven.org found it only next morning.</p>
 found them to be very helpful. Happy coding!</p>
 
 <p>Posted on 2014-08-10 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<script type="text/javascript">(function() {
+if (window.pluso)if (typeof window.pluso.start == "function") return;
+    if (window.ifpluso==undefined) { window.ifpluso = 1;
+        var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+        s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+        s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+        var h=d[g]('body')[0];
+        h.appendChild(s);
+    }})();</script>
+
+<div class="pluso" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google"></div>
 
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
