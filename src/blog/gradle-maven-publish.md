@@ -9,7 +9,7 @@ java library). And of course you want to share it with the community.
 
 Here's a quick guide for those who never published their libraries before.
 
-# What is maven central?
+## What is maven central?
 
 In java world libraries are usually stored in a big repository called Maven
 Central. You may think of it as of the NPM repository for Node.js or as of
@@ -20,7 +20,7 @@ It lets you quickly find a library at
 tools like [Gradle, Please](http://gradleplease.appspot.com/). Finally, gradle
 uses this repo if you included `mavenCentral()` into your repositories section.
 
-# Registration
+## Registration
 
 First, you will have to register. No, don't try to find a 'Register' link on
 the Maven Central website. Instead, you should register on the Sonatype
@@ -48,7 +48,7 @@ manually.
 After that you will receive a confirmation that your configuration has been
 prepared and you can publish your library.
 
-# Gradle setup
+## Gradle setup
 
 There are many possible ways of how to set up your gradle for maven publishing.
 I used a file I found in some other repository and I like it's separated from
@@ -211,7 +211,7 @@ Finally, in your build.gradle just add this line somewhere at the end:
 
 Now you're almost ready to publish.
 
-# Ensure you have gpg set up
+## Ensure you have gpg set up
 
 You should sign your package with GPG. If you never used it - first create the
 GPG keys:
@@ -235,11 +235,11 @@ were published:
 
 	$ gpg --keyserver hkp://pgp.mit.edu --search-keys johndoe@example.com # Use your email
 
-# Pushing the archives
+## Pushing the archives
 
 Now you can do:
 
-	$ gradle updateArchives
+	$ gradle uploadArchives
 
 Your library will be built, signed and pushed to the sonatype repo. Please,
 ensure that 'signing' stage was not skipped. It is skipped if your library name
@@ -266,6 +266,8 @@ So, that's it, and if you still have any problems - ask Sonatype support, I
 found them to be very helpful. Happy coding!
 
 Posted on <% date %> <% rss %>
+
+<% social %>
 
 <% disqus %>
 
