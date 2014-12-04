@@ -180,5 +180,6 @@ support for many Java niceties, like `invokedynamic` or Java 8 features.
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 

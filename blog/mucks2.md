@@ -12,7 +12,7 @@ I played with quotes in tmux "send-keys" command, and it turned out that
 different shells treat quotes in the "read" command very differently, and I found
 no easy way to overcome it.
 
-That's how AWK came to the resque. A more mature, yet much simpler language
+That's how AWK came to the rescue. A more mature, yet much simpler language
 made my code cleaner and shorter.
 
 Users would not notice it, since the configuration file syntax remains the
@@ -71,12 +71,12 @@ Tmuxinator here (last time I checked it - it could not change the colorscheme of
 	:colorscheme less
 
 Here the `colorscheme` command will be executed 200ms after the vim has
-started and it works fine. But if you type it immidiately - most like it will
+started and it works fine. But if you type it immediately - most like it will
 not be interpreted by vim at all.
 
 ## DVTM
 
-I think that [DVTM](www.brain-dump.org/projects/dvtm/) is a very nice app. Even
+I think that [DVTM](http://www.brain-dump.org/projects/dvtm/) is a very nice app. Even
 though I prefer tmux - I really like the simplicity of the DVTM and the look.
 
 With a tiny modification it can be controlled with mucks as well! You will need
@@ -95,7 +95,7 @@ the named pipe when the DVTM is in the background:
 	 /* gets executed when dvtm is started */
 
 Also, you should use it in pair with
-(abduco)[http://www.brain-dump.org/projects/abduco/] (which a believe you already do
+[abduco](http://www.brain-dump.org/projects/abduco/) (which a believe you already do
 if you picked DVTM).
 
 So here's how these three great muxers look when controlled by mucks with the same environment:
@@ -128,7 +128,8 @@ So, what's your favourite terminal multiplexor?
 
 Posted on {{ date }} {{ rss }}
 
-{{ disqus }}
+{{ social }}
 
+{{ disqus }}
 
 

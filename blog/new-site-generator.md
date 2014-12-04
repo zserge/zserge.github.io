@@ -109,7 +109,7 @@ for every piece of text and raw shell commands for every `<% .. %>` tag:
 	Hello world. Today is <% date %>.
 	                     =>   printf 'Hello world. Today is '; date
 
-Statements are now separated with semicolons, which brings some unobvious limitations:
+Statements are now separated with semicolons, which brings some not obvious limitations:
 
 	This won't work (semicolons after "do" are not allowed):
 

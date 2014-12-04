@@ -89,5 +89,6 @@ Let your code be bug-free!
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 

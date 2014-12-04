@@ -61,5 +61,6 @@ page. Open source, MIT-licensed, as usual.
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 

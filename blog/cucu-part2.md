@@ -318,6 +318,7 @@ _Check [part 1](/blog/cucu-part1.html) if you missed something_
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
 [1]: /blog/cucu-part3.html

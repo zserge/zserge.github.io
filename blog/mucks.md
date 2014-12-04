@@ -139,6 +139,7 @@ And how do you use terminal multiplexor sessions?
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
 

@@ -50,7 +50,7 @@ very old, and the code is not the state-of-the-art, I still like it, because:
 * it's easy to learn (simple syntax, the number of standard procedures is very 
 	small), easy to extend, easy to integrate with Java
 * it's very lightweight - added about 40kB to my APK size
-* it's somewhat slow, but thi is not critical for widgets - they are not
+* it's somewhat slow, but this is not critical for widgets - they are not
 	frequently updated.
 * finally, it's a nice chance to learn Scheme by myself, as I have never used
 	it before :)
@@ -234,6 +234,7 @@ bitbucket][sources].
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
 [plaintext]: http://c2.com/cgi/wiki?PowerOfPlainText

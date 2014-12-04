@@ -243,6 +243,7 @@ you missed something_
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
 [1]: http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools

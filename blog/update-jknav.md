@@ -18,5 +18,6 @@ Any advice or comments welcome!
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 

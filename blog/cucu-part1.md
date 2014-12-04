@@ -280,6 +280,7 @@ _You can check [part3](/blog/cucu-part3.html) to know how the story ended._
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
 [1]: http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form

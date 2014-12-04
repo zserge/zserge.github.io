@@ -13,14 +13,14 @@ languages.
 
 So far I've tried (tried, I never learnt these languages properly):
 
-* Mirah - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
+* _Mirah_ - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
 	lot of syntax sugar, but it failed to make a static class attribute when I
 	tried it. I'm sure now it's better, I just don't like Ruby.
-* Clojure - a Lisp. I had very big expectations about clojure, but it turned
+* _Clojure_ - a Lisp. I had very big expectations about clojure, but it turned
 	out to be slow, huge and had no libraries for Android.
-* Kawa - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
+* _Kawa_ - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
 	lisp-ish bindings for every part of Android before it becomes useful.
-* Scala - a better Java. Good. Popular. Slow. Big. I could bear the fact my
+* _Scala_ - a better Java. Good. Popular. Slow. Big. I could bear the fact my
 	binaries become larger, but the compilation time was unacceptable for me. I
 	was looking for a language to make me more productive, but instead I had to
 	wait for another minute waiting for my HelloWorld to compile.
@@ -267,5 +267,6 @@ P.S. I will upload project sources and apk on bitbucket soon.
 
 Posted on {{ date }} {{ rss }}
 
+{{ social }}
 {{ disqus }}
 
