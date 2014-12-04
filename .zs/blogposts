@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "<ul>"
+find -name '*.md' -type f | while read line ; do
+	timestamp=$($ZS var $line date)
+	if [ ! -z $timestamp ] ; then
+		echo $(date --date $timestamp +%s) $line
+	fi
+done | sort -r -n | cut -d' ' -f2 | while read f; do
+	url=$($ZS var $f url)
+	timestamp=$(date --date $($ZS var $f date) +%s)
+	name=$($ZS var $f title)
+	desc=$($ZS var $f description)
+	echo "<li><b><a href=\"$url\">$name</a></b> - $(date "+%B %d, %Y" --date @$timestamp)</li>"
+done
+echo "</ul>"

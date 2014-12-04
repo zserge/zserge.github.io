@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "<span class='rss' style='float: right;'>[[rss](/rss.xml)]</span>"
+
