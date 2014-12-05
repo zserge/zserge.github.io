@@ -6,9 +6,22 @@
 		<title> lambda support for Android </title>
 		<meta name="description" content="Bringing java 8 features to android platform" />
 		<meta name="keywords" content="android, lambda, jdk8, java 8, ant, retrolambda" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,17 +32,16 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>Lambda support for Android</h1>
+		</nav>
+		<h1>Lambda support for Android</h1>
 
-<p><em>Note: big thanks to orfjackal (Esko Luontola), the author of 
+<p><em>Note: big thanks to orfjackal (Esko Luontola), the author of
 <a href="https://github.com/orfjackal/retrolambda">Retrolambda</a>, for making it
 possible. I just used his tool to produce Android apk.</em></p>
 
@@ -39,7 +51,7 @@ Android right now (<em>warning: it's still a hack</em>)!</p>
 
 <h2>But I already have local classes!</h2>
 
-<p>Lambdas are very similar to local classes you had since early days of Java. </p>
+<p>Lambdas are very similar to local classes you had since early days of Java.</p>
 
 <p>The code below looks familiar to every Android developer:</p>
 
@@ -129,16 +141,16 @@ java.compiler.classpath=rt8.jar
 
 <p>Create <code>custom_rules.xml</code>:</p>
 
-<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;project&gt;
-    &lt;target name="-post-compile"&gt;
-        &lt;exec executable="java"&gt;
-            &lt;arg value="-Dretrolambda.inputDir=${out.classes.absolute.dir}" /&gt;
-            &lt;arg value="-Dretrolambda.classpath=${out.classes.absolute.dir}:${project.target.android.jar}" /&gt;
-            &lt;arg value="-Dretrolambda.bytecodeVersion=50" /&gt;
-            &lt;arg value="-javaagent:retrolambda.jar" /&gt;
-            &lt;arg value="-jar" /&gt;
-            &lt;arg value="retrolambda.jar" /&gt;
+    &lt;target name=&quot;-post-compile&quot;&gt;
+        &lt;exec executable=&quot;java&quot;&gt;
+            &lt;arg value=&quot;-Dretrolambda.inputDir=${out.classes.absolute.dir}&quot; /&gt;
+            &lt;arg value=&quot;-Dretrolambda.classpath=${out.classes.absolute.dir}:${project.target.android.jar}&quot; /&gt;
+            &lt;arg value=&quot;-Dretrolambda.bytecodeVersion=50&quot; /&gt;
+            &lt;arg value=&quot;-javaagent:retrolambda.jar&quot; /&gt;
+            &lt;arg value=&quot;-jar&quot; /&gt;
+            &lt;arg value=&quot;retrolambda.jar&quot; /&gt;
         &lt;/exec&gt;
     &lt;/target&gt;
 &lt;/project&gt;
@@ -168,7 +180,7 @@ public class MainActivity extends Activity {
 
         int x = 42;
         runOnUiThread(() -&gt; {
-            Log.d("MainActivity", "Hello from lambda! x = " + x);
+            Log.d(&quot;MainActivity&quot;, &quot;Hello from lambda! x = &quot; + x);
         });
 
         try {
@@ -179,18 +191,18 @@ public class MainActivity extends Activity {
             }
         } catch (NullPointerException|InterruptedException e) {
             // Multiple exceptions work!
-            Log.e("MainActivity", "Exception: ", e);
+            Log.e(&quot;MainActivity&quot;, &quot;Exception: &quot;, e);
         }
 
-        String s = "fo" + "o";
+        String s = &quot;fo&quot; + &quot;o&quot;;
 
         // Switch/case for strings works!
         switch (s) {
-            case "foo":
-                Log.d("MainActivity", "s = foo");
+            case &quot;foo&quot;:
+                Log.d(&quot;MainActivity&quot;, &quot;s = foo&quot;);
                 break;
-            case "bar":
-                Log.d("MainActivity", "s = bar");
+            case &quot;bar&quot;:
+                Log.d(&quot;MainActivity&quot;, &quot;s = bar&quot;);
                 break;
         }
     }
@@ -211,6 +223,17 @@ support for many Java niceties, like <code>invokedynamic</code> or Java 8 featur
 
 <p>Posted on 2014-01-09 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
 
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
@@ -220,10 +243,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

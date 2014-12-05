@@ -6,9 +6,22 @@
 		<title> moved to new static site generator </title>
 		<meta name="description" content="self done is well done" />
 		<meta name="keywords" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>moved to new static site generator</h1>
+		</nav>
+		<h1>moved to new static site generator</h1>
 
 <p>This website has been powered by <a href="https://bitbucket.org/obensonne/poole">poole</a> for a long time.
 I don't think I have any real reasons to migrate from poole.</p>
@@ -40,7 +52,7 @@ feel uncomfortable with Ruby, Python and even Node.js.</p>
 <a href="http://suckless.org/">suckless</a> and <a href="http://cat-v.org/">cat-v</a>. Then <a href="http://nibble.develsec.org/projects/sw.html">sw</a> appeared.</p>
 
 <p>I just made another one static site generator in pure UNIX Shell.
-I called it "Sta.sh". This website is now generated with Stash.</p>
+I called it &quot;Sta.sh&quot;. This website is now generated with Stash.</p>
 
 <h2>installation</h2>
 
@@ -102,7 +114,7 @@ Generated with [Sta.sh](http://bitbucket.org/zserge/stash) site generator.
 &lt;body&gt;
     &lt;h1&gt;Test page&lt;/h1&gt;
     &lt;p&gt;This is a test page. Today is Fri Jul 19 11:52:54 EEST 2013.&lt;/p&gt;
-    &lt;p&gt;Generated with &lt;a href="http://bitbucket.org/zserge/stash"&gt;Sta.sh&lt;/a&gt; site generator.&lt;/p&gt;
+    &lt;p&gt;Generated with &lt;a href=&quot;http://bitbucket.org/zserge/stash&quot;&gt;Sta.sh&lt;/a&gt; site generator.&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
@@ -112,11 +124,11 @@ Generated with [Sta.sh](http://bitbucket.org/zserge/stash) site generator.
 <p>Stash loads custom.sh script on start and allows you to easily extend it.
 Every function defined in custom.sh can be called from within <code>&lt;% ... %&gt;</code> tags.</p>
 
-<p>Also, there are special "hook" functions: <code>ongen</code> and <code>onexit</code>. The first one
+<p>Also, there are special &quot;hook&quot; functions: <code>ongen</code> and <code>onexit</code>. The first one
 is called for every page generated, and the second one is called after the
 whole site is processed allowing you to cleanup everything.</p>
 
-<p>I used "hooks" to build a list of blog pages with <code>ongen</code> and then render that
+<p>I used &quot;hooks&quot; to build a list of blog pages with <code>ongen</code> and then render that
 list into a single blog index page in <code>onexit</code>.</p>
 
 <h2>how it works</h2>
@@ -137,9 +149,9 @@ Hello world. Today is &lt;% date %&gt;.
                      =&gt;   printf 'Hello world. Today is '; date
 </code></pre>
 
-<p>Statements are now separated with semicolons, which brings some unobvious limitations:</p>
+<p>Statements are now separated with semicolons, which brings some not obvious limitations:</p>
 
-<pre><code>This won't work (semicolons after "do" are not allowed):
+<pre><code>This won't work (semicolons after &quot;do&quot; are not allowed):
 
 &lt;% for i in $(seq 1 10) ; do %&gt; Foo &lt;% echo $i %&gt; &lt;% done %&gt;
 for i in $(seq 1 10) ; do ; printf 'Foo' ; echo $i ; done
@@ -155,7 +167,7 @@ for i in $(seq 1 10) ; do true ; printf 'Foo' ; echo $i ; done
 <pre><code>&lt;% date ; %&gt;
 will be converted to
 date ;;
-and ";;" is an invalid token here
+and &quot;;;&quot; is an invalid token here
 </code></pre>
 
 <p>I'm sure there are much more pitfalls, so do everything with extreme care.
@@ -186,10 +198,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

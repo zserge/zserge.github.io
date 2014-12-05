@@ -6,9 +6,22 @@
 		<title> logdog - a colorized Android logcat </title>
 		<meta name="description" content="logdog is a better logcat" />
 		<meta name="keywords" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>logdog - a colorized Android logcat</h1>
+		</nav>
+		<h1>logdog - a colorized Android logcat</h1>
 
 <p>Sometimes I do Android development. I never liked using debuggers, neither I
 use IDE. So my choice is to write Android apps with Vim+Terminal. With the lack
@@ -37,12 +49,12 @@ with grepping output) is far from being pleasant.</p>
 <p>Then I found there are nicer alternatives, like
 <a href="https://code.google.com/p/colored-logcat/">coloredlogcat</a> or
 <a href="https://github.com/jasta/android-dev-tools/blob/master/proclogcat">proclogcat</a>.
-I tried them, but they lacked other output formats, like "time". So I started
+I tried them, but they lacked other output formats, like &quot;time&quot;. So I started
 writing my own one, which I successfully use in the last few months. It's
 written in Python and seems to be the smallest logcat post-processor (it's only
 about 100 LOC in a single file).</p>
 
-<p>It supports "brief", "time" and "raw" output formats and allows to filter output
+<p>It supports &quot;brief&quot;, &quot;time&quot; and &quot;raw&quot; output formats and allows to filter output
 by one or several applications.</p>
 
 <p>Here are some usage samples:</p>
@@ -63,8 +75,8 @@ $ logdog -v raw
 # .zshrc
 #
 _logdog() {
-    local tag="${words[$CURRENT]}"
-    compadd $(adb shell ps | tr -d '\r' | awk -v tag=" $tag" '$0 ~ tag { print $9 }')
+    local tag=&quot;${words[$CURRENT]}&quot;
+    compadd $(adb shell ps | tr -d '\r' | awk -v tag=&quot; $tag&quot; '$0 ~ tag { print $9 }')
 }
 compdef _logdog logdog
 
@@ -73,20 +85,32 @@ compdef _logdog logdog
 #
 _logdog() {
     local tag=${COMP_WORDS[COMP_CWORD]}
-    procs="$(adb shell pm list packages $tag | sed -e 's/package://')"
-    COMPREPLY=($(compgen -W "$procs" -- $tag))
+    procs=&quot;$(adb shell pm list packages $tag | sed -e 's/package://')&quot;
+    COMPREPLY=($(compgen -W &quot;$procs&quot; -- $tag))
 }
 complete -o default -o nospace -F _logdog logdog
 </code></pre>
 
 <p>And here's how logdog looks in my terminal:</p>
 
-<p><img src="/images/logdog.png" alt="logdog" title="" /></p>
+<p><img src="/images/logdog.png" alt="logdog" />
+</p>
 
 <p>You can download logdog on the <a href="https://bitbucket.org/zserge/logdog">bitbucket</a>
 page. Open source, MIT-licensed, as usual.</p>
 
 <p>Posted on 2013-05-20 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
 
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
@@ -97,10 +121,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

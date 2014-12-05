@@ -6,9 +6,22 @@
 		<title> AAML - another android markup language </title>
 		<meta name="description" content="writing android XMLs is easy now" />
 		<meta name="keywords" content="android, xml, markup, language, layout, macros, variables, less" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>AAML - another android markup language</h1>
+		</nav>
+		<h1>AAML - another android markup language</h1>
 
 <p>Sometimes I do android apps development. I use terminal, tmux and vim - no
 Eclipse, no IntelliJ Idea or other IDEs.</p>
@@ -71,35 +83,35 @@ too.</p>
 
 <p>And here's what you get after converting it to XML:</p>
 
-<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingTop="0"
-        android:paddingBottom="0"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:orientation="vertical"&gt;
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;fill_parent&quot;
+        android:paddingTop=&quot;0&quot;
+        android:paddingBottom=&quot;0&quot;
+        android:paddingLeft=&quot;16dp&quot;
+        android:paddingRight=&quot;16dp&quot;
+        android:orientation=&quot;vertical&quot;&gt;
         &lt;EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/to" /&gt;
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:hint=&quot;@string/to&quot; /&gt;
         &lt;EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/subject" /&gt;
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:hint=&quot;@string/subject&quot; /&gt;
         &lt;EditText
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="top"
-                android:hint="@string/message" /&gt;
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;0dp&quot;
+                android:layout_weight=&quot;1&quot;
+                android:gravity=&quot;top&quot;
+                android:hint=&quot;@string/message&quot; /&gt;
         &lt;Button
-                android:id="@+id/btn_send"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="@string/send" /&gt;
+                android:id=&quot;@+id/btn_send&quot;
+                android:layout_width=&quot;100dp&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:gravity=&quot;right&quot;
+                android:text=&quot;@string/send&quot; /&gt;
 &lt;/LinearLayout&gt;
 </code></pre>
 
@@ -153,7 +165,7 @@ Here's an example of some layout macros:</p>
 <p>There are two more things to mention. Comments are allowed, but should take a
 separate line and start with <code>#</code>. Also, as you use android:id frequently, you
 can use syntax sugar like <code>TextView#my_text</code> to define a new id <code>my_text</code> (as
-an alternative to <code>TextView id "@+id/my_text"</code>).</p>
+an alternative to <code>TextView id &quot;@+id/my_text&quot;</code>).</p>
 
 <h2>Usage</h2>
 
@@ -176,12 +188,12 @@ $ aaml aaml res
 <p>You can always use <code>custom_rules.xml</code> to build XMLs from aaml files
 automatically with <code>ant debug</code> or <code>ant release</code>:</p>
 
-<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;project&gt;
-    &lt;target name="-pre-build"&gt;
-        &lt;exec executable="aaml"&gt;
-            &lt;arg value="aaml"/&gt;
-            &lt;arg value="res"/&gt;
+    &lt;target name=&quot;-pre-build&quot;&gt;
+        &lt;exec executable=&quot;aaml&quot;&gt;
+            &lt;arg value=&quot;aaml&quot;/&gt;
+            &lt;arg value=&quot;res&quot;/&gt;
         &lt;/exec&gt;
     &lt;/target&gt;
 &lt;/project&gt;
@@ -198,6 +210,17 @@ development and to do testing.</p>
 
 <p>Posted on 2013-04-02 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
 
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
@@ -207,10 +230,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

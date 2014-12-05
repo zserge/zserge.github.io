@@ -6,9 +6,22 @@
 		<title> cucu: a compiler you can understand (3/3) </title>
 		<meta name="description" content="Compilers is fun. Want to write your own one?" />
 		<meta name="keywords" content="compiler, programming, C, smallC, easy, tiny, small, tutorial, parser, code, generate, virtal machine" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<p>Let's talk about compiler backends. C should be a portable language, and there
+		</nav>
+		<p>Let's talk about compiler backends. C should be a portable language, and there
 is no need to rewrite the whole compiler if you want to port it to the new CPU
 architecture.</p>
 
@@ -53,9 +65,9 @@ but who cares - it's a test imaginary architecture). And the first 7 bytes of
 the instruction are just ASCII symbols, and the last one is 0x10 ('\n').</p>
 
 <p>This allows us to use human-readable instruction codes, like <code>A:=A+B</code>,
-<code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory ("add register B 
-to register A", "put 0x1ef8 to register A" and "push the value of register A
-to the stack").</p>
+<code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory (&quot;add register B
+to register A&quot;, &quot;put 0x1ef8 to register A&quot; and &quot;push the value of register A
+to the stack&quot;).</p>
 
 <ul>
 <li><code>A:=NNNN</code> - put value of 0xNNNN to register A</li>
@@ -84,7 +96,7 @@ to the stack").</p>
 
 <h2>cucu backend design</h2>
 
-<p>We include "gen.c" file, which is actually a backend implementation.
+<p>We include &quot;gen.c&quot; file, which is actually a backend implementation.
 Let's start with simple functions: <code>gen_start()</code> and <code>gen_finish()</code>.
 They are used to generate application prologue (like PE header, or ELF header)
 and to post-process byte code.</p>
@@ -95,7 +107,7 @@ array. At the very end, <code>code[]</code> contains a ready-to-use compiled pro
 <p>So, compiler calls backend function, and backend just calls emit() with the
 specific byte-codes, and this is how we get compiled machine code.</p>
 
-<p>Now we need to define what are the most common constructions, that backend 
+<p>Now we need to define what are the most common constructions, that backend
 should implement. Let's start with this simple program:</p>
 
 <pre><code>int main() {
@@ -103,9 +115,9 @@ should implement. Let's start with this simple program:</p>
 }
 </code></pre>
 
-<p>Let's talk about calling convention. This is how arguments are passed to the 
+<p>Let's talk about calling convention. This is how arguments are passed to the
 function and how the return value is fetched. We stated before, that arguments
-are placed on the stack (the 1st argument is pushed 1st). Let's make a deal, 
+are placed on the stack (the 1st argument is pushed 1st). Let's make a deal,
 that the value of the register A when function returns is its return value.</p>
 
 <p>Actually, we will store all values to register A. Register B will be used as
@@ -117,10 +129,10 @@ a temporary register.</p>
 ret
 </code></pre>
 
-<p>So, we need a function to put immediate numeric value to the register A, and a 
+<p>So, we need a function to put immediate numeric value to the register A, and a
 function to do the return. We will call them <code>gen_const(int)</code> and <code>gen_ret()</code>.</p>
 
-<p><code>gen_const</code> will be called every time the compiler finds a primary expression 
+<p><code>gen_const</code> will be called every time the compiler finds a primary expression
 which is a number, and <code>gen_ret</code> is called when the compiler finds a return
 statement. Though, some functions can be <code>void</code>, and thus have no explicit
 <code>return</code> statement. So, for safety and simplicity we will add an extra
@@ -148,7 +160,7 @@ A:=A+B
 </code></pre>
 
 <p>After we compiler the left part we need to store the results (register A)
-somewhere. Stack is the most simple way to do it. So, an expression 
+somewhere. Stack is the most simple way to do it. So, an expression
 <code>1+2+3</code> will be compiled to:</p>
 
 <pre><code>A:=0001  -+     -+
@@ -173,7 +185,7 @@ then to a <code>gen_call()</code> which emits <code>call A</code>.</p>
 return the address of the given item on the stack.</p>
 
 <p>Accessing global symbols is done using <code>gen_sym_addr()</code>.
-Also, when a new symbols is created the compiler might need to 
+Also, when a new symbols is created the compiler might need to
 generate some code (e.g. when generation assembler code).
 <code>gen_sym</code> is used for such cases.</p>
 
@@ -186,7 +198,7 @@ it generates <code>A:=m[A]</code> or <code>A:=M[A]</code> code.</p>
 separate segment for data it should store the array there.</p>
 
 <p>Finally, <code>gen_patch()</code> is used to patch jump address when compiling if/while
-statement. The reason is that when we meet such statement we must generate a 
+statement. The reason is that when we meet such statement we must generate a
 jump instruction, but the address is not known yet - it depends on how many code
 is compiled for the body statetment. So, after the body is compiled
 we patch jump address with the correct value.</p>
@@ -203,25 +215,25 @@ we patch jump address with the correct value.</p>
 }
 
 jmp0008 # by gen_start(): jump to main(), which is the next instruction at 0x8
-push A  # add space for local variable "k"
-sp@0000 # get the address of the local variable #0 ("k")
+push A  # add space for local variable &quot;k&quot;
+sp@0000 # get the address of the local variable #0 (&quot;k&quot;)
 push A  # store it
 A:=0003 # put 3 to A
-pop B   # get the stored earlier address of "k"
-M[B]:=A # put the value of A to "k" as int
-sp@0000 # get the address of "k"
+pop B   # get the stored earlier address of &quot;k&quot;
+M[B]:=A # put the value of A to &quot;k&quot; as int
+sp@0000 # get the address of &quot;k&quot;
 A:=M[A] # get its value as int
 push A  # store it
 A:=0000 # put 0 to A
-pop B   # get the value of "k" stored earlier
-A:=B==A # compare A and B ("k" and zero)
+pop B   # get the value of &quot;k&quot; stored earlier
+A:=B==A # compare A and B (&quot;k&quot; and zero)
 jmz0090 # if false (A!=B, k!=0) - jump to 0x90
 A:=0001 # store 1 to A as return value
-pop0001 # free space allocated for "k" on the stack
+pop0001 # free space allocated for &quot;k&quot; on the stack
 ret     # and return
-jmp0090 # "else" branch should be here, instead jump to 0x90 (next instruction)
+jmp0090 # &quot;else&quot; branch should be here, instead jump to 0x90 (next instruction)
 A:=0000 # store 0 to A as return value
-pop0001 # free space allocated for "k" on the stack
+pop0001 # free space allocated for &quot;k&quot; on the stack
 ret     # and return
 ret     # remember about double-return for safety? ;)
 </code></pre>
@@ -247,7 +259,7 @@ use real grown-up tools:</p>
 <p>Also, it's worth checking real literature, like <a href="http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Dragon Book</a>. Maybe the
 courses from <a href="https://www.coursera.org/course/compilers">coursera.org</a> will be useful for you, too.</p>
 
-<p>If you need to port existing languages for your own architecture - 
+<p>If you need to port existing languages for your own architecture -
 you'd better learn how to write LLVM backends or GCC backends.</p>
 
 <p>If you want to read more about toy compilers - check <a href="http://en.wikipedia.org/wiki/Small-C">SmallC</a>.</p>
@@ -258,7 +270,7 @@ you'd better learn how to write LLVM backends or GCC backends.</p>
 
 <h2>final word</h2>
 
-<p>The full sources of the compiler are available on [my bitbucket page][4].  They
+<p>The full sources of the compiler are available on <a href="https://bitbucket.org/zserge/cucu">my bitbucket page</a>.  They
 are licensed under MIT, feel free to use and modify.  I'm not sure if there is
 any sense in submitting issues to this project, so do it only if you know how
 to fix them :)</p>
@@ -270,6 +282,17 @@ you missed something</em></p>
 
 <p>Posted on 2012-10-25 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
 
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
@@ -279,10 +302,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

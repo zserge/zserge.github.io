@@ -6,9 +6,22 @@
 		<title> luatesting - micro-pico-tiny framework for Lua unit testing </title>
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,25 +32,24 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>Luatesting</h1>
+		</nav>
+		<h1>Luatesting</h1>
 
-<p>luatesting was born in sin, because the reason to create is was a 
+<p>luatesting was born in sin, because the reason to create is was a
 <a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a> principle
 (Not Invented Here).</p>
 
 <h2>Philosophy</h2>
 
-<p>Yes, I know about <a href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>. 
-But I don't like it. 
-It is good for huge enterprise-level apps. But I don't write 
+<p>Yes, I know about <a href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>.
+But I don't like it.
+It is good for huge enterprise-level apps. But I don't write
 enterprise apps.
 It is good for object-oriented languages. But Lua is not that
 object-oriented.</p>
@@ -47,7 +59,7 @@ package? That's what I kept in mind when writing luatesting.</p>
 
 <h2>Code</h2>
 
-<p>The code repository is stored on 
+<p>The code repository is stored on
 <a href="https://bitbucket.org/zserge/luatesting/">bitbucket</a></p>
 
 <p>API is simple - there is just one function: <code>testing.run()</code></p>
@@ -62,19 +74,19 @@ function MyTestCase.test_other_stuff(t)
     ....
 end
 
-local testing = require("luatesting")
+local testing = require(&quot;luatesting&quot;)
 testing.run()
 </code></pre>
 
 <p>When <code>testing.run()</code> is called - all your global tables are scanned, and
-all methods containing the word "test" in the name are called.</p>
+all methods containing the word &quot;test&quot; in the name are called.</p>
 
 <p>Sounds easy?</p>
 
 <h2>How to test</h2>
 
 <p>That was how to organize your test cases. Now let's see how to test a
-single case. </p>
+single case.</p>
 
 <p>Every test case gets a single parameter - an object, called <code>t</code>.</p>
 
@@ -96,30 +108,30 @@ running this test. There can be several errors in a single test</li>
 }
 
 function ParserTest:test_single_number(t)
-    n = self.p:parse("123")
+    n = self.p:parse(&quot;123&quot;)
     if n ~= 123 then 
-        t.Error("Failed to parse 123") 
+        t.Error(&quot;Failed to parse 123&quot;) 
     end
 
-    n = self.p:parse("0.123")
+    n = self.p:parse(&quot;0.123&quot;)
     if n ~= 0.123 then 
-        t.Error("Failed to parse 0.123") 
+        t.Error(&quot;Failed to parse 0.123&quot;) 
     end
 end
 
 function ParserTest: test_array(t)
-    a = self.p:parse("[ item1, item2, item3 ]")
+    a = self.p:parse(&quot;[ item1, item2, item3 ]&quot;)
     if #a ~= 3 then
         -- We fail here, because there is no reason to continue
-        t.Fail("Array length is not 3")
+        t.Fail(&quot;Array length is not 3&quot;)
     end
 
-    if a[0] ~= "item1" or a[1] ~= "item2" or a[2] ~= "item3" then
-        t.Error("Array contents are wrong")
+    if a[0] ~= &quot;item1&quot; or a[1] ~= &quot;item2&quot; or a[2] ~= &quot;item3&quot; then
+        t.Error(&quot;Array contents are wrong&quot;)
     end
 end
 
-testing = require("luatesting")
+testing = require(&quot;luatesting&quot;)
 testing.run()
 </code></pre>
 
@@ -136,8 +148,10 @@ OK: test_array
 
 <h2>Other info</h2>
 
-<p>My experience with Lua is VERY little, so if it's not enough Lua-esque - 
+<p>My experience with Lua is VERY little, so if it's not enough Lua-esque -
 let me know how to improve it. Thanks!</p>
+
+		<footer></footer>
 	</body>
 </html>
 

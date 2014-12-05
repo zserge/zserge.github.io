@@ -6,9 +6,22 @@
 		<title> textizer: hack your android widgets </title>
 		<meta name="description" content="Never thought of writing your own android widget?" />
 		<meta name="keywords" content="android, home screen, widget, text, minimalism, weather, clock, DIY, hack" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>textizer: hack your android widgets</h1>
+		</nav>
+		<h1>textizer: hack your android widgets</h1>
 
 <p>I like the idea of Android home screen widgets. I like to visualize
 information, to get it quickly and perform common tasks in a single tap.
@@ -41,7 +53,7 @@ battery level) or very specific ones (say, a calendar that draws a date in red
 if it's a holiday in my country). And I want to have a single app to deal with
 all those widgets.</p>
 
-<p>Next, I'd like to share my widget settings with others and backup widgets 
+<p>Next, I'd like to share my widget settings with others and backup widgets
 in a simple way - in other words, I want my widget settings to be stored in a
 file. Preferably, a <a href="http://c2.com/cgi/wiki?PowerOfPlainText">plain text file</a>.</p>
 
@@ -49,9 +61,9 @@ file. Preferably, a <a href="http://c2.com/cgi/wiki?PowerOfPlainText">plain text
 fonts, layout etc. So, I'll need some kind of a programming language and maybe a
 simple markup language to do that.</p>
 
-<p>In other words, all I need is a "DIY widget for geeks". And all I have for now
+<p>In other words, all I need is a &quot;DIY widget for geeks&quot;. And all I have for now
 is an early prototype with bugs and limited functionality. I'll describe it
-below and you will be able to try it out by yourself. </p>
+below and you will be able to try it out by yourself.</p>
 
 <h2>how it works?</h2>
 
@@ -63,17 +75,17 @@ on the PC if you don't like on-screen keyboards (don't forget to copy the file
 back to the device after you've modified it). It's just a text file, so that
 should be easy.</p>
 
-<p>The configuration language must be simple yet powerful. I was thinking of using 
+<p>The configuration language must be simple yet powerful. I was thinking of using
 embeddable languages, and my final choice is - <a href="http://en.wikipedia.org/wiki/Scheme_(programming_language)">Scheme</a>. I use
 <a href="http://norvig.com/jscheme.html">Peter Norvig's toy interpreter</a> written in Java. Even though it's
 very old, and the code is not the state-of-the-art, I still like it, because:</p>
 
 <ul>
 <li>it's very minimalistic</li>
-<li>it's easy to learn (simple syntax, the number of standard procedures is very 
+<li>it's easy to learn (simple syntax, the number of standard procedures is very
 small), easy to extend, easy to integrate with Java</li>
 <li>it's very lightweight - added about 40kB to my APK size</li>
-<li>it's somewhat slow, but thi is not critical for widgets - they are not
+<li>it's somewhat slow, but this is not critical for widgets - they are not
 frequently updated.</li>
 <li>finally, it's a nice chance to learn Scheme by myself, as I have never used
 it before :)</li>
@@ -102,15 +114,15 @@ android file manager capabilities etc).</p>
 <p>Here's the initial contents of the calendar.scm file:</p>
 
 <pre><code>; auto-generated template for 'calendar' widget
-(grid 1 1 "80333333" 60)
-(cell '(1 1 1 1) "calendar")
+(grid 1 1 &quot;80333333&quot; 60)
+(cell '(1 1 1 1) &quot;calendar&quot;)
 </code></pre>
 
 <p><code>(grid ...)</code> and <code>(cell ...)</code> are the functions to create a grid-based layout.
 In the example above we've created a 1x1 grid with the background color
-"#80333333" (semi-transparent gray) and update interval of 60 seconds. Inside
+&quot;#80333333&quot; (semi-transparent gray) and update interval of 60 seconds. Inside
 the grid we've created a single 1x1 cell at the top left corner (with
-coordinates x=1, y=1) and with text "calendar" on it. If you change the text
+coordinates x=1, y=1) and with text &quot;calendar&quot; on it. If you change the text
 (and copy the file back to the device if you did editing on the PC) you'll see
 the widget has changed, too.</p>
 
@@ -144,10 +156,10 @@ in a grid, and the last two numbers are width and height.</p>
 
 <p>This layout can be produced by a script like:</p>
 
-<pre><code>(grid 4 2 "black" 60)
-(cell '(1 2 1 1) "A")
-(cell '(2 1 2 2) "B")
-(cell '(4 1 1 1) "C")
+<pre><code>(grid 4 2 &quot;black&quot; 60)
+(cell '(1 2 1 1) &quot;A&quot;)
+(cell '(2 1 2 2) &quot;B&quot;)
+(cell '(4 1 1 1) &quot;C&quot;)
 </code></pre>
 
 <p>Every logical cell has its own content, font style, alignment etc. For now the
@@ -170,8 +182,8 @@ write</code>(func arg1 arg2 arg3)`. Normally, arguments are evaluated before pas
 to the function. If you want something not to be evaluated - use a quote
 symbol, for example:</p>
 
-<pre><code>(write (+ 1 2))     ; will print "3"
-(write '(+ 1 2))    ; will print "(+ 1 2)"
+<pre><code>(write (+ 1 2))     ; will print &quot;3&quot;
+(write '(+ 1 2))    ; will print &quot;(+ 1 2)&quot;
 </code></pre>
 
 <p>So, the second argument of the <code>(cell '(x y w h) ...)</code> function is a content
@@ -182,61 +194,64 @@ function - just write them one after another after the provider name.</p>
 
 <p>Here's a sample usage of a simple clock provider:</p>
 
-<pre><code>(cell '(1 1 1 1) 'clock "HH:mm")
+<pre><code>(cell '(1 1 1 1) 'clock &quot;HH:mm&quot;)
 </code></pre>
 
-<p>Here we assign a clock provider with the format string of "HH:mm" to the cell.</p>
+<p>Here we assign a clock provider with the format string of &quot;HH:mm&quot; to the cell.</p>
 
 <p>We can create our own providers easily. Here's the sources of our calendar
 widget script:</p>
 
-<pre><code>(grid 1 4 "#ff333745" 60)
+<pre><code>(grid 1 4 &quot;#ff333745&quot; 60)
 
 (define (string-upcase s)
     (list-&gt;string (map char-upcase (string-&gt;list s))))
 
 (cell '(1 1 1 1) 
     (lambda ()
-        (style '(color "#fff6f792") '(font "sans" 18))
-        (string-upcase (clock "MMM"))))
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;sans&quot; 18))
+        (string-upcase (clock &quot;MMM&quot;))))
 
 (cell '(1 2 1 2) 
     (lambda ()
-        (style '(color "#fff6f792") '(font "bold" 36))
-        (clock "dd")))
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;bold&quot; 36))
+        (clock &quot;dd&quot;)))
 
 (cell '(1 4 1 1)
     (lambda ()
-        (style '(color "#fff6f792") '(font "bold" 18))
-        (string-upcase (clock "EEE"))))
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;bold&quot; 18))
+        (string-upcase (clock &quot;EEE&quot;))))
 </code></pre>
 
 <p>And the result is:</p>
 
-<p><img src="/images/textizer-calendar-1x1.png" alt="Widget 1x1" title="" /></p>
+<p><img src="/images/textizer-calendar-1x1.png" alt="Widget 1x1" />
+</p>
 
 <p>Here's an example of another widget created with textizer (converting time to
 text and pretty-printing is done purely in Scheme):</p>
 
-<p><img src="/images/textizer-widget-4x1.png" alt="Widget 0x1" title="" /></p>
+<p><img src="/images/textizer-widget-4x1.png" alt="Widget 0x1" />
+</p>
 
 <p>Here's a list of functions you can use to customize your textizer widgets:</p>
 
 <ul>
 <li><code>(grid width height color interval)</code> - creates a grid layout</li>
-<li><code>(cell rect provider provider-args ...)</code> - defines a new cell inside a grid. 
+<li><code>(cell rect provider provider-args ...)</code> - defines a new cell inside a grid.
 <code>rect</code> is a list of 4 numbers - <code>(x y width height)</code>.</li>
 <li><code>(clock format)</code> - returns a string representing current time according to the
-<code>format</code> string. <code>format</code> is the same as in [SimpleDateFormat][datefmt] class
+<code>format</code> string. <code>format</code> is the same as in <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a> class
 documentation.</li>
 <li><code>(style '(param value) ...)</code> - defines new painting style. <code>param</code> can be one
 of:
+
 <ul>
 <li><code>'(color color-string)</code> - defines font color.</li>
-<li><code>'(font name size)</code> - defines font style and size. <code>name</code> is one of "sans",
-"serif", "mono" or "bold".</li>
-<li><code>'(align horiz-align vert-align)</code> - defines an alignment. Can be "left",
-"right", "top", "bottom" or "center".</li>
+<li><code>'(font name size)</code> - defines font style and size. <code>name</code> is one of &quot;sans&quot;,
+&quot;serif&quot;, &quot;mono&quot; or &quot;bold&quot;.</li>
+<li><code>'(align horiz-align vert-align)</code> - defines an alignment. Can be &quot;left&quot;,
+&quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; or &quot;center&quot;.</li>
 </ul></li>
 </ul>
 
@@ -267,6 +282,17 @@ bitbucket</a>.</p>
 
 <p>Posted on 2012-08-25 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
 
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
@@ -276,10 +302,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

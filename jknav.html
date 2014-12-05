@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
+		<title> jknav for Chrome and Firefox </title>
+		<meta name="description" content="use j/k navigation in your browser - keep your hands on the home row" />
+		<meta name="keywords" content="jk, hjkl, vi-like, firefox, chrome, extension, vimperator, vimium" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-33644825-1', 'zserge.com');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<nav class='menu'>/*
+			<ul class='menu'>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
+			</ul>*/
+		</nav>
+		<h1>jknav</h1>
+
+<p>jknav is a simple vi-link j/k navigation and link hinting extension for Chrome
+and Firefox.</p>
+
+<p>I have to apologize to real javascript developers for my ugly code.
+Any advice from experienced developers in this area is appreciated ;)</p>
+
+<h2>why not use Vimperator/Vimium?</h2>
+
+<p>I really like those extensions, they are powerful and behave much like Vim.  On
+the other hand, I'm used to native hotkeys, like Ctrl-D to add to bookmarks
+(not scroll half-page down) etc. I'm quite happy with the default hotkeys,
+except for j/k, which is much nicer than arrow-up/arrow-down. Also, link
+hinting saves time for me and makes web surfing possible without using mouse at
+all.</p>
+
+<p>That's why I wrote my own tiny extrension for this limited purpose.</p>
+
+<h2>usage</h2>
+
+<p>Extension sources are hosted on <a href="https://bitbucket.org/zserge/jknav">bitbucket</a>.
+Also, one can get there prebuilt
+<a href="https://bitbucket.org/zserge/jknav/downloads/jknav.xpi">*.xpi</a> and
+<a href="https://bitbucket.org/zserge/jknav/downloads/jknav.crx">*.crx</a> packages.</p>
+
+<p>Installation can be tricky, so for Chrome you should open &quot;Extensions&quot; page
+(from Menu-Tools), then drag-n-drop the *.crx file from the file manager.</p>
+
+<p>Firefox users should open Tools-Addons window, then pick &quot;Install Add-on From
+File...&quot; option in the dropdown menu. Restart is required for extension to
+load.</p>
+
+<p>After the plugin is installed, use 'j' and 'k' to scroll page down and up.</p>
+
+<p>Use 'f' to highlight links, then type a number corresponding to the link you
+want to follow. If your number is too short (e.g. there is link '2', '21', '22', ...
+and you want to follow the link '2') - press ENTER to confirm your choice.</p>
+
+<h2>other info</h2>
+
+<p>As I have very limited experience in javascript I must warn you that this software
+have tons of bugs. The good news is that it's open-source and distributed under
+MIT license, so feel free to modify it if you need.</p>
+
+		<footer></footer>
+	</body>
+</html>
+

@@ -6,9 +6,22 @@
 		<title> six - simple IRC client kept simple </title>
 		<meta name="description" content="minimal IRC client inspired by suckless' sic" />
 		<meta name="keywords" content="irc, simple, client, terminal" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,17 +32,16 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>six</h1>
+		</nav>
+		<h1>six</h1>
 
-<p>six - simple IRC client kept simple (that's what the name means: sicks ->
+<p>six - simple IRC client kept simple (that's what the name means: sicks -&gt;
 six). six is really tiny piece of software - only 200 SLOC.</p>
 
 <p>It's mainly inspired by <a href="http://tools.suckless.org/sic">sic</a>.</p>
@@ -56,7 +68,7 @@ folder. I hope one day I will add a <code>make install</code> rule.</p>
 <p>For more automated usage you can specify your nickname, channel name,
 password (if you are not paranoid) or a custom startup script:</p>
 
-<pre><code>six -n john -k pa55w0rd -j "#johnchan" irc.server.net
+<pre><code>six -n john -k pa55w0rd -j &quot;#johnchan&quot; irc.server.net
 
 six -s &lt;commands&gt; irc.server.net
 </code></pre>
@@ -100,7 +112,7 @@ message:</p>
 
 <p>I also like using six with bitlbee. I start it like:</p>
 
-<pre><code>six -s "PRIVMSG root :IDENTIFY myPassw0rd" localhost
+<pre><code>six -s &quot;PRIVMSG root :IDENTIFY myPassw0rd&quot; localhost
 </code></pre>
 
 <p>And then I easily use my jabber in the terminal.</p>
@@ -110,6 +122,11 @@ message:</p>
 <p>If your terminal looks nice - <code>six</code> also looks nice ;)</p>
 
 <p>Here's my six+urxvt+tmux</p>
+
+<p><img src="/images/six.png" alt="screenshot" />
+</p>
+
+		<footer></footer>
 	</body>
 </html>
 

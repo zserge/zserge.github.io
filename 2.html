@@ -6,9 +6,22 @@
 		<title> the power of 2 </title>
 		<meta name="description" content="" />
 		<meta name="keywords" content="cd, chdir, unix, shell, bash, golang, autojump, CDPATH, zsh, alias" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,17 +32,16 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>2</h1>
+		</nav>
+		<h1>2</h1>
 
-<p>"2" helps you to jump between folders in your unix shell.
+<p>&quot;2&quot; helps you to jump between folders in your unix shell.
 It's just my attempt to <em>guess</em> where you want to navigate
 and help you with less typing.</p>
 
@@ -41,13 +53,13 @@ and help you with less typing.</p>
 while you are jumping around.</p>
 
 <p>Later, when you want to <code>cd</code> somewhere you just type a few letters (hints) -
-"2" will find the most suitable directory path using the fuzzy search and
+&quot;2&quot; will find the most suitable directory path using the fuzzy search and
 brings you there.</p>
 
-<p>If you want to know more - "2" has two parts (what a coincidence!).
+<p>If you want to know more - &quot;2&quot; has two parts (what a coincidence!).
 The first is a piece of a shell script (now <code>zsh</code> and <code>bash</code> are supported).
 This scripts monitors your moves around the filesystem tree and
-provides and alias for "2" and a hotkey for interactive mode (see below what
+provides and alias for &quot;2&quot; and a hotkey for interactive mode (see below what
 it means).</p>
 
 <p>The second piece is a tool written in Go. It reads and writes the directories
@@ -69,41 +81,41 @@ $ sudo cp zshrc /usr/local/share/2
 <p>Then add the following lines to your <code>.bashrc</code> or <code>.zshrc</code> depending on what
 shell you use:</p>
 
-<pre><code>export _2IGNORE="/tmp/*"
+<pre><code>export _2IGNORE=&quot;/tmp/*&quot;
 source /usr/local/share/2/bashrc # or zshrc
 </code></pre>
 
-<p>The second line integrates "2" into your shell and the first line
+<p>The second line integrates &quot;2&quot; into your shell and the first line
 is used to configure it (to make it ignore some paths)</p>
 
 <h2>tricks</h2>
 
-<p>If you want "2" to understand you better first set up the ignored paths.
+<p>If you want &quot;2&quot; to understand you better first set up the ignored paths.
 I personally don't like it to remember my <code>/tmp</code> and all its subfolders
 because they are located in the <code>tmpfs</code> and there is no sense to store these
 paths in the persistent database. Also, I don't want it to remember my home
-directory (but still remember the subdirectories). </p>
+directory (but still remember the subdirectories).</p>
 
 <p>You can put a list of ignored paths into the <code>_2IGNORE</code> environment variable
 separated by colons. In my case it looks like:</p>
 
-<pre><code>export _2IGNORE="/tmp/*:/home/serge"
+<pre><code>export _2IGNORE=&quot;/tmp/*:/home/serge&quot;
 </code></pre>
 
 <p>The star at the end of the path means a mask.</p>
 
 <p>Next, the hints that are closer to the end of the path are more important, thus
-for hint <code>"sys"</code> it's more likely to go to <code>/usr/include/sys</code> than to
+for hint <code>&quot;sys&quot;</code> it's more likely to go to <code>/usr/include/sys</code> than to
     <code>/sys/kernel/debug</code>.</p>
 
-<p>Hints are matched in the order you type them. </p>
+<p>Hints are matched in the order you type them.</p>
 
 <p>Another thing to remember is that extra importance have hints that match the
-parts of the path after the separators: hint <code>"inc"</code> points <code>/usr/include</code>
-more obviously than hint <code>"clu"</code> even though <code>"clu"</code> is closer to the end of
+parts of the path after the separators: hint <code>&quot;inc&quot;</code> points <code>/usr/include</code>
+more obviously than hint <code>&quot;clu&quot;</code> even though <code>&quot;clu&quot;</code> is closer to the end of
 the path.</p>
 
-<p>That's all you need to know. Happy "2"-ing!</p>
+<p>That's all you need to know. Happy &quot;2&quot;-ing!</p>
 
 <h2>interactive mode</h2>
 
@@ -114,7 +126,11 @@ interactive mode. It's still in its very early days, but might help someone.</p>
 
 <h2>other info</h2>
 
-<p>"2" is an open source software and is distributed under MIT license.</p>
+<p>&quot;2&quot; is an open source software and is distributed under MIT license.</p>
+
+<p>The sources are hosted on <a href="https://bitbucket.org/zserge/2">Bitbucket</a>.</p>
+
+		<footer></footer>
 	</body>
 </html>
 

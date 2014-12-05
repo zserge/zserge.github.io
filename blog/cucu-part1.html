@@ -6,9 +6,22 @@
 		<title> cucu: a compiler you can understand (1/3) </title>
 		<meta name="description" content="Compilers is fun. Want to write your own one?" />
 		<meta name="keywords" content="compiler, programming, C, smallC, easy, tiny, small, tutorial, lexer" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>cucu: a compiler you can understand (part&nbsp;1)</h1>
+		</nav>
+		<h1>cucu: a compiler you can understand (part&nbsp;1)</h1>
 
 <p>Let talk about the compilers. Have you ever thought of writing your own one?</p>
 
@@ -36,10 +48,10 @@ theoretical, so keep patience.</p>
 
 <h2>what we're going to achieve?</h2>
 
-<p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C 
+<p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C
 as possible, so that every valid CUCU program could be compiled with a C
 compiler without any errors. Of course, the support of the whole ANSI C
-standard is very difficult, so I picked a very small C language subset. </p>
+standard is very difficult, so I picked a very small C language subset.</p>
 
 <p>For example, here's a valid CUCU code snippet:</p>
 
@@ -54,7 +66,7 @@ standard is very difficult, so I picked a very small C language subset. </p>
 
 <h2>grammar</h2>
 
-<p>We're about to define a grammar for our language. It's an important step, 
+<p>We're about to define a grammar for our language. It's an important step,
 because everything in our compiler design depends on it.</p>
 
 <p>So, let's go from top to bottom. Our source file contains a <strong>program</strong>.
@@ -75,15 +87,15 @@ know what EBNF is, it's really intuitive):</p>
 <pre><code>&lt;program&gt; ::= { &lt;var-decl&gt; | &lt;func-decl&gt; | &lt;func-def&gt; } ;
 </code></pre>
 
-<p>This notation says: "a program is a repeating sequence of variable declarations,
+<p>This notation says: &quot;a program is a repeating sequence of variable declarations,
 function declarations and function definitions. But what is all those
 declarations and definitions? Ok, let's go deeper:</p>
 
-<pre><code>&lt;var-decl&gt; ::= &lt;type&gt; &lt;ident&gt; ";"
-&lt;func-decl&gt; ::= &lt;type&gt; &lt;ident&gt; "(" &lt;func-args&gt; ")" ";"
-&lt;func-def&gt; ::= &lt;type&gt; &lt;ident&gt; "(" &lt;func-args&gt; ")" &lt;func-body&gt;
-&lt;func-args&gt; ::= { &lt;type&gt; &lt;ident&gt; "," }
-&lt;type&gt; ::= "int" | "char *"
+<pre><code>&lt;var-decl&gt; ::= &lt;type&gt; &lt;ident&gt; &quot;;&quot;
+&lt;func-decl&gt; ::= &lt;type&gt; &lt;ident&gt; &quot;(&quot; &lt;func-args&gt; &quot;)&quot; &quot;;&quot;
+&lt;func-def&gt; ::= &lt;type&gt; &lt;ident&gt; &quot;(&quot; &lt;func-args&gt; &quot;)&quot; &lt;func-body&gt;
+&lt;func-args&gt; ::= { &lt;type&gt; &lt;ident&gt; &quot;,&quot; }
+&lt;type&gt; ::= &quot;int&quot; | &quot;char *&quot;
 </code></pre>
 
 <p>So, variable declaration is simple: it's a type name followed by the identifier,
@@ -93,11 +105,11 @@ and followed by a semicolon, like we usually do in C, e.g.:</p>
 char *s;
 </code></pre>
 
-<p>Function declaration is a bit more complicated. It's a "type + identifier", 
+<p>Function declaration is a bit more complicated. It's a &quot;type + identifier&quot;,
 and an optional list of function arguments <code>&lt;func-args&gt;</code> inside the braces.</p>
 
-<p>Function arguments list, in it's turn, is a sequence of comma-separated 
-"type + identifier", like:</p>
+<p>Function arguments list, in it's turn, is a sequence of comma-separated
+&quot;type + identifier&quot;, like:</p>
 
 <pre><code>char *s, int from, int to
 </code></pre>
@@ -108,10 +120,10 @@ just simplify our parser code.</em></p>
 <p>The supported data types are only <code>int</code> and <code>char *</code>. Identifier is a sequence
 of letters, digits and an underscore symbol.</p>
 
-<p>The only thing left is <code>&lt;func-body&gt;</code>. But let's talk about <strong>statements</strong> and 
+<p>The only thing left is <code>&lt;func-body&gt;</code>. But let's talk about <strong>statements</strong> and
 <strong>expressions</strong> first.</p>
 
-<p><em>Statement</em> is a smallest standalone element of the language. Here are valid 
+<p><em>Statement</em> is a smallest standalone element of the language. Here are valid
 statements in out language:</p>
 
 <pre><code>/* These are simple statements */
@@ -135,12 +147,12 @@ usually a block statement).</p>
 <p>Here's what we have:</p>
 
 <pre><code>&lt;func-body&gt; ::= &lt;statement&gt;
-&lt;statement&gt; ::= "{" { &lt;statement&gt; } "}"                /* block statement */
-                | [&lt;type&gt;] &lt;ident&gt; [ "=" &lt;expr&gt; ] ";"  /* assignment */
-                | "return" &lt;expr&gt; ";"
-                | "if" "(" &lt;expr&gt; ")" &lt;statement&gt; [ "else" &lt;statement&gt; ]
-                | "while" "(" &lt;expr&gt; ")" &lt;statement&gt;
-                | &lt;expr&gt; ";"
+&lt;statement&gt; ::= &quot;{&quot; { &lt;statement&gt; } &quot;}&quot;                /* block statement */
+                | [&lt;type&gt;] &lt;ident&gt; [ &quot;=&quot; &lt;expr&gt; ] &quot;;&quot;  /* assignment */
+                | &quot;return&quot; &lt;expr&gt; &quot;;&quot;
+                | &quot;if&quot; &quot;(&quot; &lt;expr&gt; &quot;)&quot; &lt;statement&gt; [ &quot;else&quot; &lt;statement&gt; ]
+                | &quot;while&quot; &quot;(&quot; &lt;expr&gt; &quot;)&quot; &lt;statement&gt;
+                | &lt;expr&gt; &quot;;&quot;
 </code></pre>
 
 <p>Here are possible expressions in CUCU language:</p>
@@ -163,8 +175,8 @@ usually a block statement).</p>
                | &lt;add-expr&gt; - &lt;postfix-expr&gt;
 &lt;postfix-expr&gt; ::= &lt;prim-expr&gt;
                    | &lt;postfix-expr&gt; [ &lt;expr&gt; ]
-                   | &lt;postfix-expr&gt; ( &lt;expr&gt; { "," &lt;expr&gt; } )
-&lt;prim-expr&gt; := &lt;number&gt; | &lt;ident&gt; | &lt;string&gt; | "(" &lt;expr&gt; ")"
+                   | &lt;postfix-expr&gt; ( &lt;expr&gt; { &quot;,&quot; &lt;expr&gt; } )
+&lt;prim-expr&gt; := &lt;number&gt; | &lt;ident&gt; | &lt;string&gt; | &quot;(&quot; &lt;expr&gt; &quot;)&quot;
 </code></pre>
 
 <p>That's it. Did you notice the recursion in the expression notation?  Basically,
@@ -182,7 +194,7 @@ a lexer. Our compiler takes a stream of bytes as an input, and lexer allows to
 split that stream into smaller tokens, that can be processed later. It gives us
 some level of abstraction and simplifies out parser.</p>
 
-<p>For example, a sequence of bytes "int i = 2+31;" will be split into tokens:</p>
+<p>For example, a sequence of bytes &quot;int i = 2+31;&quot; will be split into tokens:</p>
 
 <pre><code>int
 i
@@ -193,17 +205,17 @@ i
 ;
 </code></pre>
 
-<p><em>In normal grown-up lexers every lexeme (token) has a type and a value, so 
+<p><em>In normal grown-up lexers every lexeme (token) has a type and a value, so
 instead of the list above we will get a list of pairs: <code>&lt;TYPE:int&gt;,&lt;ID:i&gt;,
 &lt;ASSIGN:=&gt;,&lt;NUM:2&gt;,&lt;PLUS:+&gt;,&lt;NUM:31&gt;,&lt;SEMI:;&gt;</code>. We are going to detect lexeme
 type by its value, which is not academical at all!</em></p>
 
 <p>The major problem with the lexer is that once a byte is read from the stream -
-it can not be "un-read". And what if we've read a byte that can not be added to
+it can not be &quot;un-read&quot;. And what if we've read a byte that can not be added to
 the current token? Where should we store it until the current token is
 processed?</p>
 
-<p>Almost every lexer need to read ahead. Our grammar is simple enough, so all we 
+<p>Almost every lexer need to read ahead. Our grammar is simple enough, so all we
 need to have is a single byte buffer - <code>nextc</code>. It stores a byte, that was read
 from the stream, but has not yet been pushed to the token string.</p>
 
@@ -216,12 +228,12 @@ would loose it's simplicity.</p>
 <ul>
 <li>skip leading spaces</li>
 <li>try to read an identifier (a sequence of letters, digits and <code>_</code>)</li>
-<li>if it's not an identifier - try to read a sequence of special operators, like 
+<li>if it's not an identifier - try to read a sequence of special operators, like
 <code>&amp;, |, &lt;, &gt;, =, !</code>.</li>
-<li>if it's not an operator - try to read a string literal "...." or '....'</li>
+<li>if it's not an operator - try to read a string literal &quot;....&quot; or '....'</li>
 <li>if failed - maybe it's a comment, like <code>/* ... */</code>?</li>
 <li>if failed again - just read a single byte. It might be another single-byte
-token, like "(" or "[".</li>
+token, like &quot;(&quot; or &quot;[&quot;.</li>
 </ul>
 
 <p>Here's the whole CUCU sources we've got so far:</p>
@@ -240,7 +252,7 @@ static int nextc;
 void readchr() {
     if (tokpos == MAXTOKSZ - 1) {
         tok[tokpos] = '\0';
-        fprintf(stderr, "token too long: %s\n", tok);
+        fprintf(stderr, &quot;token too long: %s\n&quot;, tok);
         exit(EXIT_FAILURE);
     }
     tok[tokpos++] = nextc;
@@ -263,7 +275,7 @@ void readtok() {
             }
         }
         if (tokpos == 0) {
-            if (nextc == '\'' || nextc == '"') {
+            if (nextc == '\'' || nextc == '&quot;') {
                 char c = nextc;
                 readchr();
                 while (nextc != c) {
@@ -297,14 +309,14 @@ int main() {
 
     for (;;) {
         readtok();
-        printf("TOKEN: %s\n", tok);
+        printf(&quot;TOKEN: %s\n&quot;, tok);
         if (tok[0] == '\0') break;
     }
     return 0;
 }
 </code></pre>
 
-<p>If we put a C file as the compiler input - it will print us a list of tokens, 
+<p>If we put a C file as the compiler input - it will print us a list of tokens,
 one per line.</p>
 
 <p>Ok, have a cup of coffee, and let's <a href="/blog/cucu-part2.html">go further &rarr;</a></p>
@@ -312,6 +324,17 @@ one per line.</p>
 <p><em>You can check <a href="/blog/cucu-part3.html">part3</a> to know how the story ended.</em></p>
 
 <p>Posted on 2012-10-23 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
 
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
@@ -322,10 +345,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

@@ -6,9 +6,22 @@
 		<title> cucu: a compiler you can understand (2/3) </title>
 		<meta name="description" content="Compilers is fun. Want to write your own one?" />
 		<meta name="keywords" content="compiler, programming, C, smallC, easy, tiny, small, tutorial, parser, variables" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,18 +32,17 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>cucu: a compiler u can understand (part&nbsp;2)</h1>
+		</nav>
+		<h1>cucu: a compiler u can understand (part&nbsp;2)</h1>
 
-<p>So far, we have defined language grammar and have written a lexer. In this part 
-we will write a parser for our language. Before we start, we need some helper 
+<p>So far, we have defined language grammar and have written a lexer. In this part
+we will write a parser for our language. Before we start, we need some helper
 functions:</p>
 
 <pre><code>int peek(char *s) {
@@ -47,7 +59,7 @@ int accept(char *s) {
 
 int expect(char *s) {
     if (accept(s) == 0) {
-        error("Error: expected '%s'\n", s);
+        error(&quot;Error: expected '%s'\n&quot;, s);
     }
 }
 </code></pre>
@@ -58,8 +70,8 @@ int expect(char *s) {
 
 <h2>the harder part</h2>
 
-<p>As you can see from the language grammar, statements and various expression 
-types are strongly interconnected. It means we have to write all parser 
+<p>As you can see from the language grammar, statements and various expression
+types are strongly interconnected. It means we have to write all parser
 functions at once, keeping in mind the recursion. Let's go again from top
 to bottom. Here's our top-level compiler() functions:</p>
 
@@ -69,29 +81,29 @@ static void statement();
 static void compile() {
     while (tok[0] != 0) { /* until EOF */
         if (typename() == 0) {
-            error("Error: type name expected\n");
+            error(&quot;Error: type name expected\n&quot;);
         }
-        DEBUG("identifier: %s\n", tok);
+        DEBUG(&quot;identifier: %s\n&quot;, tok);
         readtok();
-        if (accept(";")) {
-            DEBUG("variable definition\n");
+        if (accept(&quot;;&quot;)) {
+            DEBUG(&quot;variable definition\n&quot;);
             continue;
         } 
-        expect("(");
+        expect(&quot;(&quot;);
         int argc = 0;
         for (;;) {
             argc++;
             typename();
-            DEBUG("function argument: %s\n", tok);
+            DEBUG(&quot;function argument: %s\n&quot;, tok);
             readtok();
-            if (peek(")")) {
+            if (peek(&quot;)&quot;)) {
                 break;
             }
-            expect(",");
+            expect(&quot;,&quot;);
         }
-        expect(")");
-        if (accept(";") == 0) {
-            DEBUG("function body\n");
+        expect(&quot;)&quot;);
+        if (accept(&quot;;&quot;) == 0) {
+            DEBUG(&quot;function body\n&quot;);
             statement();
         }
     }
@@ -101,181 +113,181 @@ static void compile() {
 <p>It reads type name, then an identifier. If it's followed by a semicolon -
 it's a variable declaration. If it's followed by a paren - it's a function.
 Function scans function arguments one by one, and if function is not
-followed by a semicolon - it's a definition (function with a body), otherwise - 
+followed by a semicolon - it's a definition (function with a body), otherwise -
 it's just a declaration (just function name and prototype).</p>
 
 <p>Here, <code>typename()</code> is function that just skips the valid type name. We accept
 only <code>int</code> and <code>char</code> and various pointers to them (<code>char *</code>):</p>
 
 <pre><code>static int typename() {
-    if (peek("int") || peek("char")) {
+    if (peek(&quot;int&quot;) || peek(&quot;char&quot;)) {
         readtok();
-        while (accept("*"));
+        while (accept(&quot;*&quot;));
         return 1;
     }
     return 0;
 }
 </code></pre>
 
-<p>The most interesting part is the <code>statement()</code> function. It parses a single 
-statement, which can be a block, a local variable definition/declaration, 
+<p>The most interesting part is the <code>statement()</code> function. It parses a single
+statement, which can be a block, a local variable definition/declaration,
 a <code>return</code> statement etc. Here how it should look like:</p>
 
 <pre><code>static void statement() {
-    if (accept("{")) {
-        while (accept("}") == 0) {
+    if (accept(&quot;{&quot;)) {
+        while (accept(&quot;}&quot;) == 0) {
             statement();
         }
     } else if (typename()) {
-        DEBUG("local variable: %s\n", tok);
+        DEBUG(&quot;local variable: %s\n&quot;, tok);
         readtok();
-        if (accept("=")) {
+        if (accept(&quot;=&quot;)) {
             expr();
-            DEBUG(" :=\n");
+            DEBUG(&quot; :=\n&quot;);
         }
-        expect(";");
-    } else if (accept("if")) {
+        expect(&quot;;&quot;);
+    } else if (accept(&quot;if&quot;)) {
         /* TODO */
-    } else if (accept("while")) {
+    } else if (accept(&quot;while&quot;)) {
         /* TODO */
-    } else if (accept("return")) {
-        if (peek(";") == 0) {
+    } else if (accept(&quot;return&quot;)) {
+        if (peek(&quot;;&quot;) == 0) {
             expr();
         }
-        expect(";");
-        DEBUG("RET\n");
+        expect(&quot;;&quot;);
+        DEBUG(&quot;RET\n&quot;);
     } else {
         expr();
-        expect(";");
+        expect(&quot;;&quot;);
     }
 }
 </code></pre>
 
 <p>So, if it's a block <code>{ .. }</code> - just read statements until end of block is met.
-If it starts with a type name - it's a local variable. Conditional statements 
-("if/then/else") and loops are just stubs for now. Think of how you would
+If it starts with a type name - it's a local variable. Conditional statements
+(&quot;if/then/else&quot;) and loops are just stubs for now. Think of how you would
 implement them according to the grammar we use.</p>
 
 <p>Anyway, most of the statement contain expressions inside. So, we need to make a
-function that parses an expression. Expression parser is a recursive descent 
-parser, so it's a number of functions that call each other recursively until 
+function that parses an expression. Expression parser is a recursive descent
+parser, so it's a number of functions that call each other recursively until
 primary expression is found. Primary expression as we can see from the grammar
 is a number (constant) or an identifier (variable or function).</p>
 
 <pre><code>static void prim_expr() {
     if (isdigit(tok[0])) {
-        DEBUG(" const-%s ", tok);
+        DEBUG(&quot; const-%s &quot;, tok);
     } else if (isalpha(tok[0])) {
-        DEBUG(" var-%s ", tok);
-    } else if (accept("(")) {
+        DEBUG(&quot; var-%s &quot;, tok);
+    } else if (accept(&quot;(&quot;)) {
         expr();
-        expect(")");
+        expect(&quot;)&quot;);
     } else {
-        error("Unexpected primary expression: %s\n", tok);
+        error(&quot;Unexpected primary expression: %s\n&quot;, tok);
     }
     readtok();
 }
 
 static void postfix_expr() {
     prim_expr();
-    if (accept("[")) {
+    if (accept(&quot;[&quot;)) {
         expr();
-        expect("]");
-        DEBUG(" [] ");
-    } else if (accept("(")) {
-        if (accept(")") == 0) {
+        expect(&quot;]&quot;);
+        DEBUG(&quot; [] &quot;);
+    } else if (accept(&quot;(&quot;)) {
+        if (accept(&quot;)&quot;) == 0) {
             expr();
-            DEBUG(" FUNC-ARG\n");
-            while (accept(",")) {
+            DEBUG(&quot; FUNC-ARG\n&quot;);
+            while (accept(&quot;,&quot;)) {
                 expr();
-                DEBUG(" FUNC-ARG\n");
+                DEBUG(&quot; FUNC-ARG\n&quot;);
             }
-            expect(")");
+            expect(&quot;)&quot;);
         }
-        DEBUG(" FUNC-CALL\n");
+        DEBUG(&quot; FUNC-CALL\n&quot;);
     }
 }
 
 static void add_expr() {
     postfix_expr();
-    while (peek("+") || peek("-")) {
-        if (accept("+")) {
+    while (peek(&quot;+&quot;) || peek(&quot;-&quot;)) {
+        if (accept(&quot;+&quot;)) {
             postfix_expr();
-            DEBUG(" + ");
-        } else if (accept("-")) {
+            DEBUG(&quot; + &quot;);
+        } else if (accept(&quot;-&quot;)) {
             postfix_expr();
-            DEBUG(" - ");
+            DEBUG(&quot; - &quot;);
         }
     }
 }
 
 static void shift_expr() {
     add_expr();
-    while (peek("&lt;&lt;") || peek("&gt;&gt;")) {
-        if (accept("&lt;&lt;")) {
+    while (peek(&quot;&lt;&lt;&quot;) || peek(&quot;&gt;&gt;&quot;)) {
+        if (accept(&quot;&lt;&lt;&quot;)) {
             add_expr();
-            DEBUG(" &lt;&lt; ");
-        } else if (accept("&gt;&gt;")) {
+            DEBUG(&quot; &lt;&lt; &quot;);
+        } else if (accept(&quot;&gt;&gt;&quot;)) {
             add_expr();
-            DEBUG(" &gt;&gt; ");
+            DEBUG(&quot; &gt;&gt; &quot;);
         }
     }
 }
 
 static void rel_expr() {
     shift_expr();
-    while (peek("&lt;")) {
-        if (accept("&lt;")) {
+    while (peek(&quot;&lt;&quot;)) {
+        if (accept(&quot;&lt;&quot;)) {
             shift_expr();
-            DEBUG(" &lt; ");
+            DEBUG(&quot; &lt; &quot;);
         }
     }
 }
 
 static void eq_expr() {
     rel_expr();
-    while (peek("==") || peek("!=")) {
-        if (accept("==")) {
+    while (peek(&quot;==&quot;) || peek(&quot;!=&quot;)) {
+        if (accept(&quot;==&quot;)) {
             rel_expr();
-            DEBUG(" == ");
-        } else if (accept("!=")) {
+            DEBUG(&quot; == &quot;);
+        } else if (accept(&quot;!=&quot;)) {
             rel_expr();
-            DEBUG("!=");
+            DEBUG(&quot;!=&quot;);
         }
     }
 }
 
 static void bitwise_expr() {
     eq_expr();
-    while (peek("|") || peek("&amp;")) {
-        if (accept("|")) {
+    while (peek(&quot;|&quot;) || peek(&quot;&amp;&quot;)) {
+        if (accept(&quot;|&quot;)) {
             eq_expr();
-            DEBUG(" OR ");
-        } else if (accept("&amp;")) {
+            DEBUG(&quot; OR &quot;);
+        } else if (accept(&quot;&amp;&quot;)) {
             eq_expr();
-            DEBUG(" AND ");
+            DEBUG(&quot; AND &quot;);
         }
     }
 }
 
 static void expr() {
     bitwise_expr();
-    if (accept("=")) {
+    if (accept(&quot;=&quot;)) {
         expr();
-        DEBUG(" := ");
+        DEBUG(&quot; := &quot;);
     }
 }
 </code></pre>
 
 <p>It's a big piece of code, but don't be afraid - it's really simple.
 Every function that parses expression type first tries to call a
-more prioritized expression parser. Then, if an expected operator is found - 
+more prioritized expression parser. Then, if an expected operator is found -
 it calls more prioritized expression parser again. Now it has parsed both
 parts of a binary expression (like x+y, or x&amp;y, or x==y), so it can perform
-an operation and return. Some expression can be "chained" (like a+b+c+d), so 
+an operation and return. Some expression can be &quot;chained&quot; (like a+b+c+d), so
 we parse them with loops.</p>
 
-<p>We put debug output after every expression parser function. This will give us 
+<p>We put debug output after every expression parser function. This will give us
 an interesting result. For example, if we parse this piece of code:</p>
 
 <pre><code>int main(int argc, char **argv) {
@@ -315,10 +327,10 @@ register-based, it's still very simple and fits our compiler needs.</p>
 <p>Ok, we are good. We've got a lexer and a parser in less than 300 lines of code.
 What we need to do is to add some functions to work with the symbols (like
 variable names, or functions). A compiler should have a table of symbols to
-quickly find their addresses, so when you write "i = 0" - it means put zero
-into the location at address 0x1234 in RAM (if symbol "i" has address 0x1234 in
+quickly find their addresses, so when you write &quot;i = 0&quot; - it means put zero
+into the location at address 0x1234 in RAM (if symbol &quot;i&quot; has address 0x1234 in
 memory).
-Also, when you call "func()" it means - jump to address 0x5678 (if symbol "func"
+Also, when you call &quot;func()&quot; it means - jump to address 0x5678 (if symbol &quot;func&quot;
 has value of 0x5678).</p>
 
 <p>We use the following structure for symbols:</p>
@@ -330,7 +342,7 @@ has value of 0x5678).</p>
 };
 </code></pre>
 
-<p>Here <code>type</code> has special meaning. We use a single-letter codes to detect symbol 
+<p>Here <code>type</code> has special meaning. We use a single-letter codes to detect symbol
 type:</p>
 
 <ul>
@@ -340,7 +352,7 @@ type:</p>
 <li><code>D</code> - defined global variable. Same as above.</li>
 </ul>
 
-<p>So far, I've added two functions: <code>sym_find(char *s)</code> to find symbol by its 
+<p>So far, I've added two functions: <code>sym_find(char *s)</code> to find symbol by its
 name, and <code>sym_declare()</code> to add a new symbol.</p>
 
 <p>Now we're are ready to develop <a href="/blog/cucu-part3.html">backend architecture &rarr;</a></p>
@@ -348,6 +360,17 @@ name, and <code>sym_declare()</code> to add a new symbol.</p>
 <p><em>Check <a href="/blog/cucu-part1.html">part 1</a> if you missed something</em></p>
 
 <p>Posted on 2012-10-24 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
+
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
 
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
@@ -358,10 +381,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 

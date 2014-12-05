@@ -6,9 +6,22 @@
 		<title> Microframework for embedded systems development </title>
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>nikl</h1>
+		</nav>
+		<h1>nikl</h1>
 
 <p>Nikl is a micro-framework for small embedded devices like AVR
 microcontrollers.</p>
@@ -53,10 +65,10 @@ need and just copy or symlink them to your project directory</li>
 
 <h2>STRUCTURE</h2>
 
-<p>You should see "/inc" folder. There is where all the modules are stored.
-Another folder is "/test". This is a folder with unit tests. </p>
+<p>You should see &quot;/inc&quot; folder. There is where all the modules are stored.
+Another folder is &quot;/test&quot;. This is a folder with unit tests.</p>
 
-<p>Let's go deeper. Inside "/inc" folder you should find modules for</p>
+<p>Let's go deeper. Inside &quot;/inc&quot; folder you should find modules for</p>
 
 <ul>
 <li>bare-bone unit-testing (test.h)</li>
@@ -64,7 +76,7 @@ Another folder is "/test". This is a folder with unit tests. </p>
 <li>FORTH virtual machine (ivm.h)</li>
 </ul>
 
-<p>For the IVM there is a simple compiler written in Python (see "/utils/ivmc").</p>
+<p>For the IVM there is a simple compiler written in Python (see &quot;/utils/ivmc&quot;).</p>
 
 <h2>HOW TO USE TESTS</h2>
 
@@ -107,8 +119,8 @@ int test_leds() {
 
 ....
 
-test(test_sdcard_available(), "sdcard test");
-test(test_leds(), "LED test");
+test(test_sdcard_available(), &quot;sdcard test&quot;);
+test(test_leds(), &quot;LED test&quot;);
 
 ...
 </code></pre>
@@ -167,7 +179,7 @@ list_for_each(&amp;my_obj_list, tmp) {
     /* This is how to get the object using list_entry() */
     my_obj *iterator;
     iterator = list_entry(tmp, my_obj, list);
-    printf("%d\n", iterator-&gt;value1);
+    printf(&quot;%d\n&quot;, iterator-&gt;value1);
 }
 </code></pre>
 
@@ -177,6 +189,8 @@ queues will be added.</p>
 <h2>HOW TO USE IVM</h2>
 
 <p>IVM is not that simple. See IVM.README for more details to how use it.</p>
+
+		<footer></footer>
 	</body>
 </html>
 

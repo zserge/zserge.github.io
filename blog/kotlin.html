@@ -6,9 +6,22 @@
 		<title> kotlin - a new hope </title>
 		<meta name="description" content="A new language for Android coding" />
 		<meta name="keywords" content="jvm, android, language, scala, kotlin, fast, safe, null-safe, intellijidea, ant" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Merriweather:400,700,700italic,400italic,300italic,300,900,900italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Vollkorn:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Flamenco' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Buenard' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<!--<link rel="stylesheet" href="http://basehold.it/36">-->
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -19,15 +32,14 @@
 		</script>
 	</head>
 	<body>
-		<div class='menu'>/*
+		<nav class='menu'>/*
 			<ul class='menu'>
-				<li><a href="/">home</a></li>
-				<li><a href="/projects.html">code</a></li>
-				<li><a href="/blog.html">blog</a></li>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
-		</div>
-		
-<h1>kotlin - a new hope</h1>
+		</nav>
+		<h1>kotlin - a new hope</h1>
 
 <p>I've been looking for Java alternatives since my first days of Android
 development. I can't say I don't like Java. It's a nice language, very easy to
@@ -38,14 +50,14 @@ languages.</p>
 <p>So far I've tried (tried, I never learnt these languages properly):</p>
 
 <ul>
-<li>Mirah - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
+<li><em>Mirah</em> - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
 lot of syntax sugar, but it failed to make a static class attribute when I
 tried it. I'm sure now it's better, I just don't like Ruby.</li>
-<li>Clojure - a Lisp. I had very big expectations about clojure, but it turned
+<li><em>Clojure</em> - a Lisp. I had very big expectations about clojure, but it turned
 out to be slow, huge and had no libraries for Android.</li>
-<li>Kawa - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
+<li><em>Kawa</em> - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
 lisp-ish bindings for every part of Android before it becomes useful.</li>
-<li>Scala - a better Java. Good. Popular. Slow. Big. I could bear the fact my
+<li><em>Scala</em> - a better Java. Good. Popular. Slow. Big. I could bear the fact my
 binaries become larger, but the compilation time was unacceptable for me. I
 was looking for a language to make me more productive, but instead I had to
 wait for another minute waiting for my HelloWorld to compile.</li>
@@ -78,29 +90,29 @@ translator from Java to Kotlin), but it failed to run.</p>
 <p>So, let's get back to Google stuff and make kotlin compiler work with Android
 build.xml. Customizations of build process are possible with <code>custom_rules.xml</code>.
 Again, good design of kotlin provides us with <code>kotlinc</code> Ant task, so we need
-to include that task into the <code>custom_rules.xml</code>. </p>
+to include that task into the <code>custom_rules.xml</code>.</p>
 
 <p>So, starting with <code>android create project</code> as usual, I added the following
 custom rules:</p>
 
-<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;project name="scala-android"&gt;
-    &lt;property environment="env"/&gt;
-    &lt;taskdef resource    = "org/jetbrains/jet/buildtools/ant/antlib.xml"&gt;
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project name=&quot;scala-android&quot;&gt;
+    &lt;property environment=&quot;env&quot;/&gt;
+    &lt;taskdef resource    = &quot;org/jetbrains/jet/buildtools/ant/antlib.xml&quot;&gt;
         &lt;classpath&gt;
-            &lt;fileset dir = "${env.KOTLIN_HOME}/lib" includes = "*.jar"/&gt;
+            &lt;fileset dir = &quot;${env.KOTLIN_HOME}/lib&quot; includes = &quot;*.jar&quot;/&gt;
         &lt;/classpath&gt;
     &lt;/taskdef&gt;
-    &lt;target name="-post-compile"&gt;
-        &lt;path id="project.javac.classpath"&gt;
-            &lt;path refid="project.all.jars.path" /&gt;
-            &lt;path refid="tested.project.classpath" /&gt;
-            &lt;path path="${java.compiler.classpath}" /&gt;
-            &lt;path path="${project.target.android.jar}"/&gt;
-            &lt;path path="${out.classes.absolute.dir}" /&gt;
+    &lt;target name=&quot;-post-compile&quot;&gt;
+        &lt;path id=&quot;project.javac.classpath&quot;&gt;
+            &lt;path refid=&quot;project.all.jars.path&quot; /&gt;
+            &lt;path refid=&quot;tested.project.classpath&quot; /&gt;
+            &lt;path path=&quot;${java.compiler.classpath}&quot; /&gt;
+            &lt;path path=&quot;${project.target.android.jar}&quot;/&gt;
+            &lt;path path=&quot;${out.classes.absolute.dir}&quot; /&gt;
         &lt;/path&gt;
-        &lt;kotlinc src="src" output="bin/classes" 
-            classpathref="project.javac.classpath" /&gt;
+        &lt;kotlinc src=&quot;src&quot; output=&quot;bin/classes&quot; 
+            classpathref=&quot;project.javac.classpath&quot; /&gt;
     &lt;/target&gt;
 &lt;/project&gt;
 </code></pre>
@@ -138,7 +150,7 @@ inheritance looks a bit different as well as super calls.</p>
 <p>Interesting part here is <code>savedInstanceState : Bundle?</code>. Question mark means a
 null-safe type.  Also, parameter name is not recommended to be changed, since
 Kotlin may use named arguments in calls. That's very annoying if careless
-Android SDK developers defined arguments as "p0", "p1" and so on. Good news
+Android SDK developers defined arguments as &quot;p0&quot;, &quot;p1&quot; and so on. Good news
 it's only a warning, so I decided to ignore it when default parameter name is
 meaningless.</p>
 
@@ -172,7 +184,7 @@ import android.hardware.SensorEvent
 
 class Main(): Activity() {
 
-    val tag = "Theremin:Main"
+    val tag = &quot;Theremin:Main&quot;
 
     val audioThread = AudioThread()
     var sensorManager : SensorManager? = null
@@ -189,7 +201,7 @@ class Main(): Activity() {
                 }
                 x = (x + 90) / 180
                 audioThread.setPitch(x)
-                Log.d(tag, "x = ${x}")
+                Log.d(tag, &quot;x = ${x}&quot;)
             }
         }
         override fun onAccuracyChanged(sensor : Sensor?, accuracy: Int) {}
@@ -270,7 +282,7 @@ first impression of how Kotlin looks like.</p>
 I think I will spend some time learning it.</p>
 
 <p>What I didn't like: null-safety is rather painful, than safe. Most android
-objects coming from the outside are marked as null-safe, so I had to write "?"
+objects coming from the outside are marked as null-safe, so I had to write &quot;?&quot;
 everywhere or check for null. However, the risk of getting null in those cases
 is almost zero, so I would prefer not to care about it. But language prevents
 such flippancy.</p>
@@ -296,6 +308,17 @@ like it.</p>
 
 <p>Posted on 2013-11-28 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
 
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
 <p><div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
     (function() {
@@ -305,10 +328,11 @@ var disqus_shortname='zserge';
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script></p>
-
+    </script>
 <noscript>
-</noscript>
+</noscript></p>
+
+		<footer></footer>
 	</body>
 </html>
 
