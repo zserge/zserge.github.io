@@ -1,0 +1,4 @@
+#!/bin/sh
+echo building styles.less >&2
+lessc styles.less $ZS_OUTDIR/styles.css
+rm -f $ZS_OUTDIR/styles.less
