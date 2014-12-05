@@ -1,3 +1,3 @@
-pub/
-gh-pages/
-.pyc
+syntax: glob
+.pub/
+.github/

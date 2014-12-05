@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ ! -d gh-pages ] ; then
+	git clone https://github.com/zserge/zserge.github.io .github
+	cd .github
+	git checkout master
+	cd ..
+fi
+
+cd .github
+git rm -rf .
+cp -r ../.pub/* .
+git add -A
+git status
+git commit -m "site update $(date)" && git push
+
