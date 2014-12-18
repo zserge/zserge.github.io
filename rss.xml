@@ -5,8 +5,8 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Fri, 19 Dec 2014 01:12:05 +0200</pubDate>
-<lastBuildDate>Fri, 19 Dec 2014 01:12:05 +0200</lastBuildDate>
+<pubDate>Fri, 19 Dec 2014 01:45:06 +0200</pubDate>
+<lastBuildDate>Fri, 19 Dec 2014 01:45:06 +0200</lastBuildDate>
 	<item><title>moved to new static site generator (again)</title><link>http://zserge.com/blog/new-site-generator2.html</link><description>self done is well done</description><pubDate>Sat, 20 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/new-site-generator2.html</guid></item>
 <item><title>ultimately minimal unit testing</title><link>http://zserge.com/blog/minimal-testing.html</link><description>a tiny libraries for testing in JS, Lua and Bash</description><pubDate>Tue, 16 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/minimal-testing.html</guid></item>
 <item><title>simple library publishing with Gradle</title><link>http://zserge.com/blog/gradle-maven-publish.html</link><description>quick guide to maven central library publishing with gradle</description><pubDate>Sun, 10 Aug 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/gradle-maven-publish.html</guid></item>

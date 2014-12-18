@@ -162,7 +162,7 @@ to simplify string extraction from JSON data.</p>
 
 <pre><code>jsmn_parser parser;
 
-jsmn_init_parser(&amp;parser);
+jsmn_init(&amp;parser);
 </code></pre>
 
 <p>This will initialize (or reset) the parser.</p>
@@ -172,16 +172,23 @@ parser:</p>
 
 <pre><code>jsmntok_t tokens[256];
 const char *js;
-js = ...;
+jsmnerr_t r;
 
+js = ...;
 r = jsmn_parse(&amp;parser, js, tokens, 256);
 </code></pre>
 
-<p>If something goes wrong, you will get an error returned by <code>jsmn_parse()</code>.
-Return value will be one of these:</p>
+<p>A non-negative return value of <code>jsmn_parse</code> is the number of tokens actually
+used by the parser.</p>
+
+<p>Passing NULL instead of the tokens array would not store parsing results, but
+instead the function will return the value of tokens needed to parse the given
+string. This can be useful if you don't know yet how many tokens to allocate.</p>
+
+<p>If something goes wrong, you will get a negative error returned by
+<code>jsmn_parse()</code>. Return value will be one of these:</p>
 
 <ul>
-<li><code>JSMN_SUCCESS</code> - everything went fine. String was parsed</li>
 <li><code>JSMN_ERROR_INVAL</code> - bad token, JSON string is corrupted</li>
 <li><code>JSMN_ERROR_NOMEM</code> - not enough tokens, JSON string is too large</li>
 <li><code>JSMN_ERROR_PART</code> - JSON string is too short, expecting more JSON data</li>
