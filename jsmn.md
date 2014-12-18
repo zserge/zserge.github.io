@@ -130,7 +130,7 @@ All job is done by `jsmn_parser` object. You can initialize a new parser using:
 
 	jsmn_parser parser;
 	
-	jsmn_init_parser(&parser);
+	jsmn_init(&parser);
 
 This will initialize (or reset) the parser.
 
@@ -139,15 +139,21 @@ parser:
 
 	jsmntok_t tokens[256];
 	const char *js;
-	js = ...;
+	jsmnerr_t r;
 
+	js = ...;
 	r = jsmn_parse(&parser, js, tokens, 256);
 
+A non-negative return value of `jsmn_parse` is the number of tokens actually
+used by the parser.
 
-If something goes wrong, you will get an error returned by `jsmn_parse()`. 
-Return value will be one of these:
+Passing NULL instead of the tokens array would not store parsing results, but
+instead the function will return the value of tokens needed to parse the given
+string. This can be useful if you don't know yet how many tokens to allocate.
 
-* `JSMN_SUCCESS` - everything went fine. String was parsed
+If something goes wrong, you will get a negative error returned by
+`jsmn_parse()`. Return value will be one of these:
+
 * `JSMN_ERROR_INVAL` - bad token, JSON string is corrupted
 * `JSMN_ERROR_NOMEM` - not enough tokens, JSON string is too large
 * `JSMN_ERROR_PART` - JSON string is too short, expecting more JSON data
