@@ -5,9 +5,10 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Fri, 05 Dec 2014 20:43:57 +0200</pubDate>
-<lastBuildDate>Fri, 05 Dec 2014 20:43:57 +0200</lastBuildDate>
-	<item><title>simple library publishing with Gradle</title><link>http://zserge.com/blog/gradle-maven-publish.html</link><description>quick guide to maven central library publishing with gradle</description><pubDate>Sun, 10 Aug 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/gradle-maven-publish.html</guid></item>
+<pubDate>Fri, 19 Dec 2014 00:27:38 +0200</pubDate>
+<lastBuildDate>Fri, 19 Dec 2014 00:27:38 +0200</lastBuildDate>
+	<item><title>ultimately minimal unit testing</title><link>http://zserge.com/blog/minimal-testing.html</link><description>a tiny libraries for testing in JS, Lua and Bash</description><pubDate>Tue, 16 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/minimal-testing.html</guid></item>
+<item><title>simple library publishing with Gradle</title><link>http://zserge.com/blog/gradle-maven-publish.html</link><description>quick guide to maven central library publishing with gradle</description><pubDate>Sun, 10 Aug 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/gradle-maven-publish.html</guid></item>
 <item><title>mucks: now with the dvtm flavor!</title><link>http://zserge.com/blog/mucks2.html</link><description>mucks - a tiny session manager for tmux, screen and dvtm</description><pubDate>Sat, 07 Jun 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/mucks2.html</guid></item>
 <item><title>mucks: automating screen and tmux</title><link>http://zserge.com/blog/mucks.html</link><description>mucks - a session manager for screen and tmux</description><pubDate>Fri, 25 Apr 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/mucks.html</guid></item>
 <item><title>lambda support for Android</title><link>http://zserge.com/blog/android-lambda.html</link><description>Bringing java 8 features to android platform</description><pubDate>Thu, 09 Jan 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-lambda.html</guid></item>
