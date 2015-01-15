@@ -247,7 +247,7 @@ every UI interaction:</p>
 when user interaction happens. If your data is updated from some other sources
 - call render() manually.</p>
 
-<h2>Help needed</h2>
+<h2>Summing up</h2>
 
 <p>This simple approach is really powerful:</p>
 
@@ -269,12 +269,10 @@ persistent</li>
 <p>This proves that the concept is viable. Now I wonder if anyone wants to join
 the development of a full-featured library based on this concept?</p>
 
-<p>There are two major points I need help with.</p>
-
-<p>The first one is designing a good 'diff' algorithm. Basically, it should detect
-if a node was added/removed/modified. The trick here is attribute nodes. For
-simple data types we can just call &quot;equals()&quot; to compare old value to the new
-value. But what about listeners:</p>
+<p>The still is an big task of designing a good 'diff' algorithm. Basically, it
+should detect if a node was added/removed/modified. The trick here is attribute
+nodes. For simple data types we can just call &quot;equals()&quot; to compare old value
+to the new value. But what about listeners:</p>
 
 <pre><code>v(SomeView.java,
     onClick(v =&gt; ...));
@@ -285,12 +283,12 @@ How to compare them? Never update listeners? Update only if the listener class
 has changed? Use some kind of event bus and post events instead of registering
 listeners?</p>
 
-<p>Another big thing is my unwillingness to write all attribute setters by hand.
-There must be a better way, because Kotlin guys did it:
-<a href="https://github.com/yanex/koan">https://github.com/yanex/koan</a></p>
+<p>Another important thing is my unwillingness to write all attribute setters by
+hand. There is be a better way, and Kotlin guys did it for their
+<a href="https://github.com/yanex/koan">koan</a> library.</p>
 
-<p>They mention that setters can be automatically generated from android.jar, but
-my knowledge of Kotlin is close to zero, so I can't find the details.</p>
+<p>I'm now working on generating setters automatically from android.jar classes
+and I hope it will make this experiment more useful.</p>
 
 <p>Anyway, the current code is on
 <a href="https://github.com/zserge/android-virtual-layout">Github</a>, MIT licensed.
