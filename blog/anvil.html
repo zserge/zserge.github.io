@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
+		<title> Anvil: the story of automatic rendering </title>
+		<meta name="description" content="How to render your view automatically and stop worrying about UI state" />
+		<meta name="keywords" content="anvil, android, render, layout, mvc, mvvm, mvp, mithril, listeners, knork" />
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-33644825-1', 'zserge.com');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<nav class='menu'>/*
+			<ul class='menu'>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
+			</ul>*/
+		</nav>
+		<p>Reading my <a href="/android-mvx.html">previous blog post</a> some people asking why I'm so strongly against
+XMLs if they are really good? I think I shall clarify that I'm not against XMLs
+per se, I'm against the way many developers organize their apps. Let's look at
+a simple example - a button and a textview showing how many times the button
+was pressed.</p>
+
+<p>Here's a typical implementation in Java+XML:</p>
+
+<pre><code>&lt;LinearLayout ....&gt;
+    &lt;TextView android:id=&quot;@+id/text&quot; ..../&gt;
+    &lt;Button android:id=&quot;@+id/button&quot; .... /&gt;
+&lt;/LinearLayout&gt;
+
+private int mNumberOfClicks = 0;
+
+setContentView(R.layout.counter_layout);
+final TextView textView = (TextView) findViewById(R.id.text);
+Button b = (Button) findViewById(R.id.button);
+button.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+        mNumberOfClicks++;
+        textView.setText(&quot;Clicked &quot; + mNumberOfClicks + &quot; times&quot;);
+    }
+});
+</code></pre>
+
+<p>Here's the same example written with Anvil:</p>
+
+<pre><code>private int mNumberOfClicks = 0;
+
+View.OnClickListener increment = (v) -&gt; mNumberOfClicks++;
+
+public NodeView view() {
+    return
+        v(LinearLayout.class,
+            v(TextView.class,
+                text(&quot;Clicked&quot; + mNumberOfClicks + &quot; times&quot;)),
+            v(Button.class,
+                text(&quot;Increase&quot;),
+                onClick(increment)));
+}
+</code></pre>
+
+<p>So far they are very similar, but we can already see that View and Controller
+are clearly separated in the second example. Is it helpful?</p>
+
+<p>Let's now have two buttons - increment and decrement, and let's the range of
+number will be between 0 and 10. Increment button should be disabled when the
+number reaches 10, decrement button should be disabled when the number reaches
+0.</p>
+
+<p>Here's typical android + Knork view injector to make code shorter:</p>
+
+<pre><code>&lt;LinearLayout ....&gt;
+    &lt;TextView android:id=&quot;@+id/text&quot; ..../&gt;
+    &lt;Button android:id=&quot;@+id/up&quot; .... /&gt;
+    &lt;Button android:id=&quot;@+id/down&quot; .... /&gt;
+&lt;/LinearLayout&gt;
+
+private int mNumberOfClicks = 0;
+
+@Id(R.id.text) TextView mTextView;
+@Id(R.id.up) Button mUpButton;
+@Id(R.id.down) Button mDownButton;
+
+@On(CLICK + R.id.up)
+public void onClick(View v) {
+    mNumberOfClicks++;
+    if (mNumberOfClicks == 10) {
+        mUpButton.setEnabled(false);
+    }
+    updateText();
+}
+
+@On(CLICK + R.id.down)
+public void onClick(View v) {
+    mNumberOfClicks--;
+    if (mNumberOfClicks == 0) {
+        mDownButton.setEnabled(false);
+    }
+    updateText();
+}
+
+private void updateText() {
+    mTextView.setText(&quot;Clicked &quot; + mNumberOfClicks + &quot; times&quot;);
+}
+</code></pre>
+
+<p>See what happened? I only changed the requirement about View (another button,
+enabled/disabled state should be controlled) - but we had to rewrite most of
+the existing Activity code. That's because Activity is not a pure Controller.
+It's a mix of View and Controller that are so tightly coupled that you can't
+use them separately.</p>
+
+<p>With Anvil where view and controller are decoupled this change won't be even
+noticeable:</p>
+
+<pre><code>private int mNumberOfClicks = 0;
+
+View.OnClickListener increment = (v) -&gt; mNumberOfClicks++;
+View.OnClickListener decrement = (v) -&gt; mNumberOfClicks--;
+
+public NodeView view() {
+    return
+        v(LinearLayout.class,
+            v(TextView.class,
+                text(&quot;Clicked&quot; + mNumberOfClicks + &quot; times&quot;)),
+            v(Button.class,
+                text(&quot;Increase&quot;),
+                enabled(mNumberOfClicks &lt; 10),
+                onClick(increment)),
+            v(Button.class,
+                text(&quot;Decrease&quot;),
+                enabled(mNumberOfClicks &gt; 0),
+                onClick(increment)));
+}
+</code></pre>
+
+<p>See? I only added one line to the Controller part (because we really need to
+modify our model differently, so the controller had to change), and I modified
+the view, because it was requested to control the enabled state of the buttons.</p>
+
+<p>Now, let's also add a Slider to control the same numeric value. Of course when
+the value is changed using the buttons - the slider should be adjusted, too.</p>
+
+<p>With Android+Knork we now have too many places when we control the state of our
+views, so we move it to a separate method called &quot;render&quot;:</p>
+
+<pre><code>&lt;LinearLayout ....&gt;
+    &lt;TextView android:id=&quot;@+id/text&quot; ..../&gt;
+    &lt;Button android:id=&quot;@+id/up&quot; .... /&gt;
+    &lt;Button android:id=&quot;@+id/down&quot; .... /&gt;
+    &lt;Slider android:id=&quot;@+id/seekbar .... /&gt;
+&lt;/LinearLayout&gt;
+
+private int mNumberOfClicks = 0;
+
+@Id(R.id.text) TextView mTextView;
+@Id(R.id.up) Button mUpButton;
+@Id(R.id.down) Button mDownButton;
+@Id(R.id.seekbar) SeekBar mSeekBar;
+
+@On(CLICK + R.id.up)
+public void increment(View v) {
+    mNumberOfClicks++;
+    render();
+}
+
+@On(CLICK + R.id.down)
+public void decrement(View v) {
+    mNumberOfClicks--;
+    render();
+}
+
+@On(INJECT + R.id.seekbar)
+public void setupSeekbar(SeekBar seekBar) {
+    seekBar.setMax(10);
+}
+
+@On(SEEKBAR_CHANGE + R.id.seekbar)
+public void change(SeekBar seekBar, int progress, boolean fromUser) {
+    if (fromUser) {
+        mNumberOfClicks = progress;
+        render();
+    }
+}
+
+private void render() {
+    mTextView.setText(&quot;Clicked &quot; + mNumberOfClicks + &quot; times&quot;);
+    mDownButton.setEnabled(mNumberOfClicks &gt; 0);
+    mUpButton.setEnabled(mNumberOfClicks &lt; 10);
+}
+</code></pre>
+
+<p>Now, imagine if render() is called automatically inside your UI event
+listeners? That's how Anvil works! One important note on performance - Anvil
+renders only the parts of the layout that have been changed.</p>
+
+<pre><code>private int mNumberOfClicks = 0;
+
+View.OnClickListener increment = (v) -&gt; mNumberOfClicks++;
+View.OnClickListener decrement = (v) -&gt; mNumberOfClicks--;
+SeekBar.OnSeekBarChangeListener change = new SeekBar.OnSeekBarChangeListener() {
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            mNumberOfClicks = progress;
+        }
+    }
+    public void onStartTrackingTouch(SeekBar seerBar) {}
+    public void onStopTrackingTouch(SeekBar seerBar) {}
+};
+
+public NodeView view() {
+    return
+        v(LinearLayout.class,
+            v(TextView.class,
+                text(&quot;Clicked&quot; + mNumberOfClicks + &quot; times&quot;)),
+            v(Button.class,
+                text(&quot;Increase&quot;),
+                enabled(mNumberOfClicks &lt; 10),
+                onClick(increment)),
+            v(Button.class,
+                text(&quot;Decrease&quot;),
+                enabled(mNumberOfClicks &gt; 0),
+                onClick(increment)),
+            v(SeekBar.class,
+                max(10),
+                onSeekBarChange(change)));
+}
+</code></pre>
+
+<p>Summing up. Declarative event binding is much more readable than setting
+listeners manually. It's as good as using Knork or ButterKnife or RoboGuice or
+AndroidAnnotations. Except for with Anvil it gives you automatic smart
+rendering of your UI after your event listener has been finished.</p>
+
+<p>Rendering all your layouts at once is nice way to ensure that your model and UI
+are always in sync, no matter how complex your UI logic is. But it can be too
+complicated if you have lots of UI widgets and you want to change the text of
+just one of them. So Anvil does this automatically for you.</p>
+
+		<footer></footer>
+	</body>
+</html>
+

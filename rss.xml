@@ -5,9 +5,10 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Thu, 15 Jan 2015 17:56:08 +0200</pubDate>
-<lastBuildDate>Thu, 15 Jan 2015 17:56:08 +0200</lastBuildDate>
-	<item><title>android UI development made easy</title><link>http://zserge.com/blog/android-mvx.html</link><description>Bringing the ideas from Mithril, React, Bloop to Android</description><pubDate>Wed, 14 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-mvx.html</guid></item>
+<pubDate>Thu, 22 Jan 2015 19:15:31 +0200</pubDate>
+<lastBuildDate>Thu, 22 Jan 2015 19:15:31 +0200</lastBuildDate>
+	<item><title>Anvil: the story of automatic rendering</title><link>http://zserge.com/blog/anvil-1.html</link><description>How to render your view automatically and stop worrying about UI state</description><pubDate>Thu, 22 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/anvil-1.html</guid></item>
+<item><title>android UI development made easy</title><link>http://zserge.com/blog/android-mvx.html</link><description>Bringing the ideas from Mithril, React, Bloop to Android</description><pubDate>Wed, 14 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-mvx.html</guid></item>
 <item><title>moved to new static site generator (again)</title><link>http://zserge.com/blog/new-site-generator2.html</link><description>self done is well done</description><pubDate>Sat, 20 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/new-site-generator2.html</guid></item>
 <item><title>ultimately minimal unit testing</title><link>http://zserge.com/blog/minimal-testing.html</link><description>a tiny libraries for testing in JS, Lua and Bash</description><pubDate>Tue, 16 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/minimal-testing.html</guid></item>
 <item><title>simple library publishing with Gradle</title><link>http://zserge.com/blog/gradle-maven-publish.html</link><description>quick guide to maven central library publishing with gradle</description><pubDate>Sun, 10 Aug 2014 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/gradle-maven-publish.html</guid></item>
