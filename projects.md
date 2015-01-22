@@ -10,6 +10,12 @@ Programming is fun. Here's what I work on in my free time.
   [[repo](http://bitbucket.org/zserge/jsmn)]
 * [six](/six.html) - very simple IRC client 
   [[repo](http://bitbucket.org/zserge/six)]
+* [zs](https://github.com/zserge/zs) - static site genenrator in Go
+* [gambiarra](https://bitbucket.org/zserge/gambiarra) and
+	[klud.js](https://bitbucket.org/zserge/klud.js) - minimal unit testing for
+	Lua and JavaScript
+* [mucks](https://bitbucket.org/zserge/mucks) - Tmux/Screen/DVTM wrapper to
+	create workspaces
 * gotftp - basic TFTP server written in Go
 	[[repo](http://bitbucket.org/zserge/gotftp)]
 * j1vm - J1 Forth CPU simulator and compiler 

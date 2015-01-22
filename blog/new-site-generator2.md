@@ -8,7 +8,7 @@ As you may have noticed, the site has changed its look. That's because I made a
 small rewrite and it resulted in a new static site generator. It's my another
 NIH product, this time it's written in Go.
 
-# stash away
+## stash away
 
 I used `stash` before. It was written in UNIX Shell and was really perfect
 for my needs. Then it became slower and slower. The reason is that it could not
@@ -29,7 +29,7 @@ Then I found a brilliant [zas](https://github.com/imdario/zas). I so much liked
 the idea of "everything can be a plugin" that I wanted to see if I can make it
 even smaller and cleaner.
 
-# zs
+## zs
 
 That's how I made [zs](https://github.com/zserge/zs). The name can be
 interpreted as a stripped down "zas" or as "zen static" or as my initials.
