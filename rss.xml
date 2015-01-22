@@ -5,8 +5,8 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Thu, 22 Jan 2015 19:42:53 +0200</pubDate>
-<lastBuildDate>Thu, 22 Jan 2015 19:42:53 +0200</lastBuildDate>
+<pubDate>Thu, 22 Jan 2015 19:43:38 +0200</pubDate>
+<lastBuildDate>Thu, 22 Jan 2015 19:43:38 +0200</lastBuildDate>
 	<item><title>Anvil: the story of automatic rendering</title><link>http://zserge.com/blog/anvil-1.html</link><description>How to render your view automatically and stop worrying about UI state</description><pubDate>Thu, 22 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/anvil-1.html</guid></item>
 <item><title>android UI development made easy</title><link>http://zserge.com/blog/android-mvx.html</link><description>Bringing the ideas from Mithril, React, Bloop to Android</description><pubDate>Wed, 14 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-mvx.html</guid></item>
 <item><title>moved to new static site generator (again)</title><link>http://zserge.com/blog/new-site-generator2.html</link><description>self done is well done</description><pubDate>Sat, 20 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/new-site-generator2.html</guid></item>
