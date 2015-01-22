@@ -26,7 +26,7 @@
 				<li><a class='menu-link' href="/blog.html">blog</a></li>
 			</ul>*/
 		</nav>
-		<p>Reading my <a href="/blog/android-mvx.html">previous blog post</a> some people asking why I'm so strongly against
+		<p>Reading my <a href="/android-mvx.html">previous blog post</a> some people asking why I'm so strongly against
 XMLs if they are really good? I think I shall clarify that I'm not against XMLs
 per se, I'm against the way many developers organize their apps. Let's look at
 a simple example - a button and a textview showing how many times the button
@@ -77,7 +77,7 @@ number will be between 0 and 10. Increment button should be disabled when the
 number reaches 10, decrement button should be disabled when the number reaches
 0.</p>
 
-<p>This time we will use the Knork view injector to make code shorter:</p>
+<p>Here's typical android + Knork view injector to make code shorter:</p>
 
 <pre><code>&lt;LinearLayout ....&gt;
     &lt;TextView android:id=&quot;@+id/text&quot; ..../&gt;
@@ -94,7 +94,6 @@ private int mNumberOfClicks = 0;
 @On(CLICK + R.id.up)
 public void onClick(View v) {
     mNumberOfClicks++;
-    mDownButton.setEnabled(true);
     if (mNumberOfClicks == 10) {
         mUpButton.setEnabled(false);
     }
@@ -104,7 +103,6 @@ public void onClick(View v) {
 @On(CLICK + R.id.down)
 public void onClick(View v) {
     mNumberOfClicks--;
-    mUpButton.setEnabled(true);
     if (mNumberOfClicks == 0) {
         mDownButton.setEnabled(false);
     }
@@ -142,25 +140,19 @@ public NodeView view() {
             v(Button.class,
                 text(&quot;Decrease&quot;),
                 enabled(mNumberOfClicks &gt; 0),
-                onClick(decrement)));
+                onClick(increment)));
 }
 </code></pre>
 
-<p>I only added one line to the Controller part (because we really need to handle
-our model differently, so the controller had to change), and I modified the
-view, because it was requested to control the enabled state of the buttons.</p>
-
-<p>If later the requirement becomes to hide buttons instead of enabling them - I
-will have to modify the view only, not the controller. But if the change will
-be to reset number to zero instead of decreasing it - I will modify the
-controller only, not the view.</p>
+<p>See? I only added one line to the Controller part (because we really need to
+modify our model differently, so the controller had to change), and I modified
+the view, because it was requested to control the enabled state of the buttons.</p>
 
 <p>Now, let's also add a Slider to control the same numeric value. Of course when
 the value is changed using the buttons - the slider should be adjusted, too.</p>
 
-<p>With Android+Knork we now have too many places when we need to modify the state
-of our views, so we move it to a separate method called &quot;render&quot; to avoid
-copy-paste:</p>
+<p>With Android+Knork we now have too many places when we control the state of our
+views, so we move it to a separate method called &quot;render&quot;:</p>
 
 <pre><code>&lt;LinearLayout ....&gt;
     &lt;TextView android:id=&quot;@+id/text&quot; ..../&gt;
@@ -205,14 +197,12 @@ private void render() {
     mTextView.setText(&quot;Clicked &quot; + mNumberOfClicks + &quot; times&quot;);
     mDownButton.setEnabled(mNumberOfClicks &gt; 0);
     mUpButton.setEnabled(mNumberOfClicks &lt; 10);
-    mSeekBar.setProgress(mNumberOfClicks);
 }
 </code></pre>
 
-<p>Now, imagine if render() is called automatically in your UI event listeners?
-You've just re-invented Anvil! But one important note on performance - Anvil
-renders only the parts of the layout that have actually been changed, not all
-of your UI widgets.</p>
+<p>Now, imagine if render() is called automatically inside your UI event
+listeners? That's how Anvil works! One important note on performance - Anvil
+renders only the parts of the layout that have been changed.</p>
 
 <pre><code>private int mNumberOfClicks = 0;
 
@@ -243,7 +233,6 @@ public NodeView view() {
                 onClick(increment)),
             v(SeekBar.class,
                 max(10),
-                progress(mNumberOfClicks),
                 onSeekBarChange(change)));
 }
 </code></pre>
@@ -257,38 +246,6 @@ rendering of your UI after your event listener has been finished.</p>
 are always in sync, no matter how complex your UI logic is. But it can be too
 complicated if you have lots of UI widgets and you want to change the text of
 just one of them. So Anvil does this automatically for you.</p>
-
-<p>Finally, decoupling views and controllers is a good way to keep your app code
-clean and maintainable.</p>
-
-<p>P.S. For those who missed the birth of Anvil last week -
-<a href="https://github.com/zserge/android-virtual-layout">here's</a> the repository</p>
-
-<p>Posted on 2015-01-22 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
-
-<p><script type="text/javascript">(function() {
-  if (window.pluso)if (typeof window.pluso.start == 'function') return;
-  if (window.ifpluso==undefined) { window.ifpluso = 1;
-    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
-    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
-    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
-    var h=d[g]('body')[0];
-    h.appendChild(s);
-  } })();</script>
-<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
-
-<p><div id="disqus_thread"></div><script type="text/javascript">
-var disqus_shortname='zserge';
-    (function() {
-        var dsq = document.createElement('script');
-        dsq.type = 'text/javascript';
-        dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
-<noscript>
-</noscript></p>
 
 		<footer></footer>
 	</body>
