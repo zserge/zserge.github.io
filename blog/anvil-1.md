@@ -132,7 +132,8 @@ Now, let's also add a Slider to control the same numeric value. Of course when
 the value is changed using the buttons - the slider should be adjusted, too.
 
 With Android+Knork we now have too many places when we need to modify the state
-of our views, so we move it to a separate method called "render":
+of our views, so we move it to a separate method called "render" to avoid
+copy-paste:
 
 	<LinearLayout ....>
 		<TextView android:id="@+id/text" ..../>
@@ -177,6 +178,7 @@ of our views, so we move it to a separate method called "render":
 		mTextView.setText("Clicked " + mNumberOfClicks + " times");
 		mDownButton.setEnabled(mNumberOfClicks > 0);
 		mUpButton.setEnabled(mNumberOfClicks < 10);
+		mSeekBar.setProgress(mNumberOfClicks);
 	}
 
 Now, imagine if render() is called automatically in your UI event listeners?
@@ -213,6 +215,7 @@ of your UI widgets.
 					onClick(increment)),
 				v(SeekBar.class,
 					max(10),
+					progress(mNumberOfClicks),
 					onSeekBarChange(change)));
 	}
 
