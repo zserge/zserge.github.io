@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
+		<title> Anvil: big progress for a small library </title>
+		<meta name="description" content="Summing up the progress of anvil development" />
+		<meta name="keywords" content="anvil, android, render, layout, mvc, mvvm, mvp, mithril, listeners, butterknife, knork" />
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-33644825-1', 'zserge.com');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<nav class='menu'>/*
+			<ul class='menu'>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
+			</ul>*/
+		</nav>
+		<h1>Anvil: big progress for a small library</h1>
+
+<p>I have just released <a href="https://github.com/zserge/anvil">Anvil 0.0.2</a>. So many changes have been made and now I am
+absolutely confident that Anvil has its strong points even though I'm the only
+active user of it.</p>
+
+<h2>What is Anvil?</h2>
+
+<p>This section is for those who missed the <a href="/blog/android-mvx.html">early</a> <a href="/blog/anvil-1.html">steps</a> of Anvil.</p>
+
+<p>Anvil is a tiny reactive UI library for Android. What does this mean? It means
+that you can declare your UI in Java, bind your data to the views, bind event
+listeners to the views and leave it running. The rest will be done by Anvil:
+once some data is changed - the UI will be updated in a smart way, so that only
+the widgets bound to that data will be modified.</p>
+
+<p>This totally changes the way we design Android apps.</p>
+
+<p>The core thing to understand is that Anvil uses virtual layout. Instead of
+modifying your Views and ViewGroups - it first builds a virtual tree containing
+the attributes of your views in the layout hierarchy:</p>
+
+<pre><code>ViewNode for LinearLayout
+    ViewNode for TextView
+        AttrNode for text with value &quot;Hello&quot;
+    ViewNode for Button
+        AttrNode for OnClickListener with some listener object value
+</code></pre>
+
+<p>Then, Anvil compares the current virtual layout tree and a previous one and
+applies the attribute changes when it finds a difference.</p>
+
+<h2>But I loved my XMLs</h2>
+
+<p>I've heard some frustration from people who used XMLs a lot. I understand
+their criticism, but we have to admit - there is no way to achieve simple,
+lightweight and declarative data binding and reactive behavior with XMLs. On
+the other hand, we can achieve declarative layouts, styling, multi-screen
+support etc with Java.</p>
+
+<p>Good news is that Anvil does not force you to delete all your XMLs
+and never use them again. You can nicely mix Anvil layouts with XML layouts.</p>
+
+<p>Same applies to the <a href="http://corner.squareup.com/2014/10/advocating-against-android-fragments.html">single-activity</a> approach, which I find very helpful.
+Anvil supports it and encourages it. But you still can use your Fragments and
+Activities as you did before and still have some benefits from using Anvil.</p>
+
+<h2>Show me the code</h2>
+
+<p>Here's a stupid counter example (using Java 8):</p>
+
+<pre><code>public class MyCounterView extends RenderableView {
+
+    private int count = 0;
+
+    public MyCounterView(Context c) {
+        super(c);
+    }
+
+    public void onCounterButtonClicked(View v) {
+        count++;
+    }
+
+    public ViewNode view() {
+        return
+            v(LinearLayout.class,
+                orientation(LinearLayout.VERTICAL),
+
+                v(TextView.class,
+                    text(&quot;Count is &quot; + this.count)),
+
+                v(Button.class,
+                    text(&quot;Click me&quot;),
+                    onClick(this::onCounterButtonClicked)));
+    }
+}
+</code></pre>
+
+<p>That's it. When the button is clicked - onCounterButtonClicked method is
+called, which increases the count and then Anvil.render() is performed to
+update the UI. At this point the new virtual layout will differ in one place
+only - the text() attribute of the TextView will be &quot;Count is 1&quot; instead of
+&quot;Count is 0&quot;. That's why the attribute node will update the TextView by calling
+its setText() method.</p>
+
+<h2>Anvil, the Renderer</h2>
+
+<p>The fundamental class is <code>Anvil</code>. It's a renderer that keeps a list of current
+<code>Renderables</code> and provides you with the <code>render()</code> method.  This method smartly
+updates all the visible renderables (views, fragments). So if you want to force
+the UI update (for example when you received some data from the
+HttpUrlConenction) - you just call Anvil.render() on the UI thread.</p>
+
+<h2>Renderable</h2>
+
+<p>Renderable is an interface that holds some root ViewGroup (into which the
+layout will be rendered) and has a view() method returning the virtual layout
+corresponding to the current application state.</p>
+
+<p>Activities and Fragments can implement Renderable interface, but most likely
+you would use RenderableViews. RenderableView is a syntax sugar for a
+Renderable FrameLayout, so you only have to override the view() method and
+you're done. Also, you can save/restore view state in
+onLoad(Bundle)/onStore(Bundle) methods. This helps a lot to split your app into
+components and never worry about screen rotation and related problems:</p>
+
+<pre><code>public MyView extends RenderableView {
+    public MyView(Context c) {
+        super(c);
+    }
+
+    private int count = 0;
+
+    public ViewNode view() {
+        return
+            v(Button.class,
+                text(&quot;Clicked &quot; + count),
+                onClick(v -&gt; count++));
+    }
+
+    // Count will be kept when the screen is rotated
+    public void onLoad(Bundle b) {
+        b.putInt(&quot;count&quot;, count);
+    }
+
+    public void onSave(Bundle b) {
+        count = b.getInt(&quot;count&quot;);
+    }
+}
+</code></pre>
+
+<h2>Adapters</h2>
+
+<p>One may argue that Android has very nice MVC implemented with Adapters. I totally agree, I like Adapters a lot, and Anvil makes them even better:</p>
+
+<pre><code>RenderableArrayAdapter myAdapter =
+    new RenderableArrayAdapter(String[]{&quot;John&quot;, &quot;Jane&quot;, &quot;Jack&quot;, &quot;Jade&quot;}) {
+
+    public void onItemClick(AdapterView a, View v, int pos, long id) {
+        Log.d(tag, &quot;You clicked on item &quot; + pos);
+    }
+
+    // Background will be different for odd and even items
+    public ViewNode itemView(int pos) {
+        return v(TextView.class,
+            backgroundColor(pos % 2 == 0 ? MyStyle.WHITE : MyStyle.GREY),
+            onItemClicked(this::onItemClicked),
+            text(getItem(pos)));
+    }
+};
+
+public ViewNode view() {
+    return
+        v(ListView.class,
+            adapter(myAdapter));
+}
+</code></pre>
+
+<p>Also, a renderable base adapter exists to give you more flexibility.</p>
+
+<h2>Styling your views</h2>
+
+<p>If some views share the same style - just move it to another method as you would do in any programming language to avoid code duplication:</p>
+
+<pre><code>public AttrNode textStyle() {
+    return attrs(
+        textColor(Color.BLACK),
+        textSize(27),
+        gravity(CENTER));
+}
+
+...
+
+v(TextView.class,
+    textStyle(),
+    text(&quot;Hello&quot;))
+</code></pre>
+
+<p>You can even override some styles, the latter one has priority, since java method arguments are evaluates left to right:</p>
+
+<pre><code>v(TextView.class,
+    textBaseStyle(),
+    textStyle(), // may override some properties in textBaseStyle
+    text(&quot;Hello&quot;))
+</code></pre>
+
+<p>Now, the fonts. I really like good typography and here's how to make it less painful in Android:</p>
+
+<pre><code>v(TextView.class,
+    // use &quot;assets/RobotoCondensed-Light.ttf&quot; typeface
+    typeface(&quot;RobotoCondensed-Light.ttf&quot;),
+    text(&quot;Hello, Roboto!&quot;));
+</code></pre>
+
+<p>And now something completely different...</p>
+
+<p><strong>Icons</strong>! You can use <a href="http://fortawesome.github.io/Font-Awesome/icons/">Font Awesome</a> icons inside your textviews. They can be any color, they fit every screen size, no extra work is needed:</p>
+
+<pre><code>private AttrNode materialIcon(String s) {
+    return attrs(
+            size(dip(48), dip(48)),
+            gravity(CENTER),
+            textColor(Color.WHITE),
+            typeface(&quot;Material-Design-Icons.ttf&quot;),
+            textSize(36),
+            backgroundResource(R.drawable.icon_button),
+            text(s));
+}
+
+v(TextView.class,
+    materialIcon(&quot;\ue620&quot;), // Icon for remove
+</code></pre>
+
+<h2>I like to move it move it</h2>
+
+<p>Animations are great. But how hard can it be to tie them to the app logic... Anvil tries to simplify it (still work in progress, so the API may be changed soon):</p>
+
+<pre><code>private boolean isShown = false;
+
+...
+
+v(TextView.class,
+    anim(!isShown).of(&quot;alpha&quot;, 0f).duration(250),
+    anim(isShown).of(&quot;alpha&quot;, 1f).duration(250).listener(() -&gt; {
+        // animation has ended
+    }));
+
+...
+
+// Here's how to show the view with animation:
+isShown = true
+// Here's how to hide the view with animation:
+isShown = false
+</code></pre>
+
+<p>Also, you can use an existing Animator class (e.g. inflated from animation XMLs):</p>
+
+<pre><code>v(TextView.class,
+    anim(isShown, myAnimation));
+</code></pre>
+
+<h2>Single-activity applications</h2>
+
+<p>With Anvil it's very easy to componentize your app. Each component will be an
+isolated renderable view. Now, how to do the navigation between them if they
+are all in the same activity?</p>
+
+<p>Anvil provides a simple helper in the Backstack class:</p>
+
+<pre><code>private Backstack mBackstack = new Backstack(this, (v) -&gt; {
+    setContentView(v);
+});
+
+@Override
+public void onCreate(Bundle b) {
+    super.onCreate(b);
+    if (b != null) {
+        mBackstack.load(b);
+    } else {
+        mBackstack.navigate(new MyDefaultView(this));
+    }
+}
+
+@Override
+public void onBackPressed() {
+    if (!mBackstack.back()) {
+        finish();
+    }
+}
+</code></pre>
+
+<p>You can use backstack navigate method anywhere inside your views. You can also
+save the stack of the views to Bundle inside onSaveInstanceState() in your
+activity.</p>
+
+<h2>Kotlin!</h2>
+
+<p>Anvil work fine with good old Java 6. With Java 8 + Retrolambda you would be
+able to use method references and lambdas making your code much more compact.</p>
+
+<p>But <a href="/blog/anvil-kotlin.html">Kotlin makes it even better</a>!</p>
+
+<h2>Are here any real apps written with Anvil?</h2>
+
+<p>Yes. First, you can check the example that comes with Anvil. Next, I've
+published a couple of simple games on Google Play (sources will be released
+later) - <a href="http://play.google.com/store/apps/details?id=trikita.spot">Spot</a> and
+<a href="http://play.google.com/store/apps/details?id=trikita.quilt">Quilt</a>. Both
+written exclusively with Anvil.</p>
+
+<h2>Bright future you say?</h2>
+
+<p>Currently Anvil is good enough to be used. I wonder if Anvil can be integrated
+with some event bus implementations, so onClick() would take an event object
+instead of taking a listener. This will simplify the syntax of Java without
+lambdas. Also, animations could be implemented in better way I think.
+Performance could be optimized by caching the attribute nodes. Helpers could be
+added for colors (like darken()/lighten() etc), for touch events, for support
+libraries. Tutorials could be written for newcomers.</p>
+
+<p>Lots of things to do. Stay tuned.</p>
+
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
+<p><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+<noscript>
+</noscript></p>
+
+		<footer></footer>
+	</body>
+</html>
+

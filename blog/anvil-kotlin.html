@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
+		<title> Where Anvil meets Kotlin </title>
+		<meta name="description" content="Summing up the progress of anvil development" />
+		<meta name="keywords" content="anvil, android, render, UI, mvc, mvvm, mvp, mithril, kotlin, scala" />
+		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="/styles.css" />
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-33644825-1', 'zserge.com');
+			ga('send', 'pageview');
+		</script>
+	</head>
+	<body>
+		<nav class='menu'>/*
+			<ul class='menu'>
+				<li><a class='menu-link' href="/">home</a></li>
+				<li><a class='menu-link' href="/projects.html">code</a></li>
+				<li><a class='menu-link' href="/blog.html">blog</a></li>
+			</ul>*/
+		</nav>
+		<h1>Where Anvil meets Kotlin</h1>
+
+<p>Kotlin is a <a href="http://kotlinlang.org/">very nice language for JVM</a>. I <a href="/blog/kotlin.html">wrote</a> about it in the past.<br />
+<a href="/blog/anvil-2.html">Anvil</a> is a very nice UI library for Android. How do these two play together?</p>
+
+<h2>The first attempt</h2>
+
+<p>My favourite example to demonstrate Anvil syntax is a simple click counter. It demonstrates the use of layouts, views, data binding and event binding. In Java it looks like this:</p>
+
+<pre><code>public ViewNode view() {
+    return
+        v(LinearLayout.class,
+                orientation(LinearLayout.VERTICAL),
+
+                v(TextView.class,
+                    text(&quot;Count is &quot; + this.count)),
+
+                v(Button.class,
+                    text(&quot;Click me&quot;),
+                    onClick(this::onCounterButtonClicked)));
+}
+</code></pre>
+
+<p>When we try to translate this literaly - we get something like this in Kotlin:</p>
+
+<pre><code>class MyView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        v(javaClass&lt;LinearLayout&gt;(),
+            size(FILL, FILL),
+            orientation(LinearLayout.VERTICAL),
+
+            v(javaClass&lt;TextView&gt;(),
+                text(&quot;Count: &quot; + count)),
+
+            v(javaClass&lt;Button&gt;(),
+                onClick({ count++ }),
+                text(&quot;Click me&quot;)))
+}
+</code></pre>
+
+<p>Good parts:</p>
+
+<ul>
+<li>Return type is inferred automatically</li>
+<li>Lambdas are very compact</li>
+</ul>
+
+<p><br/>
+Bad parts:</p>
+
+<ul>
+<li>javaClass&lt;TextView&gt;() is less readable than TextView.class</li>
+<li>static imports are not working well. I had to import the whole hierarchy of classes
+to get syntax sugar for attributes working</li>
+</ul>
+
+<h2>Type-safe builders</h2>
+
+<p>In Kotlin the cool way to make DSLs is <a href="http://kotlinlang.org/docs/reference/type-safe-builders.html">type-safe builders</a>. Here is how I would imagine this to look like:</p>
+
+<pre><code>class MyView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        linearLayout {
+            size(FILL, FILL)
+            orientation(LinearLayout.VERTICAL)
+            textView {
+                text(&quot;Count: &quot; + count)
+            }
+            button {
+                onClick({ count++ })
+                text(&quot;Click me&quot;))
+            }
+        }
+}
+</code></pre>
+
+<p>Here linearLayout() is a function that takes some other function, and that's why the parens will be omitted:</p>
+
+<pre><code>linearLayout({
+    ...
+})
+// same as:
+linearLayout {
+    ...
+}
+</code></pre>
+
+<p>But after some quick thoughts I found how complex will it be to make Anvil compatible to this syntax. Basically it would be easier to rewrite it all from scratch rather than adjust it.</p>
+
+<p>The worst part was attribute generators, like text(). In Anvil they return AttrNode instrances, while in Kotlin they should assign AttrNode instances to the parent ViewNode object.</p>
+
+<p>Any ideas?</p>
+
+<h2>Minimally sweetened Anvil</h2>
+
+<p>Luckily, Kotlin has <em>lots</em> of syntax sugar. And it also has operator
+overloading (oh, I know how bad it can be). We can keep the stack of nested
+views and abuse some of the operators to assign AttrNode to the topmost
+ViewNode.</p>
+
+<p>This only requires an extra few lines of code:</p>
+
+<pre><code>// The stack of views
+val stack = ArrayDeque&lt;ViewNode&gt;()
+
+// A function to build a new view node and put it onto the stack
+inline fun v&lt;reified T: View&gt;(f: () -&gt; Unit): ViewNode {
+    val node = ViewNode(javaClass&lt;T&gt;())
+    if (!stack.empty) {
+        stack.peek().addViews(node)
+    }
+    stack.push(node)
+    f()
+    return stack.pop()
+}
+
+// Overloading &quot;-&quot;
+fun AttrNode.minus() = stack.peek().addAttrs(this);
+
+// Overloading &quot;+&quot;
+fun AttrNode.plus() = stack.peek().addAttrs(this);
+</code></pre>
+
+<p>Can you imagine how nicely Anvil code looks now with this little hack? I use
+minus here because it resembles me of markdown lists. People can use &quot;+size()&quot;
+as well instead of &quot;-size()&quot;:</p>
+
+<pre><code>class MySugarView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        v&lt;LinearLayout&gt; {
+            - size(FILL, FILL)
+            - orientation(LinearLayout.VERTICAL)
+
+            v&lt;TextView&gt; {
+                - text(&quot;Clicked: &quot; + count)
+            }
+            v&lt;Button&gt; {
+                - text(&quot;Click me&quot;)
+                - onClick {
+                    println(&quot;Button clicked&quot;)
+                    count++
+                }
+            }
+        }
+}
+</code></pre>
+
+<p>It's clean, it's readable, it's reactive, it's only extra 200K of code for
+Kotlin standard library.</p>
+
+<p>Now I wonder why would I still use Java for Android development...</p>
+
+<p><script type="text/javascript">(function() {
+  if (window.pluso)if (typeof window.pluso.start == 'function') return;
+  if (window.ifpluso==undefined) { window.ifpluso = 1;
+    var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+    s.type = 'text/javascript'; s.charset='UTF-8'; s.async = true;
+    s.src = ('https:' == window.location.protocol ? 'https' : 'http')  + '://share.pluso.ru/pluso-like.js';
+    var h=d[g]('body')[0];
+    h.appendChild(s);
+  } })();</script>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+
+<p><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+    (function() {
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+<noscript>
+</noscript></p>
+
+		<footer></footer>
+	</body>
+</html>
+
