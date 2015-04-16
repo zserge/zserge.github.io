@@ -5,9 +5,10 @@
 <link>http://zserge.com/blog.html</link>
 <description>My thoughts on software, simplicity and how to make it work together</description>
 <language>en-us</language>
-<pubDate>Thu, 16 Apr 2015 18:24:32 +0300</pubDate>
-<lastBuildDate>Thu, 16 Apr 2015 18:24:32 +0300</lastBuildDate>
-	<item><title>Anvil - big progress for a small library</title><link>http://zserge.com/blog/anvil-2.html</link><description>Summing up the progress of anvil development</description><pubDate>Thu, 16 Apr 2015 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/anvil-2.html</guid></item>
+<pubDate>Thu, 16 Apr 2015 20:42:04 +0300</pubDate>
+<lastBuildDate>Thu, 16 Apr 2015 20:42:04 +0300</lastBuildDate>
+	<item><title>Where Anvil meets Kotlin</title><link>http://zserge.com/blog/anvil-kotlin.html</link><description>Summing up the progress of anvil development</description><pubDate>Thu, 16 Apr 2015 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/anvil-kotlin.html</guid></item>
+<item><title>Anvil: big progress for a small library</title><link>http://zserge.com/blog/anvil-2.html</link><description>Summing up the progress of anvil development</description><pubDate>Thu, 16 Apr 2015 00:00:00 +0300</pubDate><guid>http://zserge.com/blog/anvil-2.html</guid></item>
 <item><title>Anvil: the story of automatic rendering</title><link>http://zserge.com/blog/anvil-1.html</link><description>How to render your view automatically and stop worrying about UI state</description><pubDate>Thu, 22 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/anvil-1.html</guid></item>
 <item><title>android UI development made easy</title><link>http://zserge.com/blog/android-mvx.html</link><description>Bringing the ideas from Mithril, React, Bloop to Android</description><pubDate>Wed, 14 Jan 2015 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/android-mvx.html</guid></item>
 <item><title>moved to new static site generator (again)</title><link>http://zserge.com/blog/new-site-generator2.html</link><description>self done is well done</description><pubDate>Sat, 20 Dec 2014 00:00:00 +0200</pubDate><guid>http://zserge.com/blog/new-site-generator2.html</guid></item>
