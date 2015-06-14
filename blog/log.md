@@ -6,7 +6,7 @@ date: 2015-06-14
 
 Once upon a time I was making a pretty large app for Android. When everything
 was almost finished I wondered how shall I remove all my logs before publishing
-the app? Looks like [many][1] [other][2] [develoeprs][3] are interested in the
+the app? Looks like [many][1] [other][2] [developers][3] are interested in the
 same question as well.
 
 Surprisingly, the recommented way out is to strip off the Log class from the
