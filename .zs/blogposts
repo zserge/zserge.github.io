@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export LC_ALL=C
+
 echo "<ul>"
 find -name '*.md' -type f | while read line ; do
 	timestamp=$($ZS var $line date)
