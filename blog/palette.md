@@ -107,7 +107,7 @@ mention it works in Opera, I haven't tested it.
 
 ## palette app
 
-So, meet the palette app: [palette.trikita.co][link].
+So, meet the palette app: [0xrgb.com][link].
 
 You can use it in modern browsers, without flash, even without javascript.
 
@@ -119,7 +119,7 @@ Posted on {{ date }} {{ rss }}
 {{ social }}
 {{ disqus }}
 
-[link]: http://palette.trikita.co
+[link]: http://0xrgb.com
 [1]: http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 [2]: http://zeroclipboard.org
 [3]: https://threatpost.com/mozilla-disables-flash-in-firefox/113763
