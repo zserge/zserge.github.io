@@ -4,15 +4,18 @@ export LC_ALL=C
 
 echo "<ul>"
 find -name '*.md' -type f | while read line ; do
-	timestamp=$($ZS var $line date)
-	if [ ! -z $timestamp ] ; then
-		echo $(date --date $timestamp +%s) $line
+	d=$($ZS var $line date)
+	if [ ! -z $d ] ; then
+		echo $($ZS dateparse "2006-01-02" $d) $line
 	fi
 done | sort -r -n | cut -d' ' -f2 | while read f; do
 	url=$($ZS var $f url)
-	timestamp=$(date --date $($ZS var $f date) +%s)
+	timestamp=$($ZS dateparse "2006-01-02" $($ZS var $f date))
 	name=$($ZS var $f title)
 	desc=$($ZS var $f description)
+	echo $($ZS var $f) >&2
+	echo $url >&2
+	echo "<li><a href=\"$url\">$name</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>" >&2
 	echo "<li><a href=\"$url\">$name</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>"
 done
 echo "</ul>"
