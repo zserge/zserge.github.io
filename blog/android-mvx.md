@@ -134,11 +134,13 @@ you can be safe about the type. Remaining arguments are all of type `Node` so
 we simply add them to the list. It could be helpful to ignore null nodes:
 
 	public static Node v(final Class<? extends View> cls, final Node ...nodes) {
-		return new Node(cls) {{
-			for (Node n : nodes) {
-				attrs.add(n);
+		return new Node(cls) {
+			{
+				for (Node n : nodes) {
+					attrs.add(n);
+				}
 			}
-		}};
+		};
 	}
 
 Here's an example of the text() attribute setter (the real code is a bit
