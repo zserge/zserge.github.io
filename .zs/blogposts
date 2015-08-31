@@ -13,9 +13,6 @@ done | sort -r -n | cut -d' ' -f2 | while read f; do
 	timestamp=$($ZS dateparse "2006-01-02" $($ZS var $f date))
 	name=$($ZS var $f title)
 	desc=$($ZS var $f description)
-	echo $($ZS var $f) >&2
-	echo $url >&2
-	echo "<li><a href=\"$url\">$name</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>" >&2
 	echo "<li><a href=\"$url\">$name</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>"
 done
 echo "</ul>"

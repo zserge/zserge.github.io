@@ -40,15 +40,15 @@ html[lang="en-US"]
 			nav
 				ul
 					li
-						a[ref="/"] about
+						a[href="/about.html"] about
 					li
-						a[ref="/"] rss
+						a[href="/rss.xml"] rss
 					li
-						a[ref="/"] @me
+						a[href="https://twitter.com/zsergo"] @me
 					li
-						a[ref="/"] +me
+						a[href="https://plus.google.com/u/0/+SergeZaitsev"] +me
 					li
-						a[ref="/"] </>me
+						a[href="https://github.com/zserge"] </>me
 
 		#{unescaped(content)}
 
