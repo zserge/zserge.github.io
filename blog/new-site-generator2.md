@@ -76,9 +76,6 @@ So I find my exercise in minimalism to be successful (1 file, 260 LOC, 1
 dependency) and you are welcome to try zs and to
 [report the issues](https://github.com/zserge/zs/issues)
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 

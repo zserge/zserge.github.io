@@ -265,8 +265,5 @@ like it.
 
 P.S. I will upload project sources and apk on bitbucket soon.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

@@ -294,8 +294,6 @@ libraries. Tutorials could be written for newcomers.
 
 Lots of things to do. Stay tuned.
 
-{{ social }}
-{{ disqus }}
 
 [1]: https://github.com/zserge/anvil
 [2]: /blog/android-mvx.html

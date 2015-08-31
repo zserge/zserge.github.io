@@ -316,10 +316,7 @@ Now we're are ready to develop [backend architecture &rarr;][1]
 
 _Check [part 1](/blog/cucu-part1.html) if you missed something_
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [1]: /blog/cucu-part3.html
 

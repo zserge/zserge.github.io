@@ -90,10 +90,7 @@ Done. One 'apply from' line and signing just works.
 You may try it, too. Sources are available on [github][2], so please file an
 issue or a pull request if something it not working.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [1]: https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
 <!--http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Signing-Configurations-->

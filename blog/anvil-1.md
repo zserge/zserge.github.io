@@ -235,9 +235,6 @@ clean and maintainable.
 P.S. For those who missed the birth of Anvil last week -
 [here's](https://github.com/zserge/android-virtual-layout) the repository
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 

@@ -178,8 +178,5 @@ declaration. Maybe that can be improved somehow to support lambdas properly.
 Anyway, I hope you find it useful and I hope that one day Android will get official
 support for many Java niceties, like `invokedynamic` or Java 8 features.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

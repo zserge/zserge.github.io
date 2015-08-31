@@ -59,8 +59,5 @@ And here's how logdog looks in my terminal:
 You can download logdog on the [bitbucket](https://bitbucket.org/zserge/logdog)
 page. Open source, MIT-licensed, as usual.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

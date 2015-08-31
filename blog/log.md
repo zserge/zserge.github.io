@@ -94,10 +94,7 @@ line numbers and any other relevant information you need.
 Also if you have any feature suggestions or found a bug - please report it to
 the issue tracker.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [1]: http://stackoverflow.com/questions/2018263/android-logging
 [2]: http://stackoverflow.com/questions/10289129/setting-android-log-levels

@@ -241,10 +241,7 @@ Anyway, compilers is fun. I hope you liked it!
 _Check [part 1](/blog/cucu-part1.html) or [part 2](/blog/cucu-part2.html) if
 you missed something_
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [1]: http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools
 [2]: https://www.coursera.org/course/compilers

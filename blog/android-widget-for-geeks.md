@@ -232,10 +232,7 @@ So, what do you think? Is there any sense in such a widget for geeks?
 P.S. Textizer is open source, free and with no ads. The sources are [hosted on
 bitbucket][sources].
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [plaintext]: http://c2.com/cgi/wiki?PowerOfPlainText
 [scheme]: http://en.wikipedia.org/wiki/Scheme_(programming_language)

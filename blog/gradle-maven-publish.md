@@ -265,10 +265,7 @@ but the search.maven.org found it only next morning.
 So, that's it, and if you still have any problems - ask Sonatype support, I
 found them to be very helpful. Happy coding!
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
 
-{{ disqus }}
 
 

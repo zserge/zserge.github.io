@@ -263,8 +263,5 @@ Anyway, the current code is on
 [Github](https://github.com/zserge/android-virtual-layout), MIT licensed.
 Comments and pull requests are welcome!
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

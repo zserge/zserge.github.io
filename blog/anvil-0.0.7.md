@@ -134,9 +134,6 @@ time and sequence of data changes that involve view animations.
 However I have to acknowledge you that States API is still experimental and
 might be changed in future versions.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 

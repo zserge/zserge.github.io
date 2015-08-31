@@ -16,8 +16,5 @@ Here's [the project page](/jknav.html), and here are
 
 Any advice or comments welcome!
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

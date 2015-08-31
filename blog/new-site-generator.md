@@ -144,9 +144,7 @@ summary
 So, now there is one more static site generator in Shell. Less than 100 LOC,
 pure UNIX Shell, extensible, MIT-licensed. Enjoy!
 
-Posted on {{ date }} {{ rss }}
 
-{{ disqus }}
 
 [1]: https://bitbucket.org/obensonne/poole
 [2]: http://werc.cat-v.org/

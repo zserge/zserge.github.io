@@ -169,8 +169,5 @@ development and to do testing.
 
 AAML is free software and distributed under MIT license.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

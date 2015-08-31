@@ -154,8 +154,6 @@ Kotlin standard library.
 
 Now I wonder why would I still use Java for Android development...
 
-{{ social }}
-{{ disqus }}
 
 [1]: http://kotlinlang.org/
 [2]: /blog/kotlin.html

@@ -126,10 +126,7 @@ So here's how these three great muxers look when controlled by mucks with the sa
 
 So, what's your favourite terminal multiplexor?
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
 
-{{ disqus }}
 
 

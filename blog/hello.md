@@ -23,7 +23,5 @@ That's why I started this site/blog. I will try to gather together here all my
 projects and thoughs, tools and toys, fresh and mossy code, wise and stupid
 ideas. Hope you'll like them.
 
-Posted on {{ date }} {{ rss }}
 
-{{ disqus }}
 

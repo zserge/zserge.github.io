@@ -114,10 +114,7 @@ You can use it in modern browsers, without flash, even without javascript.
 And if you find any issues or have any suggestions - please report an [issue on
 github][8].
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 
 [link]: http://0xrgb.com
 [1]: http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript

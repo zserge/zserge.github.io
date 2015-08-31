@@ -226,8 +226,5 @@ about Objective-C, Swift, Io, Tcl (no, I really don't know)?
 Anyway, summing up, testing can be fun, testing can be simple. And
 overcomplicated testing tools should not be an excuse to no unit testing.
 
-Posted on {{ date }} {{ rss }}
 
-{{ social }}
-{{ disqus }}
 

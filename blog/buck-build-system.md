@@ -159,8 +159,6 @@ Buck project that would use Kotlin or any other compiler (Scala, Groovy,
 Clojure) with nailgun and Buck - please share your thoughts. Also if you have
 an idea to improve my buckbone scripts - send me pull requests.
 
-{{ social }}
-{{ disqus }}
 
 [1]: http://bazel.io
 [2]: http://buckbuild.com
