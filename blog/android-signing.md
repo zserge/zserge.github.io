@@ -12,7 +12,7 @@ Whenever I prepare my APK for the release - I used to do the following steps:
 	 and password defined
 3. Copy some code from [some blog][1] that would load the properties and set up
 	 the signing
-4. Finally, do 'gradle build'
+4. Finally, do `gradle build`
 
 But why not to move the boilderplate out of build.gradle?
 
@@ -96,5 +96,5 @@ Posted on {{ date }} {{ rss }}
 {{ disqus }}
 
 [1]: https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
-http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Signing-Configurations
+<!--http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Signing-Configurations-->
 [2]: https://github.com/trikita/gradle-android-signing
