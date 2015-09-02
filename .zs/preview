@@ -1,0 +1,19 @@
+#!/bin/sh
+
+for f in ./blog/*.md ; do
+	d=$($ZS var $f date)
+	if [ ! -z $d ] ; then
+		timestamp=`date --date "$d" +%s`
+		echo $timestamp $f
+	fi
+done | sort -r -n | head -n 5 | cut -d' ' -f2- | while read f ; do
+	url=`$ZS var $f url`
+	title=`$ZS var $f title`
+	descr=`$ZS var $f description`
+	echo "# [$title]($url)"
+	echo
+	words=$(cat $f | wc -w)
+	ttr=$((words/200))
+	echo "$descr ([${ttr} min to read]($url))"
+	echo
+done
