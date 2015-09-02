@@ -2,6 +2,8 @@ $font-normal: "Merriweather", "PT-Serif", Georgia, Times, "Times New Roman", ser
 $font-header: "Lato", "Open Sans", Lato, Helvetica, Arial, sans-serif
 $font-mono: "Roboto Mono", Inconsolata, Consolas, "Liberation Mono", monospace
 
+$black: rgba(0, 0, 0, 0.87)
+
 body
   margin: 40px auto
   padding: 0 10px
@@ -9,17 +11,21 @@ body
   line-height: 1.6
   font-family: $font-normal
   font-size: 20px
-  color: rgba(0, 0, 0, 0.87)
+  color: $black
 
 h1, h2, h3
   line-height: 1.2
   font-family: $font-header
   font-weight: 100
   text-transform: uppercase
+  a
+    color: $black
 
 h2, h3
   text-align: right
-  border-bottom: 2px solid rgba(0, 0, 0, 0.87)
+  font-size: 24px
+  /*text-transform: lowercase*/
+  border-bottom: 2px solid $black
 
 p
   text-align: justify
@@ -28,7 +34,7 @@ a
   color: #0076df
   text-decoration: none
   &:hover
-    color: rgba(0, 0, 0, 0.87)
+    color: $black
 
 ul, ol
   list-style-position: outside
@@ -63,9 +69,7 @@ header
   h2, nav, ul, li, .logo
     display: flex
   .logo
-    &:hover
-      background: #0076df
-    background-color: rgba(0, 0, 0, 0.87)
+    background-color: $black
     justify-content: center
     align-items: center
     color: #fff
@@ -73,11 +77,11 @@ header
     height: 2em
   h2
     border: none
-    a
-      color: rgba(0, 0, 0, 0.87)
   li
     list-style: none
     min-width: 72px
     justify-content: center
     align-items: center
 
+footer
+  font-size: 12px
