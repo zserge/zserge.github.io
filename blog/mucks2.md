@@ -1,7 +1,7 @@
-title: mucks: now with the dvtm flavor!
+title: "mucks: now with the dvtm flavor!"
 description: mucks - a tiny session manager for tmux, screen and dvtm
 date: 2014-06-07
-
+---
 # {{ title }}
 
 Somehow refactoring turned info rewriting from scratch... So, meet the new

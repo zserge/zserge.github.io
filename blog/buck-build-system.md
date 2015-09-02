@@ -2,7 +2,7 @@ title: Buck - life is too short to spend a minute for each build
 description: Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it.
 keywords: buck, build system, android build, slow gradle, speed up gradle, ant build, buck facebook, bazel
 date: 2015-05-27
-
+---
 # {{ title }}
 
 Gradle is too slow, Ant is too basic. Buck is fast and super-configurable and

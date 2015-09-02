@@ -2,7 +2,7 @@ title: kotlin - a new hope
 description: A new language for Android coding
 keywords: jvm, android, language, scala, kotlin, fast, safe, null-safe, intellijidea, ant
 date: 2013-11-28
-
+---
 # {{ title }}
 
 I've been looking for Java alternatives since my first days of Android

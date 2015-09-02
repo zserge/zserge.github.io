@@ -1,7 +1,7 @@
 title: log - a drop-in replacement for android Log class
 description: another logger for Android, tiny, easy-to-use, smart and flexible
 date: 2015-06-14
-
+---
 # {{ title }}
 
 Once upon a time I was making a pretty large app for Android. When everything

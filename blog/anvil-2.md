@@ -1,8 +1,8 @@
-title: Anvil: big progress for a small library
+title: "Anvil: big progress for a small library"
 description: Summing up the progress of anvil development
 keywords: anvil, android, render, layout, mvc, mvvm, mvp, mithril, listeners, butterknife, knork
 date: 2015-04-16
-
+---
 # Anvil: big progress for a small library
 
 I have just released [Anvil 0.0.2][1]. So many changes have been made and now I am

@@ -1,7 +1,7 @@
 title: moved to new static site generator (again)
 description: self done is well done
 date: 2014-12-20
-
+---
 # {{ title }}
 
 As you may have noticed, the site has changed its look. That's because I made a

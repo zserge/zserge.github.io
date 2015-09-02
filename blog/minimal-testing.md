@@ -2,7 +2,7 @@ title: ultimately minimal unit testing
 description: a tiny libraries for testing in JS, Lua and Bash
 keywords: unit testing, minimal, lightweight, dependencies, microjs, lua, busted, qunit, assert.sh
 date: 2014-12-16
-
+---
 # {{ title }}
 
 Most large software projects include automated testing and the reasons are

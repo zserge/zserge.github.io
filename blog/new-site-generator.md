@@ -1,7 +1,7 @@
 title: moved to new static site generator
 description: self done is well done
 date: 2013-07-18
-
+---
 # {{ title }}
 
 This website has been powered by [poole][1] for a long time.

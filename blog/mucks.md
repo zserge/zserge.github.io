@@ -1,7 +1,7 @@
-title: mucks: automating screen and tmux
+title: "mucks: automating screen and tmux"
 description: mucks - a session manager for screen and tmux
 date: 2014-04-25
-
+---
 # {{ title }}
 
 I can't imagine my daily work in terminal without multiplexers.

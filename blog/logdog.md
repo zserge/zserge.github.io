@@ -1,7 +1,7 @@
 title: logdog - a colorized Android logcat
 description: logdog is a better logcat
 date: 2013-05-20
-
+---
 # {{ title }}
 
 Sometimes I do Android development. I never liked using debuggers, neither I

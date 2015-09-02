@@ -1,8 +1,8 @@
-title: new project: jknav
+title: "new project: jknav"
 description: my attempt to jk-navigation in browsers
 keywords: jk, vim, vi, nagivation, chrome, plugin, extension, scroll
 date: 2012-11-30
-
+---
 # {{ title }}
 
 I like Vim and I like using 'J' and 'K' to scroll text down and up.

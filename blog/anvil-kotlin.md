@@ -2,7 +2,7 @@ title: Where Anvil meets Kotlin
 description: Summing up the progress of anvil development
 keywords: anvil, android, render, UI, mvc, mvvm, mvp, mithril, kotlin, scala
 date: 2015-04-16
-
+---
 # {{ title }}
 
 Kotlin is a [very nice language for JVM][1]. I [wrote][2] about it in the past.  

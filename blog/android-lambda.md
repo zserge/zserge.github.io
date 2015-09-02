@@ -2,7 +2,7 @@ title: lambda support for Android
 description: Bringing java 8 features to android platform
 keywords: android, lambda, jdk8, java 8, ant, retrolambda
 date: 2014-01-09
-
+---
 # Lambda support for Android
 
 _Note: big thanks to orfjackal (Esko Luontola), the author of 

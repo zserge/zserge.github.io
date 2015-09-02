@@ -1,8 +1,8 @@
-title: Anvil: Double O Seven
+title: "Anvil: Double O Seven"
 description: A preferred way to prepare your android apps. Shaken, not stirred.
 keywords: android UI, android design, android architecture, android mvc, simple android animations, android react.js, android reactive UI, butterknife, dagger
 date: 2015-06-25
-
+---
 # Anvil: version 0.0.7 released!
 
 If you missed the news - [Anvil](https://github.com/zserge/anvil) is a tiny

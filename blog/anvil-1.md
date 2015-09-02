@@ -1,8 +1,8 @@
-title: Anvil: the story of automatic rendering
+title: "Anvil: the story of automatic rendering"
 description: How to render your view automatically and stop worrying about UI state
 keywords: anvil, android, render, layout, mvc, mvvm, mvp, mithril, listeners, knork
 date: 2015-01-22
-
+---
 Reading my [previous blog post](/blog/android-mvx.html) some people asking why I'm so strongly against
 XMLs if they are really good? I think I shall clarify that I'm not against XMLs
 per se, I'm against the way many developers organize their apps. Let's look at

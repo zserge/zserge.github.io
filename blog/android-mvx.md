@@ -2,7 +2,7 @@ title: android UI development made easy
 description: Bringing the ideas from Mithril, React, Bloop to Android
 keywords: android, layout, mvc, mvvm, mvp, react.js, mithril, data binding
 date: 2015-01-14
-
+---
 # Android UI development made easy
 
 TL;DR: I offer declarative strongly typed layouts with data bindings in pure

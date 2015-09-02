@@ -1,7 +1,7 @@
 title: simple library publishing with Gradle
 description: quick guide to maven central library publishing with gradle
 date: 2014-08-10
-
+---
 # {{ title }}
 
 So, you switched to Gradle and just finished you new shiny Android library (or

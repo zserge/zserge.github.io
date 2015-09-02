@@ -2,7 +2,7 @@ title: the first post
 description: I'm just saying "Hi!"
 keywords: hello
 date: 2012-08-01
-
+---
 # {{ title }}
 
 Normally, people don't read 'hello' posts. I consider them useless, they teach

@@ -1,8 +1,8 @@
 title: How Palette was made
-description: clean minimal color scheme picker for traditional palettes: material, flatui, ios, wp7, solarized, tango
+description: "clean minimal color scheme picker for traditional palettes: material, flatui, ios, metro, solarized, tango"
 keywords: color scheme, color picker, without flash, clipboard, html5, palette, material design, flat ui
 date: 2015-08-06
-
+---
 # {{ title }}
 
 [Palette][link] is an open source lightweight color picker for the most famous
