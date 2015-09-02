@@ -1,33 +1,23 @@
 #!/bin/sh
 
-TITLE="zserge's blog"
-BASEURL="http://zserge.com"
+#
+# Generate RSS items
+#
 
-xml=$(cat << EOF
-<?xml version="1.0"?>
-<rss version="2.0">
-<channel>
-<title>$TITLE</title>
-<link>$BASEURL/blog.html</link>
-<description>My thoughts on software, simplicity and how to make it work together</description>
-<language>en-us</language>
-<pubDate>$(date -R)</pubDate>
-<lastBuildDate>$(date -R)</lastBuildDate>
-	$(find -name '*.md' -type f | while read line ; do
-		timestamp=$($ZS var $line date)
-		if [ ! -z $timestamp ] ; then
-			echo $(date --date $timestamp +%s) $line
-		fi
-	done | sort -r -n | cut -d' ' -f2 | while read f; do
-		url=$($ZS var $f url)
-		timestamp=$(date --date $($ZS var $f date) +%s)
-		name=$($ZS var $f title)
-		desc=$($ZS var $f description)
-		printf "<item><title>%s</title><link>%s</link><description>%s</description><pubDate>%s</pubDate><guid>%s</guid></item>\n" \
-			"$name" "$BASEURL/$url" "$desc" "$(date --date @$timestamp -R)" "$BASEURL/$url"
-	done)
-</channel>
-</rss>
-EOF
-)
-echo "$xml" > $ZS_OUTDIR/rss.xml
+for f in ./blog/*.md ; do
+	d=$($ZS var $f date)
+	if [ ! -z $d ] ; then
+		timestamp=`date --date "$d" +%s`
+		url=`$ZS var $f url`
+		title=`$ZS var $f title | tr A-Z a-z`
+		descr=`$ZS var $f description`
+		echo $timestamp \
+			"<item>" \
+			"<title>$title</title>" \
+			"<link>http://zserge.com/$url</link>" \
+			"<description>$descr</description>" \
+			"<pubDate>$(date --date @$timestamp -R)</pubDate>" \
+			"<guid>http://zserge.com/$url</guid>" \
+		"</item>"
+	fi
+done | sort -r -n | cut -d' ' -f2-
