@@ -2,17 +2,19 @@
 
 export LC_ALL=C
 
+#
+# Generates full list of posts in chronological order
+#
+
 echo "<ul>"
-find -name '*.md' -type f | while read line ; do
-	d=$($ZS var $line date)
-	if [ ! -z $d ] ; then
-		echo $($ZS dateparse "2006-01-02" $d) $line
-	fi
-done | sort -r -n | cut -d' ' -f2 | while read f; do
-	url=$($ZS var $f url)
-	timestamp=$($ZS dateparse "2006-01-02" $($ZS var $f date))
-	name=$($ZS var $f title)
-	desc=$($ZS var $f description)
-	echo "<li><a href=\"$url\">$name</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>"
-done
+	for f in ./blog/*.md ; do
+		d=$($ZS var $f date)
+		if [ ! -z $d ] ; then
+			timestamp=`date --date "$d" +%s`
+			url=`$ZS var $f url`
+			title=`$ZS var $f title | tr A-Z a-z`
+			descr=`$ZS var $f description`
+			echo "$timestamp <li><a href=\"$url\">$title</a> - $(date "+%B %d, %Y" --date @$timestamp)</li>"
+		fi
+	done | sort -r -n | cut -d' ' -f2-
 echo "</ul>"
