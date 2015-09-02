@@ -1,31 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> Ultra-leightweight logging for embedded system </title>
-		<meta name="description" content="just minimal logging in C" />
-		<meta name="keywords" content="log, embedded, variable-length, printf, format" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>Ultra-leightweight logging for embedded system</title>
+		<meta content="just minimal logging in C" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Ultra-leightweight logging for embedded system" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="just minimal logging in C" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
 		<h1>log.h</h1>
 
 <p>log.h is a ultra-light logging library for <a href="/nikl.html">nikl</a> framework.
@@ -33,14 +53,14 @@ You can use it to profile your code or debug time-critical parts.</p>
 
 <h2>idea</h2>
 
-<p>Real hackers don't use debuggers, they use <code>printf</code> instead, right?
+<p>Real hackers don&rsquo;t use debuggers, they use <code>printf</code> instead, right?
 But <code>printf</code> is often too heavy for your tiny 8-bit MCU.</p>
 
-<p>Nikl's logger sends only printf payload (e.g. arguments, without even format
+<p>Nikl&rsquo;s logger sends only printf payload (e.g. arguments, without even format
 string) and some information to find the line in the source file and
 get format string from there.</p>
 
-<p>It allows you to send (let's assume that sending 1 byte takes 1 instruction):</p>
+<p>It allows you to send (let&rsquo;s assume that sending 1 byte takes 1 instruction):</p>
 
 <ul>
 <li><code>TRACE()</code> message: 5 bytes, 10 instructions.</li>
@@ -73,7 +93,7 @@ contain 3 data types:</p>
 <li>Binary data of known length</li>
 </ul>
 
-<p>Let's see how these type are encoded.</p>
+<p>Let&rsquo;s see how these type are encoded.</p>
 
 <h2>data types</h2>
 
@@ -97,7 +117,7 @@ Data comes after length.</li>
 
 <h2>internals</h2>
 
-<p>Well, sending TRACE() is simple - it's just a function that sends 5 bytes.</p>
+<p>Well, sending TRACE() is simple - it&rsquo;s just a function that sends 5 bytes.</p>
 
 <p>LOG() is somewhat more complicated. Normally, LOG() arguments are passed
 comma-separated. As you know, statements in C can be also written separated
@@ -110,7 +130,23 @@ LOG(&quot;request = %s&quot;, _S(req));   /* _S() - for strings */
 LOG(&quot;payload = %v&quot;, _D(buf, 512)); /* _D() for binary data */
 </code></pre>
 
-		<footer></footer>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

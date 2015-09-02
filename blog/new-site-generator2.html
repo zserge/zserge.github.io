@@ -1,67 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> moved to new static site generator (again) </title>
-		<meta name="description" content="self done is well done" />
-		<meta name="keywords" content="" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>moved to new static site generator (again)</title>
+		<meta content="self done is well done" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="moved to new static site generator (again)" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="self done is well done" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
 		<h1>moved to new static site generator (again)</h1>
 
-<p>As you may have noticed, the site has changed its look. That's because I made a
-small rewrite and it resulted in a new static site generator. It's my another
-NIH product, this time it's written in Go.</p>
+<p>As you may have noticed, the site has changed its look. That&rsquo;s because I made a
+small rewrite and it resulted in a new static site generator. It&rsquo;s my another
+NIH product, this time it&rsquo;s written in Go.</p>
 
 <h2>stash away</h2>
 
 <p>I used <code>stash</code> before. It was written in UNIX Shell and was really perfect
 for my needs. Then it became slower and slower. The reason is that it could not
 track the timestamps of the web pages so it regenerated every page every
-time. It made live editing almost impossible and in general I didn't trust it
+time. It made live editing almost impossible and in general I didn&rsquo;t trust it
 anymore (would you trust a pocket monster made of awk/sed/sh?)</p>
 
 <p>So I checked the variety of the modern website generators. I used to like
 Python and Node, but I tried a Python generator years ago (poole) and I find
-Node to be somewhat slow. Yes, it's a very subjective sentiment.</p>
+Node to be somewhat slow. Yes, it&rsquo;s a very subjective sentiment.</p>
 
 <p>I wanted to find something fresh and experimental. I looked at
-<a href="http://gohugo.io">Hugo</a> and I didn't share the whole euphoria around it.
-It turns out it can't make a simple web site where index page is also a
+<a href="http://gohugo.io">Hugo</a> and I didn&rsquo;t share the whole euphoria around it.
+It turns out it can&rsquo;t make a simple web site where index page is also a
 markdown content, not just a list of recent blog posts.</p>
 
 <p>Then I found a brilliant <a href="https://github.com/imdario/zas">zas</a>. I so much liked
-the idea of &quot;everything can be a plugin&quot; that I wanted to see if I can make it
+the idea of &ldquo;everything can be a plugin&rdquo; that I wanted to see if I can make it
 even smaller and cleaner.</p>
 
 <h2>zs</h2>
 
-<p>That's how I made <a href="https://github.com/zserge/zs">zs</a>. The name can be
-interpreted as a stripped down &quot;zas&quot; or as &quot;zen static&quot; or as my initials.</p>
+<p>That&rsquo;s how I made <a href="https://github.com/zserge/zs">zs</a>. The name can be
+interpreted as a stripped down &ldquo;zas&rdquo; or as &ldquo;zen static&rdquo; or as my initials.</p>
 
-<p>It has no configuration files. It's absolutely flexible - you can write any
+<p>It has no configuration files. It&rsquo;s absolutely flexible - you can write any
 plugin you want in any programming language.</p>
 
-<p>Where's the catch? Well, it means you <em>have</em> to write every plugin you need
+<p>Where&rsquo;s the catch? Well, it means you <em>have</em> to write every plugin you need
 because zs is very very basic.</p>
 
 <p>Your site will be written in Markdown, and you can define arbitrary variables
@@ -88,8 +108,8 @@ Hello, {name}. The weather is {weather}
 echo &quot;sunny and hot&quot;
 </code></pre>
 
-<p>Here <code>name</code> will be replaced with &quot;John Doe&quot; and <code>weather</code> with &quot;sunny and
-hot&quot;. This open ways to many helpful tricks, like RSS or table of contents
+<p>Here <code>name</code> will be replaced with &ldquo;John Doe&rdquo; and <code>weather</code> with &ldquo;sunny and
+hot&rdquo;. This open ways to many helpful tricks, like RSS or table of contents
 generation.</p>
 
 <p>Zs also supports some special hook plugins - <code>pre</code> and <code>post</code>. They can be
@@ -102,9 +122,11 @@ me a way to quickly edit and review my pages.</p>
 dependency) and you are welcome to try zs and to
 <a href="https://github.com/zserge/zs/issues">report the issues</a></p>
 
-<p>Posted on 2014-12-20 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
-
-<p><script type="text/javascript">(function() {
+		<p>Posted on 2014-12-20</p>
+		<span class="rss" style="float: right">
+			<a href="/rss.xml">[rss]</a>
+		</span>
+		<script type="text/javascript">(function() {
   if (window.pluso)if (typeof window.pluso.start == 'function') return;
   if (window.ifpluso==undefined) { window.ifpluso = 1;
     var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
@@ -113,22 +135,40 @@ dependency) and you are welcome to try zs and to
     var h=d[g]('body')[0];
     h.appendChild(s);
   } })();</script>
-<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div>
 
-<p><div id="disqus_thread"></div><script type="text/javascript">
+
+		<div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
-    (function() {
-        var dsq = document.createElement('script');
-        dsq.type = 'text/javascript';
-        dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
 <noscript>
-</noscript></p>
+</noscript>
 
-		<footer></footer>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

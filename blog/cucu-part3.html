@@ -1,32 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> cucu: a compiler you can understand (3/3) </title>
-		<meta name="description" content="Compilers is fun. Want to write your own one?" />
-		<meta name="keywords" content="compiler, programming, C, smallC, easy, tiny, small, tutorial, parser, code, generate, virtal machine" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>cucu: a compiler you can understand (3/3)</title>
+		<meta content="Compilers is fun. Want to write your own one?" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="cucu: a compiler you can understand (3/3)" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="Compilers is fun. Want to write your own one?" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
-		<p>Let's talk about compiler backends. C should be a portable language, and there
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<p>Let&rsquo;s talk about compiler backends. C should be a portable language, and there
 is no need to rewrite the whole compiler if you want to port it to the new CPU
 architecture.</p>
 
@@ -37,24 +57,24 @@ highly portable.</p>
 <p>I wanted CUCU to be a portable compiler (actually, a cross-compiler).
 So, I decided to move backend code generator to a separate module.</p>
 
-<p>But before we dive into the backend code generation, let's think of how we will
+<p>But before we dive into the backend code generation, let&rsquo;s think of how we will
 test it.</p>
 
 <h2>minimal target architecture</h2>
 
-<p>Our minimal target has two registers (let's call them A and B), and a stack.
+<p>Our minimal target has two registers (let&rsquo;s call them A and B), and a stack.
 Register A is an accumulator. We could use fixed-size instruction codes, as
-many RISC CPUs do, but there's not much fun in decoding hexadecimal numbers to
+many RISC CPUs do, but there&rsquo;s not much fun in decoding hexadecimal numbers to
 find out what the code actually does.</p>
 
-<p>I have chosen a simpler way. Every instruction is 8 bytes long (yes, it's huge,
-but who cares - it's a test imaginary architecture). And the first 7 bytes of
-the instruction are just ASCII symbols, and the last one is 0x10 ('\n').</p>
+<p>I have chosen a simpler way. Every instruction is 8 bytes long (yes, it&rsquo;s huge,
+but who cares - it&rsquo;s a test imaginary architecture). And the first 7 bytes of
+the instruction are just ASCII symbols, and the last one is 0x10 (&rsquo;\n&rsquo;).</p>
 
 <p>This allows us to use human-readable instruction codes, like <code>A:=A+B</code>,
-<code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory (&quot;add register B
-to register A&quot;, &quot;put 0x1ef8 to register A&quot; and &quot;push the value of register A
-to the stack&quot;).</p>
+<code>A:=1ef8</code>, or <code>push A</code>. These seem to be self-explanatory (&ldquo;add register B
+to register A&rdquo;, &ldquo;put 0x1ef8 to register A&rdquo; and &ldquo;push the value of register A
+to the stack&rdquo;).</p>
 
 <ul>
 <li><code>A:=NNNN</code> - put value of 0xNNNN to register A</li>
@@ -83,8 +103,8 @@ to the stack&quot;).</p>
 
 <h2>cucu backend design</h2>
 
-<p>We include &quot;gen.c&quot; file, which is actually a backend implementation.
-Let's start with simple functions: <code>gen_start()</code> and <code>gen_finish()</code>.
+<p>We include &ldquo;gen.c&rdquo; file, which is actually a backend implementation.
+Let&rsquo;s start with simple functions: <code>gen_start()</code> and <code>gen_finish()</code>.
 They are used to generate application prologue (like PE header, or ELF header)
 and to post-process byte code.</p>
 
@@ -95,16 +115,16 @@ array. At the very end, <code>code[]</code> contains a ready-to-use compiled pro
 specific byte-codes, and this is how we get compiled machine code.</p>
 
 <p>Now we need to define what are the most common constructions, that backend
-should implement. Let's start with this simple program:</p>
+should implement. Let&rsquo;s start with this simple program:</p>
 
 <pre><code>int main() {
     return 0;
 }
 </code></pre>
 
-<p>Let's talk about calling convention. This is how arguments are passed to the
+<p>Let&rsquo;s talk about calling convention. This is how arguments are passed to the
 function and how the return value is fetched. We stated before, that arguments
-are placed on the stack (the 1st argument is pushed 1st). Let's make a deal,
+are placed on the stack (the 1st argument is pushed 1st). Let&rsquo;s make a deal,
 that the value of the register A when function returns is its return value.</p>
 
 <p>Actually, we will store all values to register A. Register B will be used as
@@ -131,8 +151,8 @@ fine for us</em></p>
 
 <h2>maths</h2>
 
-<p>Now let's compile some arithmetic expressions. They are all similar, so I'll
-show how it's done with an example of addition. Remember how parser works? It
+<p>Now let&rsquo;s compile some arithmetic expressions. They are all similar, so I&rsquo;ll
+show how it&rsquo;s done with an example of addition. Remember how parser works? It
 parses (and theoretically, compiles) the left part of the expression, then the
 right part, and then performs an operation.</p>
 
@@ -190,7 +210,7 @@ jump instruction, but the address is not known yet - it depends on how many code
 is compiled for the body statetment. So, after the body is compiled
 we patch jump address with the correct value.</p>
 
-<p>We are done. Let's try the following program:</p>
+<p>We are done. Let&rsquo;s try the following program:</p>
 
 <pre><code>int main() {
     int k;
@@ -228,7 +248,7 @@ ret     # remember about double-return for safety? ;)
 <p>Yeah, the code is so dirty and bloated. But it works. And which is more
 important, you know now how compilers work and how create your own one.</p>
 
-<p>But I should warn you...</p>
+<p>But I should warn you&hellip;</p>
 
 <h2>warning</h2>
 
@@ -236,18 +256,18 @@ important, you know now how compilers work and how create your own one.</p>
 use real grown-up tools:</p>
 
 <ul>
-<li>flex/lex/jlex/...</li>
-<li>yacc/bison/cup...</li>
+<li>flex/lex/jlex/&hellip;</li>
+<li>yacc/bison/cup&hellip;</li>
 <li>ANTLR</li>
 <li>Ragel</li>
 <li>and many others</li>
 </ul>
 
-<p>Also, it's worth checking real literature, like <a href="http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Dragon Book</a>. Maybe the
+<p>Also, it&rsquo;s worth checking real literature, like <a href="http://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">Dragon Book</a>. Maybe the
 courses from <a href="https://www.coursera.org/course/compilers">coursera.org</a> will be useful for you, too.</p>
 
 <p>If you need to port existing languages for your own architecture -
-you'd better learn how to write LLVM backends or GCC backends.</p>
+you&rsquo;d better learn how to write LLVM backends or GCC backends.</p>
 
 <p>If you want to read more about toy compilers - check <a href="http://en.wikipedia.org/wiki/Small-C">SmallC</a>.</p>
 
@@ -258,7 +278,7 @@ you'd better learn how to write LLVM backends or GCC backends.</p>
 <h2>final word</h2>
 
 <p>The full sources of the compiler are available on <a href="https://bitbucket.org/zserge/cucu">my bitbucket page</a>.  They
-are licensed under MIT, feel free to use and modify.  I'm not sure if there is
+are licensed under MIT, feel free to use and modify.  I&rsquo;m not sure if there is
 any sense in submitting issues to this project, so do it only if you know how
 to fix them :)</p>
 
@@ -267,9 +287,11 @@ to fix them :)</p>
 <p><em>Check <a href="/blog/cucu-part1.html">part 1</a> or <a href="/blog/cucu-part2.html">part 2</a> if
 you missed something</em></p>
 
-<p>Posted on 2012-10-25 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
-
-<p><script type="text/javascript">(function() {
+		<p>Posted on 2012-10-25</p>
+		<span class="rss" style="float: right">
+			<a href="/rss.xml">[rss]</a>
+		</span>
+		<script type="text/javascript">(function() {
   if (window.pluso)if (typeof window.pluso.start == 'function') return;
   if (window.ifpluso==undefined) { window.ifpluso = 1;
     var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
@@ -278,22 +300,40 @@ you missed something</em></p>
     var h=d[g]('body')[0];
     h.appendChild(s);
   } })();</script>
-<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div>
 
-<p><div id="disqus_thread"></div><script type="text/javascript">
+
+		<div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
-    (function() {
-        var dsq = document.createElement('script');
-        dsq.type = 'text/javascript';
-        dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
 <noscript>
-</noscript></p>
+</noscript>
 
-		<footer></footer>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

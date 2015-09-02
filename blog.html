@@ -1,55 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> zserge's blog </title>
-		<meta name="description" content="Thoughts about linux, android, web and other things" />
-		<meta name="keywords" content="software, minimalism, linux, embedded, avr, android, golang, KISS" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>zserge's blog</title>
+		<meta content="thoughts about software, linux, android, web and other things" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="zserge&#39;s blog" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="thoughts about software, linux, android, web and other things" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
-		<p>This is my blog. If you like it and want to subscribe - here's <a href="/rss.xml">rss</a>.</p>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<p>This is my blog. If you like it and want to subscribe - here&rsquo;s <a href="/rss.xml">rss</a>.</p>
 
-<h2>my posts</h2>
+<h2>posts</h2>
 
 <ul>
-<li><a href="blog/android-signing.html">How to sign release apk with gradle</a> - August 09, 2015</li>
-<li><a href="blog/palette.html">How Palette was made</a> - August 06, 2015</li>
-<li><a href="blog/anvil-0.0.7.html">Anvil: Double O Seven</a> - June 25, 2015</li>
-<li><a href="blog/log.html">log - a drop-in replacement for android Log class</a> - June 14, 2015</li>
-<li><a href="blog/buck-build-system.html">Buck - life is too short to spend a minute for each build</a> - May 27, 2015</li>
-<li><a href="blog/anvil-kotlin.html">Where Anvil meets Kotlin</a> - April 16, 2015</li>
-<li><a href="blog/anvil-2.html">Anvil: big progress for a small library</a> - April 16, 2015</li>
-<li><a href="blog/anvil-1.html">Anvil: the story of automatic rendering</a> - January 22, 2015</li>
-<li><a href="blog/android-mvx.html">android UI development made easy</a> - January 14, 2015</li>
+<li><a href="blog/android-signing.html">how to sign release apk with gradle</a> - August 09, 2015</li>
+<li><a href="blog/palette.html">how palette was made</a> - August 06, 2015</li>
+<li><a href="blog/anvil-0.0.7.html">anvil: double o seven</a> - June 25, 2015</li>
+<li><a href="blog/log.html">log - a drop-in replacement for android log class</a> - June 14, 2015</li>
+<li><a href="blog/buck-build-system.html">buck - life is too short to spend a minute for each build</a> - May 27, 2015</li>
+<li><a href="blog/anvil-kotlin.html">where anvil meets kotlin</a> - April 16, 2015</li>
+<li><a href="blog/anvil-2.html">anvil: big progress for a small library</a> - April 16, 2015</li>
+<li><a href="blog/anvil-1.html">anvil: the story of automatic rendering</a> - January 22, 2015</li>
+<li><a href="blog/android-mvx.html">android ui development made easy</a> - January 14, 2015</li>
 <li><a href="blog/new-site-generator2.html">moved to new static site generator (again)</a> - December 20, 2014</li>
 <li><a href="blog/minimal-testing.html">ultimately minimal unit testing</a> - December 16, 2014</li>
-<li><a href="blog/gradle-maven-publish.html">simple library publishing with Gradle</a> - August 10, 2014</li>
+<li><a href="blog/gradle-maven-publish.html">simple library publishing with gradle</a> - August 10, 2014</li>
 <li><a href="blog/mucks2.html">mucks: now with the dvtm flavor!</a> - June 07, 2014</li>
 <li><a href="blog/mucks.html">mucks: automating screen and tmux</a> - April 25, 2014</li>
-<li><a href="blog/android-lambda.html">lambda support for Android</a> - January 09, 2014</li>
+<li><a href="blog/android-lambda.html">lambda support for android</a> - January 09, 2014</li>
 <li><a href="blog/kotlin.html">kotlin - a new hope</a> - November 28, 2013</li>
 <li><a href="blog/new-site-generator.html">moved to new static site generator</a> - July 18, 2013</li>
-<li><a href="blog/logdog.html">logdog - a colorized Android logcat</a> - May 20, 2013</li>
-<li><a href="blog/aaml.html">AAML - another android markup language</a> - April 02, 2013</li>
+<li><a href="blog/logdog.html">logdog - a colorized android logcat</a> - May 20, 2013</li>
+<li><a href="blog/aaml.html">aaml - another android markup language</a> - April 02, 2013</li>
 <li><a href="blog/update-jknav.html">new project: jknav</a> - November 30, 2012</li>
 <li><a href="blog/cucu-part3.html">cucu: a compiler you can understand (3/3)</a> - October 25, 2012</li>
 <li><a href="blog/cucu-part2.html">cucu: a compiler you can understand (2/3)</a> - October 24, 2012</li>
@@ -59,7 +79,23 @@
 <li><a href="blog/hello.html">the first post</a> - August 01, 2012</li>
 </ul>
 
-		<footer></footer>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

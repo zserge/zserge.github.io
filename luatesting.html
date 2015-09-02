@@ -1,31 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> luatesting - micro-pico-tiny framework for Lua unit testing </title>
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>luatesting - micro-pico-tiny framework for Lua unit testing</title>
+		<meta content="" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="luatesting - micro-pico-tiny framework for Lua unit testing" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
 		<h1>Luatesting</h1>
 
 <p>luatesting was born in sin, because the reason to create is was a
@@ -35,14 +55,14 @@
 <h2>Philosophy</h2>
 
 <p>Yes, I know about <a href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>.
-But I don't like it.
-It is good for huge enterprise-level apps. But I don't write
+But I don&rsquo;t like it.
+It is good for huge enterprise-level apps. But I don&rsquo;t write
 enterprise apps.
 It is good for object-oriented languages. But Lua is not that
 object-oriented.</p>
 
 <p>Have you heard about Go language <a href="http://golang.org/pkg/testing/">testing</a>
-package? That's what I kept in mind when writing luatesting.</p>
+package? That&rsquo;s what I kept in mind when writing luatesting.</p>
 
 <h2>Code</h2>
 
@@ -66,13 +86,13 @@ testing.run()
 </code></pre>
 
 <p>When <code>testing.run()</code> is called - all your global tables are scanned, and
-all methods containing the word &quot;test&quot; in the name are called.</p>
+all methods containing the word &ldquo;test&rdquo; in the name are called.</p>
 
 <p>Sounds easy?</p>
 
 <h2>How to test</h2>
 
-<p>That was how to organize your test cases. Now let's see how to test a
+<p>That was how to organize your test cases. Now let&rsquo;s see how to test a
 single case.</p>
 
 <p>Every test case gets a single parameter - an object, called <code>t</code>.</p>
@@ -88,7 +108,7 @@ running this test. There can be several errors in a single test</li>
 
 <p>If nothing was done to the <code>t</code> object - the test is passed successfully.</p>
 
-<p>Here's an example of a test case:</p>
+<p>Here&rsquo;s an example of a test case:</p>
 
 <pre><code>ParserTest = {
     p = parser_create()
@@ -122,7 +142,7 @@ testing = require(&quot;luatesting&quot;)
 testing.run()
 </code></pre>
 
-<p>Here's good output:</p>
+<p>Here&rsquo;s good output:</p>
 
 <pre><code>OK: test_single_number
 OK: test_array
@@ -135,10 +155,26 @@ OK: test_array
 
 <h2>Other info</h2>
 
-<p>My experience with Lua is VERY little, so if it's not enough Lua-esque -
+<p>My experience with Lua is VERY little, so if it&rsquo;s not enough Lua-esque -
 let me know how to improve it. Thanks!</p>
 
-		<footer></footer>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

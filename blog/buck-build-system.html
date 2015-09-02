@@ -1,51 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> Buck - life is too short to spend a minute for each build </title>
-		<meta name="description" content="Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it." />
-		<meta name="keywords" content="buck, build system, android build, slow gradle, speed up gradle, ant build, buck facebook, bazel" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>Buck - life is too short to spend a minute for each build</title>
+		<meta content="Buck is a build system made by Facebook. It fits so perfectly for my needs that I&#39;ve made a project skeleton generator for it." name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Buck - life is too short to spend a minute for each build" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="Buck is a build system made by Facebook. It fits so perfectly for my needs that I&#39;ve made a project skeleton generator for it." property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
 		<h1>Buck - life is too short to spend a minute for each build</h1>
 
 <p>Gradle is too slow, Ant is too basic. Buck is fast and super-configurable and
-I'd like to tell you how I use it for Android development.</p>
+I&rsquo;d like to tell you how I use it for Android development.</p>
 
-<p>I own a pretty old thinkpad laptop so I don't expect the builds to be too fast.
+<p>I own a pretty old thinkpad laptop so I don&rsquo;t expect the builds to be too fast.
 Ant used to spend 10..40 seconds for each build on my laptop depending on how
-large the project is. Gradle takes about a minute in average and that's too
+large the project is. Gradle takes about a minute in average and that&rsquo;s too
 long for me - I just lose focus when I just sit and wait for the build results.</p>
 
-<p>I had great expectations about <a href="http://bazel.io">Bazel</a>, but it doesn't have Android support
-yet. And then I've heard about <a href="http://buckbuild.com">Buck</a>. I tried it and it was so great that
+<p>I had great expectations about <a href="http://bazel.io">Bazel</a>, but it doesn&rsquo;t have Android support
+yet. And then I&rsquo;ve heard about <a href="http://buckbuild.com">Buck</a>. I tried it and it was so great that
 I could not believe it.</p>
 
 <h2>how fast is this buck?</h2>
 
-<p>Let me show you some numbers for each of the build systems. It's not a real
-benchmark made in the vacuum, it's just a picture of my average workflow with
+<p>Let me show you some numbers for each of the build systems. It&rsquo;s not a real
+benchmark made in the vacuum, it&rsquo;s just a picture of my average workflow with
 my normal apps running in the background. I created a minimal empty project
-with a single activity, some XML resources and a few lines of code. Here's the
+with a single activity, some XML resources and a few lines of code. Here&rsquo;s the
 commands I used to generate project structure:</p>
 
 <p>Ant:</p>
@@ -64,8 +84,8 @@ commands I used to generate project structure:</p>
 </code></pre>
 
 <p>Then I tried a clean build, an incremental build and a no-op build. For all
-builds I used 'ant debug', 'gradle assembleDebug' and 'buck build app'
-commands, I measured time with 'time' command (instead of using the numbers
+builds I used &lsquo;ant debug&rsquo;, &lsquo;gradle assembleDebug&rsquo; and &lsquo;buck build app&rsquo;
+commands, I measured time with &lsquo;time&rsquo; command (instead of using the numbers
 printed by each build system, those numbers are a bit lower).</p>
 
 <ul>
@@ -92,7 +112,7 @@ printed by each build system, those numbers are a bit lower).</p>
 </ul></li>
 </ul>
 
-<p>Now, let's try a larger project. I simply added some fake methods in five more
+<p>Now, let&rsquo;s try a larger project. I simply added some fake methods in five more
 source files, 3000 LOC in total. Looks like a common number for a single-person
 project. Incremental build times are (for the addition of 3000 LOC):</p>
 
@@ -110,12 +130,12 @@ simple) projects.</p>
 
 <p>Technical details of Buck are described <a href="http://buckbuild.com/concept/what_makes_buck_so_fast.html">here</a>. It optimizes everything - it
 keeps jvm running in the nailgun server, it uses threads, it caches a lot,
-it uses an optimized 'dx' utility etc etc. They even seem to have a separate
-app that updates your code in the 'live' mode, so you don't have to pack the
-APK and install it (in fact, now 'adb install' is one of the longest build
+it uses an optimized &lsquo;dx&rsquo; utility etc etc. They even seem to have a separate
+app that updates your code in the &lsquo;live&rsquo; mode, so you don&rsquo;t have to pack the
+APK and install it (in fact, now &lsquo;adb install&rsquo; is one of the longest build
 steps I have now!).</p>
 
-<h2>where's the catch?</h2>
+<h2>where&rsquo;s the catch?</h2>
 
 <p>Buck has outdated documentation. You have to spend time reading the issue
 trackers and looking for the ansers.</p>
@@ -123,7 +143,7 @@ trackers and looking for the ansers.</p>
 <p>Buck seems to have a small community. Not so many Stackoverflow answers, not so
 many articles, not so many tutorials.</p>
 
-<p>Buck 'quickstart' command is far from what you expect from the app
+<p>Buck &lsquo;quickstart&rsquo; command is far from what you expect from the app
 skeleton generator.</p>
 
 <p>In Buck you have to write most of the build scripts manually. It gives you
@@ -131,13 +151,13 @@ power, but it takes away the convenience. E.g. for your dependencies you have
 to download them, put into some folder, create rules that point to the JARs,
 include those rules as a dependency.</p>
 
-<p>Ah, Buck seems to have no support for Windows, but well, I don't care about
+<p>Ah, Buck seems to have no support for Windows, but well, I don&rsquo;t care about
 Windows.</p>
 
 <p>So Buck can be a problem for newcomers, but if you learn it - you get a very
 fast build system you can totally control. No magic behing the scenes.</p>
 
-<h2>finally, what's that buckbonejava command?</h2>
+<h2>finally, what&rsquo;s that buckbonejava command?</h2>
 
 <p>Since I often play with app ideas - I want to start a new app quickly, write
 some code and see the results as quickly as possible. Buck fits perfectly here.</p>
@@ -150,9 +170,9 @@ sources.</p>
 
 <p>In your project the sources will be at <code>java/my/package/name/</code>, and resources
 will be at <code>res/my/package/name/res/values/strings.xml</code> etc. Just go edit those
-and run 'buck install app' or 'buck build app'.</p>
+and run &lsquo;buck install app&rsquo; or &lsquo;buck build app&rsquo;.</p>
 
-<p>As a nice bonus I've added the <code>maven</code> macro so you can include the dependencies like:</p>
+<p>As a nice bonus I&rsquo;ve added the <code>maven</code> macro so you can include the dependencies like:</p>
 
 <pre><code>maven('com.squareup:otto:1.3.7') # that's how you define your maven library
 maven('com.squareup.okhttp:okhttp:2.4.0') # that's how you define your maven library
@@ -166,8 +186,8 @@ android_library(
 )
 </code></pre>
 
-<p>AARs and JARs are supported. You can run 'buck fetch app' to download those
-dependencies. Or it will download them on the next 'buck build' cycle. Similar
+<p>AARs and JARs are supported. You can run &lsquo;buck fetch app&rsquo; to download those
+dependencies. Or it will download them on the next &lsquo;buck build&rsquo; cycle. Similar
 to Gradle, huh?</p>
 
 <p>Next, I like <a href="http://kotlinlang.org">Kotlin language</a> <a href="http://zserge.com/blog/anvil-kotlin.html">a lot</a> and I want it to become my primary
@@ -181,25 +201,29 @@ projects right now.</p>
 
 <p>I also tried to manually run nailgun for the Kotlin compiler and got the app
 built in about 5 seconds, I could not even dream about such a small number. But
-this approach uses too many hardcoded paths that I can't recommend it yet for
-normal usage and I can't make a generic wrapper.</p>
+this approach uses too many hardcoded paths that I can&rsquo;t recommend it yet for
+normal usage and I can&rsquo;t make a generic wrapper.</p>
 
 <h2>extending Buck</h2>
 
-<p>At the moment Buck is very hard to extend and it's not documented. So no Buck
-plugins yet (and that's why it seems so hard for me to add Kotlin support).</p>
+<p>At the moment Buck is very hard to extend and it&rsquo;s not documented. So no Buck
+plugins yet (and that&rsquo;s why it seems so hard for me to add Kotlin support).</p>
 
-<p>Also I'm not sure how the top-level Buck configuration can be accessed from
-within the Buck script, but if that's possible - it could simplify things a lot.
+<p>Also I&rsquo;m not sure how the top-level Buck configuration can be accessed from
+within the Buck script, but if that&rsquo;s possible - it could simplify things a lot.
 E.g. compiler paths could be defined in the top-level config, and other build
 scripts would reuse those.</p>
 
-<p>I'm still very new to Buck, but if you have any suggestions how to create a
+<p>I&rsquo;m still very new to Buck, but if you have any suggestions how to create a
 Buck project that would use Kotlin or any other compiler (Scala, Groovy,
 Clojure) with nailgun and Buck - please share your thoughts. Also if you have
 an idea to improve my buckbone scripts - send me pull requests.</p>
 
-<p><script type="text/javascript">(function() {
+		<p>Posted on 2015-05-27</p>
+		<span class="rss" style="float: right">
+			<a href="/rss.xml">[rss]</a>
+		</span>
+		<script type="text/javascript">(function() {
   if (window.pluso)if (typeof window.pluso.start == 'function') return;
   if (window.ifpluso==undefined) { window.ifpluso = 1;
     var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
@@ -208,22 +232,40 @@ an idea to improve my buckbone scripts - send me pull requests.</p>
     var h=d[g]('body')[0];
     h.appendChild(s);
   } })();</script>
-<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div>
 
-<p><div id="disqus_thread"></div><script type="text/javascript">
+
+		<div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
-    (function() {
-        var dsq = document.createElement('script');
-        dsq.type = 'text/javascript';
-        dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
 <noscript>
-</noscript></p>
+</noscript>
 
-		<footer></footer>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-

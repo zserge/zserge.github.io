@@ -1,45 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimumscale=1.0, maximum-scale=1.0" />
-		<title> kotlin - a new hope </title>
-		<meta name="description" content="A new language for Android coding" />
-		<meta name="keywords" content="jvm, android, language, scala, kotlin, fast, safe, null-safe, intellijidea, ant" />
-		<link href='http://fonts.googleapis.com/css?family=Crimson+Text:400,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="/styles.css" />
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-			ga('create', 'UA-33644825-1', 'zserge.com');
-			ga('send', 'pageview');
-		</script>
+		<meta charset="UTF-8" />
+		<title>kotlin - a new hope</title>
+		<meta content="A new language for Android coding" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href=".zs/layout.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="kotlin - a new hope" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content=".zs/layout.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="A new language for Android coding" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
 	</head>
 	<body>
-		<nav class='menu'>/*
-			<ul class='menu'>
-				<li><a class='menu-link' href="/">home</a></li>
-				<li><a class='menu-link' href="/projects.html">code</a></li>
-				<li><a class='menu-link' href="/blog.html">blog</a></li>
-			</ul>*/
-		</nav>
+		<header>
+			<a class="logo" href="/">Z</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/about.html">about</a>
+					</li>
+					<li>
+						<a href="/blog.html">posts</a>
+					</li>
+					<li>
+						<a href="https://twitter.com/zsergo">@me</a>
+					</li>
+					<li>
+						<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					</li>
+					<li>
+						<a href="https://github.com/zserge">&lt;/>me</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
 		<h1>kotlin - a new hope</h1>
 
-<p>I've been looking for Java alternatives since my first days of Android
-development. I can't say I don't like Java. It's a nice language, very easy to
+<p>I&rsquo;ve been looking for Java alternatives since my first days of Android
+development. I can&rsquo;t say I don&rsquo;t like Java. It&rsquo;s a nice language, very easy to
 learn and pretty logical.  But the lack of proper functional style
-constructions often inspires me to check what's new in the field of JVM
+constructions often inspires me to check what&rsquo;s new in the field of JVM
 languages.</p>
 
-<p>So far I've tried (tried, I never learnt these languages properly):</p>
+<p>So far I&rsquo;ve tried (tried, I never learnt these languages properly):</p>
 
 <ul>
 <li><em>Mirah</em> - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
 lot of syntax sugar, but it failed to make a static class attribute when I
-tried it. I'm sure now it's better, I just don't like Ruby.</li>
+tried it. I&rsquo;m sure now it&rsquo;s better, I just don&rsquo;t like Ruby.</li>
 <li><em>Clojure</em> - a Lisp. I had very big expectations about clojure, but it turned
 out to be slow, huge and had no libraries for Android.</li>
 <li><em>Kawa</em> - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
@@ -60,7 +80,7 @@ notes when phone was tilted.</p>
 
 <h2>Kotlin - The Phantom Menace</h2>
 
-<p>I've heard Kotlin has nice support of the IDE, but as a convinced vim user I decided to try it in console/vim environment.</p>
+<p>I&rsquo;ve heard Kotlin has nice support of the IDE, but as a convinced vim user I decided to try it in console/vim environment.</p>
 
 <p>So, on the official <a href="http://kotlin.jetbrains.org/">website</a> I found no binaries.
 Instead, I found a link to Github release with source archives. That was not
@@ -69,12 +89,12 @@ days to make Java world more complicated. Luckily, Kotlin build system was plain
 
 <p>Dealing with dependencies and compiling the compiler took a while, and in the
 <code>$SRC/dist/kotlinc</code> directory I found compiler binaries and runtime. Also, in the
-<code>$SRC/dist/kotlinc/tools</code> directory there was a j2k app (I thought it's a
+<code>$SRC/dist/kotlinc/tools</code> directory there was a j2k app (I thought it&rsquo;s a
 translator from Java to Kotlin), but it failed to run.</p>
 
 <h2>Kotlin - Empire Strikes Back</h2>
 
-<p>So, let's get back to Google stuff and make kotlin compiler work with Android
+<p>So, let&rsquo;s get back to Google stuff and make kotlin compiler work with Android
 build.xml. Customizations of build process are possible with <code>custom_rules.xml</code>.
 Again, good design of kotlin provides us with <code>kotlinc</code> Ant task, so we need
 to include that task into the <code>custom_rules.xml</code>.</p>
@@ -104,19 +124,19 @@ custom rules:</p>
 &lt;/project&gt;
 </code></pre>
 
-<p>I'm not good at Ant, but that works if <code>KOTLIN_HOME</code> environment variable is
+<p>I&rsquo;m not good at Ant, but that works if <code>KOTLIN_HOME</code> environment variable is
 set correctly (it should point to the <code>kotlinc</code> folder). We use post-install
 hook, because R.java should be generated and compiled before compiling kotlin
 files.</p>
 
 <p>Then, copy Kotlin runtime from <code>$KOTLIN_HOME/libs</code> to your project <code>libs</code> directory.
-Runtime is small, so I hoped apk size won't get large, too.</p>
+Runtime is small, so I hoped apk size won&rsquo;t get large, too.</p>
 
 <p>Now, create an empty source file <code>src/&lt;...package...&gt;/Main.kt</code>.</p>
 
 <h2>Kotlin - Return of the Jedi</h2>
 
-<p>So, let's write some Kotlin. Minimal activity example looks much like Java:</p>
+<p>So, let&rsquo;s write some Kotlin. Minimal activity example looks much like Java:</p>
 
 <pre><code>package kotlin.theremin
 
@@ -136,12 +156,12 @@ inheritance looks a bit different as well as super calls.</p>
 
 <p>Interesting part here is <code>savedInstanceState : Bundle?</code>. Question mark means a
 null-safe type.  Also, parameter name is not recommended to be changed, since
-Kotlin may use named arguments in calls. That's very annoying if careless
-Android SDK developers defined arguments as &quot;p0&quot;, &quot;p1&quot; and so on. Good news
-it's only a warning, so I decided to ignore it when default parameter name is
+Kotlin may use named arguments in calls. That&rsquo;s very annoying if careless
+Android SDK developers defined arguments as &ldquo;p0&rdquo;, &ldquo;p1&rdquo; and so on. Good news
+it&rsquo;s only a warning, so I decided to ignore it when default parameter name is
 meaningless.</p>
 
-<p>Build, install, run - all should work. Build process doesn't feel slow, but
+<p>Build, install, run - all should work. Build process doesn&rsquo;t feel slow, but
 compiler output (warnings, errors) is a bit hard to read, since at the end of
 the build logs there is a long stack trace if your code has errors, so I had to
 scroll up to see actual error messages.</p>
@@ -149,9 +169,9 @@ scroll up to see actual error messages.</p>
 <h2>Kotlin - Attack of the Clones</h2>
 
 <p>So, I could write some code in Kotlin. The strongest feeling was that Kotlin is
-a copy of Scala. I can't say it's bad. I think I would have spent more time to
+a copy of Scala. I can&rsquo;t say it&rsquo;s bad. I think I would have spent more time to
 study Scala if it was not that slow, and if I saw real profit of how Scala can
-help me in Android development. Here's the code of theremin app in kotlin:</p>
+help me in Android development. Here&rsquo;s the code of theremin app in kotlin:</p>
 
 <pre><code>package kotlin.theremin
 
@@ -257,8 +277,8 @@ class AudioThread(): Thread() {
 </code></pre>
 
 <p>It was all in one source file, Main.kt. It plays major scale notes as you tilt
-the phone.  Sine generator code was stolen somewhere from the web, so it's not
-an example of how one should write it. But I hope it's enough to get
+the phone.  Sine generator code was stolen somewhere from the web, so it&rsquo;s not
+an example of how one should write it. But I hope it&rsquo;s enough to get
 first impression of how Kotlin looks like.</p>
 
 <p>Good news: overhead is only 200KB, Kotlin runtime is very small.</p>
@@ -268,13 +288,13 @@ first impression of how Kotlin looks like.</p>
 <p>Impressions. Very nice language. Logical, consistent, fast, small. Pretty stable.
 I think I will spend some time learning it.</p>
 
-<p>What I didn't like: null-safety is rather painful, than safe. Most android
-objects coming from the outside are marked as null-safe, so I had to write &quot;?&quot;
+<p>What I didn&rsquo;t like: null-safety is rather painful, than safe. Most android
+objects coming from the outside are marked as null-safe, so I had to write &ldquo;?&rdquo;
 everywhere or check for null. However, the risk of getting null in those cases
 is almost zero, so I would prefer not to care about it. But language prevents
 such flippancy.</p>
 
-<p>Converting types in math is also verbose, and often doesn't work automatically
+<p>Converting types in math is also verbose, and often doesn&rsquo;t work automatically
 (well, not in the way I assumed it to work). I had to split expression into
 smaller ones to make them compile.</p>
 
@@ -282,20 +302,22 @@ smaller ones to make them compile.</p>
 documentation on how to work with it, there is <code>Array&lt;Int&gt;</code>, which is Kotlin
 array, and they are different.</p>
 
-<p>I haven't found a way how to declare a volatile variable.</p>
+<p>I haven&rsquo;t found a way how to declare a volatile variable.</p>
 
 <p>However, theoretical possibility to make domain-specific functions and extreme
 flexibility of the language is really amazing.</p>
 
-<p>So, don't be afraid to try Kotlin, the more developers know about it, the
+<p>So, don&rsquo;t be afraid to try Kotlin, the more developers know about it, the
 larger is the community - the better is the language and tools. Hope you will
 like it.</p>
 
 <p>P.S. I will upload project sources and apk on bitbucket soon.</p>
 
-<p>Posted on 2013-11-28 <span class='rss' style='float: right;'>[<a href="/rss.xml">rss</a>]</span></p>
-
-<p><script type="text/javascript">(function() {
+		<p>Posted on 2013-11-28</p>
+		<span class="rss" style="float: right">
+			<a href="/rss.xml">[rss]</a>
+		</span>
+		<script type="text/javascript">(function() {
   if (window.pluso)if (typeof window.pluso.start == 'function') return;
   if (window.ifpluso==undefined) { window.ifpluso = 1;
     var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
@@ -304,22 +326,40 @@ like it.</p>
     var h=d[g]('body')[0];
     h.appendChild(s);
   } })();</script>
-<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div></p>
+<div class="pluso" data-lang="en" data-background="transparent" data-options="medium,round,line,horizontal,nocounter,theme=02" data-services="facebook,twitter,google,vkontakte,email" data-url="http://zserge.com" data-title="zserge's blog" data-description="My thoughts on software and simplicity"></div>
 
-<p><div id="disqus_thread"></div><script type="text/javascript">
+
+		<div id="disqus_thread"></div><script type="text/javascript">
 var disqus_shortname='zserge';
-    (function() {
-        var dsq = document.createElement('script');
-        dsq.type = 'text/javascript';
-        dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
 <noscript>
-</noscript></p>
+</noscript>
 
-		<footer></footer>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
 	</body>
 </html>
-
