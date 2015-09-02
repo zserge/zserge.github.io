@@ -1,5 +1,5 @@
 title: Microframework for embedded systems development
-keywords embedded system, rtos, protothread, development, avr, pic, arm, microcontroller, programming
+---
 
 nikl
 ====

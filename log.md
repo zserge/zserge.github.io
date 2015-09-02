@@ -1,7 +1,7 @@
 title: Ultra-leightweight logging for embedded system
 keywords: log, embedded, variable-length, printf, format
 description: just minimal logging in C
-
+---
 log.h
 =====
 

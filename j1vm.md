@@ -1,7 +1,7 @@
 title: Tiny virtual machine for Forth language
 keywords: virtual machine, vm, forth, interpreter, compiler, assembler, stack, embedded, small, retro
 description: minimal Forth virtual machine + compiler designed after the J1 CPU
-
+---
 IVM
 ===
 
