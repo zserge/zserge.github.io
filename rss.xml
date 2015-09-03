@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Wed, 02 Sep 2015 21:46:14 +0200
+		<pubDate>Thu, 03 Sep 2015 11:21:50 +0200
 </pubDate>
-		<lastBuildDate>Wed, 02 Sep 2015 21:46:14 +0200
+		<lastBuildDate>Thu, 03 Sep 2015 11:21:50 +0200
 </lastBuildDate>
 
-		<item> <title>how to sign release apk with gradle</title> <link>http://zserge.com/blog/android-signing.html</link> <description>Signing apks without boilerplate code</description> <pubDate>Sun, 09 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/android-signing.html</guid> </item>
+		<item> <title>lua-sh: calling shell commands as functions</title> <link>http://zserge.com/blog/luash.html</link> <description>Subprocess interface for Lua, inspired by Python 'sh' module</description> <pubDate>Thu, 03 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/luash.html</guid> </item>
+<item> <title>how to sign release apk with gradle</title> <link>http://zserge.com/blog/android-signing.html</link> <description>Signing apks without boilerplate code</description> <pubDate>Sun, 09 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/android-signing.html</guid> </item>
 <item> <title>how palette was made</title> <link>http://zserge.com/blog/palette.html</link> <description>clean minimal color scheme picker for traditional palettes: material, flatui, ios, metro, solarized, tango</description> <pubDate>Thu, 06 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/palette.html</guid> </item>
 <item> <title>anvil: double o seven</title> <link>http://zserge.com/blog/anvil-0.0.7.html</link> <description>A preferred way to prepare your android apps. Shaken, not stirred.</description> <pubDate>Thu, 25 Jun 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-0.0.7.html</guid> </item>
 <item> <title>log - a drop-in replacement for android log class</title> <link>http://zserge.com/blog/log.html</link> <description>another logger for Android, tiny, easy-to-use, smart and flexible</description> <pubDate>Sun, 14 Jun 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/log.html</guid> </item>
