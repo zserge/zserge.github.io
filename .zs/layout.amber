@@ -35,28 +35,59 @@ html[lang="en-US"]
 
 	body
 		header
-			a.logo[href="/"] Z
 			nav
-				ul
-					li
-						a[href="/about.html"] about
-					li
-						a[href="/blog.html"] posts
-					li
-						a[href="https://twitter.com/zsergo"] @me
-					li
-						a[href="https://plus.google.com/u/0/+SergeZaitsev"] +me
-					li
-						a[href="https://github.com/zserge"] </>me
+				a.logo[href="/"] Z
+			div.empty
+			nav
+				section
+					a[href="/about.html"] about
+					a[href="/blog.html"] posts
+				section
+					a[href="https://twitter.com/zsergo"] @me
+					a[href="https://plus.google.com/u/0/+SergeZaitsev"] +me
+					a[href="https://github.com/zserge"] </>me
 
 		{{ content }}
 
 		if date
 			p Posted on {{ date }}
-			span.rss[style="float: right"]
-				a[href="/rss.xml"] [rss]
-			{{ social }}
-			{{ disqus }}
+			section.social
+				section
+					a
+						[style="background-color: #3b5997"]
+						[href="http://www.facebook.com/share.php?u=http://zserge.com/"+url+"&title="+title]
+						| like
+					| &nbsp;
+					a
+						[style="background-color: #41b7d8"]
+						[href="http://twitter.com/intent/tweet?status="+title+"+http://zserge.com/"+url+" via @zsergo"]
+						| tweet
+					| &nbsp;
+					a
+						[style="background-color: #d64937"]
+						[href="https://plus.google.com/share?url=http://zserge.com/"+url]
+						| +1
+				section
+					a
+						[style="background-color: #f26522"]
+						[href="/rss.xml"]
+						| rss
+					| &nbsp;
+					a
+						[style="background-color: #41b7d8"]
+						[href="https://twitter.com/zsergo"]
+						| @me
+					| &nbsp;
+					a
+						[style="background-color: #d64937"]
+						[href="https://plus.google.com/u/0/+SergeZaitsev"]
+						| +me
+					| &nbsp;
+					a
+						[style="background-color: #333333"]
+						[href="https://github.com/zserge"]
+						| &lt;/&gt;me
+			section {{ disqus }}
 
 		footer
 			p

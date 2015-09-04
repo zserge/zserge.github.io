@@ -1,6 +1,7 @@
 title: zserge who?
 description: a portrait of myself trough the software prism
 ---
+
 Hi! I'm Serge.
 
 I'm one part of the [Trikita] duet - together with Anna we make software, which
@@ -20,7 +21,7 @@ If you want to subscribe to my works, you can do it via:
 * GitHub - https://github.com/zserge
 * BitBucket - https://butbucket.org/zserge
 * Twitter - https://twitter.com/zsergo
-* Google+ - https://plus.google.com/u/0/+SergeZaitsev
+* Google Plus - [SergeZaitsev](https://plus.google.com/u/0/+SergeZaitsev)
 
 The easiest way to contact me is probably via email: zaitsev.serge@gmail.com
 

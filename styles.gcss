@@ -66,22 +66,36 @@ header
   display: flex
   justify-content: space-between
   align-items: center
-  h2, nav, ul, li, .logo
+  nav, section, a, .logo, .empty
     display: flex
+    justify-content: center
+    align-items: center
+    min-height: 32px
+  nav
+    flex-wrap: wrap
+  .empty
+    flex: 1 0 0
   .logo
     background-color: $black
-    justify-content: center
-    align-items: center
     color: #fff
-    width: 2em
-    height: 2em
-  h2
-    border: none
-  li
-    list-style: none
+    min-width: 48px
+    min-height: 48px
+  a
     min-width: 72px
-    justify-content: center
-    align-items: center
+
+.social
+  display: flex
+  justify-content: space-between
+  flex-wrap: wrap
+  section
+    display: flex
+    margin: 0.5em 0
+    a
+      display: inline-block
+      text-align: center
+      min-width: 3em
+      padding: 0.5em
+      color: white
 
 footer
   font-size: 12px

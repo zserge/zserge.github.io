@@ -85,7 +85,8 @@ Transfer/sec:    242.30KB
 ## Heroku
 
 [Heroku] is a well-known cloud platform, only one app can be hosted for free.
-Integration with Github is super-easy and deployment procedure is just a single button click (which can be automated as well).
+Integration with Github is super-easy and deployment procedure is just a single
+button click (which can be automated as well).
 
 ```
 Running 30s test @ http://bench.herokuapp.com/ping
@@ -197,22 +198,30 @@ Just summing up:
 
 ```
 localhost:           2067 / free :)
-Heroku:              1122 / 1 free dyno
-DigitalOcean/Dokku:   727 / 5$ per month (0.007$/hour), multiple containers
-OpenShift:            597 / 3 free cartridges
+Heroku:              1122 / 1 free dyno, or 7$/month (0.009$/hour)
+DigitalOcean/Dokku:   727 / 5$/month (0.007$/hour), multiple containers
+OpenShift:            597 / 3 free cartridges, or 0.02$/hour
 AWS T2.micro/Dokku:   456 / 0.013$/hour, multiple containers
 ```
 
+The only dual-core machine here is my laptop, thus it wins the race. Other VMs
+seem to be single-core.
+
+* DigitalOcean: 512MB RAM , 20GB SSD, 1TB of traffic.
+* Heroku: 512MB RAM, *free gear must "sleep" for 6 hours a day*.
+* OpenShift: 512MB Ram, 1GB storage.
+* AWS T2.micro: 615MB RAM
+
 Altough my persontal preference is Digital Ocean, I like how well Heroku
-performs. If only they gave more than one dyno for free - it would be a great
-choice for development purposes.
+performs. If only they made free dyno available for 24 hours - it would be a
+great choice for development purposes.
 
 I'm very surprised with the OpenShift balancer, I really was hoping it gives
-some dramatic improvements to performance.
+some dramatic improvements to performance. Also the pricing...
 
 Finally, I didn't expect Amazon to take the last place in this rating. It might
 be good for big apps, but for small experiments, well, they charge more than
-DigitalOcean does, yet they have about 40% worse performance.
+DigitalOcean does, yet they give about 40% worse performance.
 
 P.S. I understand that this benchmark can show different numbers in your case.
 But if you have any comments or different results - [let me know]!
