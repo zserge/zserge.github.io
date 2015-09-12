@@ -22,8 +22,6 @@ Programming is fun. Here's what I work on in my free time.
   [[repo](http://bitbucket.org/zserge/j1vm)]
 * codehound - a fast search tool for a big volumes of source code
 	[[repo](http://bitbucket.org/zserge/codehound)]
-* luatesting - a Go-like unit-testing microframework for Lua
-	[[repo](http://bitbucket.org/zserge/codehound)]
 * [nikl](/nikl.html) - micro-framework for programming embedded systems 
   [[repo](http://bitbucket.org/zserge/nikl)]
 	* test - minimal C unit-testing
