@@ -1,0 +1,101 @@
+$font-normal: "Merriweather", "PT-Serif", Georgia, Times, "Times New Roman", serif
+$font-header: "Lato", "Open Sans", Lato, Helvetica, Arial, sans-serif
+$font-mono: "Roboto Mono", Inconsolata, Consolas, "Liberation Mono", monospace
+
+$black: rgba(0, 0, 0, 0.87)
+
+body
+  margin: 40px auto
+  padding: 0 10px
+  max-width: 740px 
+  line-height: 1.6
+  font-family: $font-normal
+  font-size: 20px
+  color: $black
+
+h1, h2, h3
+  line-height: 1.2
+  font-family: $font-header
+  font-weight: 100
+  text-transform: uppercase
+  a
+    color: $black
+
+h2, h3
+  text-align: right
+  font-size: 24px
+  /*text-transform: lowercase*/
+  border-bottom: 2px solid $black
+
+p
+  text-align: justify
+
+a
+  color: #0076df
+  text-decoration: none
+  &:hover
+    color: $black
+
+ul, ol
+  list-style-position: outside
+  margin-left: 1em
+
+img
+  display: block
+  margin-left: auto
+  margin-right: auto
+  max-width: 100%
+
+code
+  font-family: $font-normal
+  font-style: italic
+
+pre
+  overflow-y: auto
+  font-size: 14px
+  line-height: 20px
+  background: #eee
+  color: rgba(0, 0, 0, 87)
+  border-radius: 2px
+  padding: 1em
+  code
+    font-family: $font-mono
+    font-style: normal
+
+header
+  display: flex
+  justify-content: space-between
+  align-items: center
+  nav, section, a, .logo, .empty
+    display: flex
+    justify-content: center
+    align-items: center
+    min-height: 32px
+  nav
+    flex-wrap: wrap
+  .empty
+    flex: 1 0 0
+  .logo
+    background-color: $black
+    color: #fff
+    min-width: 48px
+    min-height: 48px
+  a
+    min-width: 72px
+
+.social
+  display: flex
+  justify-content: space-between
+  flex-wrap: wrap
+  section
+    display: flex
+    margin: 0.5em 0
+    a
+      display: inline-block
+      text-align: center
+      min-width: 3em
+      padding: 0.5em
+      color: white
+
+footer
+  font-size: 12px

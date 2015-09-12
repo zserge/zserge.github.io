@@ -1,0 +1,5 @@
+#!/bin/sh
+
+touch blog.md
+touch index.md
+touch rss.xml

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#
+# Generate RSS items
+#
+
+for f in ./blog/*.md ; do
+	d=$($ZS var $f date)
+	if [ ! -z $d ] ; then
+		timestamp=`date --date "$d" +%s`
+		url=`$ZS var $f url`
+		title=`$ZS var $f title | tr A-Z a-z`
+		descr=`$ZS var $f description`
+		echo $timestamp \
+			"<item>" \
+			"<title>$title</title>" \
+			"<link>http://zserge.com/$url</link>" \
+			"<description>$descr</description>" \
+			"<pubDate>$(date --date @$timestamp -R)</pubDate>" \
+			"<guid>http://zserge.com/$url</guid>" \
+		"</item>"
+	fi
+done | sort -r -n | cut -d' ' -f2-

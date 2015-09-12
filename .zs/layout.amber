@@ -1,0 +1,98 @@
+doctype 5
+html[lang="en-US"]
+	head
+		meta[charset="UTF-8"]
+		title {{ title }}
+		meta[name="description"][content=description]
+		meta[name="author"][content="Serge Zaitsev"]
+		meta[http-equiv="X-UA-Compatible"][content="IE=edge,chrome=1"]
+		meta[name="viewport"][content="width=device-width"]
+		link[rel="alternate"][type="application/rss+xml"][title="RSS"][href="http://zserge.com/rss.xml"]
+		link[rel="canonical"][href=url]
+
+		// OpenGraph data
+		meta[property="og:title"][content=title]
+		meta[property="og:type"][content="article"]
+		meta[property="og:url"][content=url]
+		meta[property="og:image"][content="http://zserge.com/logo.png"]
+		meta[property="og:description"][content=description]
+		meta[property="og:locale"][content="en_US"]
+
+		// Twitter card data
+		meta[name="twitter:card"][content="summary"]
+		meta[name="twitter:site"][content="@zsergo"]
+
+		// Fonts
+		link[href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic"][rel="stylesheet"][type="text/css"]
+		link[href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext"][rel="stylesheet"][type="text/css"]
+
+		// Styles
+		link[href="/styles.css"][rel="stylesheet"][type="text/css"]
+
+		// Favicons
+		link[rel="shortcut icon"][href="/favicon.ico"]
+		link[rel="apple-touch-icon-precomposed"][href="/favicon.128.png"]
+
+	body
+		header
+			nav
+				a.logo[href="/"] Z
+			div.empty
+			nav
+				section
+					a[href="/about.html"] about
+					a[href="/blog.html"] posts
+				section
+					a[href="https://twitter.com/zsergo"] @me
+					a[href="https://plus.google.com/u/0/+SergeZaitsev"] +me
+					a[href="https://github.com/zserge"] </>me
+
+		{{ content }}
+
+		if date
+			p Posted on {{ date }}
+			section.social
+				section
+					a
+						[style="background-color: #3b5997"]
+						[href="http://www.facebook.com/share.php?u=http://zserge.com/"+url+"&title="+title]
+						| like
+					| &nbsp;
+					a
+						[style="background-color: #41b7d8"]
+						[href="http://twitter.com/intent/tweet?status="+title+"+http://zserge.com/"+url+" via @zsergo"]
+						| tweet
+					| &nbsp;
+					a
+						[style="background-color: #d64937"]
+						[href="https://plus.google.com/share?url=http://zserge.com/"+url]
+						| +1
+				section
+					a
+						[style="background-color: #f26522"]
+						[href="/rss.xml"]
+						| rss
+					| &nbsp;
+					a
+						[style="background-color: #41b7d8"]
+						[href="https://twitter.com/zsergo"]
+						| @me
+					| &nbsp;
+					a
+						[style="background-color: #d64937"]
+						[href="https://plus.google.com/u/0/+SergeZaitsev"]
+						| +me
+					| &nbsp;
+					a
+						[style="background-color: #333333"]
+						[href="https://github.com/zserge"]
+						| &lt;/&gt;me
+			section {{ disqus }}
+
+		footer
+			p
+				| &copy;2012&ndash;2015 &middot;
+				a[href="http://zserge.com"] Serge Zaitsev
+				| &middot; 
+				a[href="mailto:zaitsev.serge@gmail.com"] zaitsev.serge@gmail.com
+		{{ ga }}
