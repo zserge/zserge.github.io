@@ -19,7 +19,7 @@ If you want to subscribe to my works, you can do it via:
 
 * RSS - http://zserge.com/rss.xml
 * GitHub - https://github.com/zserge
-* BitBucket - https://butbucket.org/zserge
+* BitBucket - https://bitbucket.org/zserge
 * Twitter - https://twitter.com/zsergo
 * Google Plus - [SergeZaitsev](https://plus.google.com/u/0/+SergeZaitsev)
 
