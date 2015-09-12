@@ -33,9 +33,9 @@ It's also just one file of ~100LOC, so it should not be hard to read or to
 install it. I also tried to do some tests at least for the configuration parser
 (right, there are test frameworks for UNIX Shell as well).
 
-So, just download the sources (or at least one [mucks](https://bitbucket.org/zserge/mucks/raw/1162dd436dcc72aafae6fef1a62b16a247fcdc92/mucks) file) - and you're ready to use it:
+So, just download the sources (or at least one [mucks](https://raw.githubusercontent.com/zserge/mucks/master/mucks) file) - and you're ready to use it:
 
-	hg clone https://bitbucket.org/zserge/mucks
+	git clone https://github.com/zserge/mucks
 
 Now let's create a simple session
 

@@ -5,7 +5,7 @@ date: 2014-06-07
 # {{ title }}
 
 Somehow refactoring turned info rewriting from scratch... So, meet the new
-shiny [mucks app](https://bitbucket.org/zserge/mucks) written in AWK language
+shiny [mucks app](https://github.com/zserge/mucks) written in AWK language
 (instead of UNIX Shell).
 
 I played with quotes in tmux "send-keys" command, and it turned out that
