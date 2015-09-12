@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>simple library publishing with Gradle</title>
+		<meta content="quick guide to maven central library publishing with gradle" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="blog/gradle-maven-publish.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="simple library publishing with Gradle" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="blog/gradle-maven-publish.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="quick guide to maven central library publishing with gradle" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>simple library publishing with Gradle</h1>
+
+<p>So, you switched to Gradle and just finished you new shiny Android library (or
+java library). And of course you want to share it with the community.</p>
+
+<p>Here&rsquo;s a quick guide for those who never published their libraries before.</p>
+
+<h2>What is maven central?</h2>
+
+<p>In java world libraries are usually stored in a big repository called Maven
+Central. You may think of it as of the NPM repository for Node.js or as of
+PyPI for Python.</p>
+
+<p>It lets you quickly find a library at
+<a href="http://search.maven.org">http://search.maven.org</a>. It is also used by other
+tools like <a href="http://gradleplease.appspot.com/">Gradle, Please</a>. Finally, gradle
+uses this repo if you included <code>mavenCentral()</code> into your repositories section.</p>
+
+<h2>Registration</h2>
+
+<p>First, you will have to register. No, don&rsquo;t try to find a &lsquo;Register&rsquo; link on
+the Maven Central website. Instead, you should register on the Sonatype
+website.</p>
+
+<p>What is Sonatype? They are the guys who created Maven back in 2002. But don&rsquo;t
+try to find a registration link on their site either, instead go to their <a href="https://issues.sonatype.org/secure/Signup!default.jspa">issue
+tracker</a>.  (well-known
+JIRA) and register there:</p>
+
+<p>Next, <a href="https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&amp;pid=10134">create a new
+issue</a>.</p>
+
+<p>In the issue details fill in your library description and summary, specify
+project URL if any and version control URL (like bitbucket or github link).
+Ensure you have a valid group id. It&rsquo;s should be somehow related to your
+package and should contain at least one dot in it. So, names like &lsquo;johndoe&rsquo; are
+invalid, but &lsquo;com.johndoe&rsquo; are ok if you own the &lsquo;johndoe.com&rsquo; website. If you
+don&rsquo;t own any website - you may use your version control hosting name, e.g.
+com.bitbucket.johndoe or com.github.johndoe.</p>
+
+<p>Then - relax and wait. It may take up to 2 business days to process your ticket
+manually.</p>
+
+<p>After that you will receive a confirmation that your configuration has been
+prepared and you can publish your library.</p>
+
+<h2>Gradle setup</h2>
+
+<p>There are many possible ways of how to set up your gradle for maven publishing.
+I used a file I found in some other repository and I like it&rsquo;s separated from
+the main build.gradle.</p>
+
+<p>Here it is:</p>
+
+<pre><code>/*
+ * Copyright 2013 Chris Banes
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def isReleaseBuild() {
+        return VERSION_NAME.contains(&quot;SNAPSHOT&quot;) == false
+}
+
+def getReleaseRepositoryUrl() {
+        return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+                        : &quot;https://oss.sonatype.org/service/local/staging/deploy/maven2/&quot;
+}
+
+def getSnapshotRepositoryUrl() {
+        return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+                        : &quot;https://oss.sonatype.org/content/repositories/snapshots/&quot;
+}
+
+def getRepositoryUsername() {
+        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : &quot;&quot;
+}
+
+def getRepositoryPassword() {
+        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : &quot;&quot;
+}
+
+afterEvaluate { project -&gt;
+        uploadArchives {
+                repositories {
+                        mavenDeployer {
+                                beforeDeployment { MavenDeployment deployment -&gt; signing.signPom(deployment) }
+
+                                pom.groupId = GROUP
+                                pom.artifactId = POM_ARTIFACT_ID
+                                pom.version = VERSION_NAME
+
+                                repository(url: getReleaseRepositoryUrl()) {
+                                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                                }
+                                snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                                }
+
+                                pom.project {
+                                        name POM_NAME
+                                        packaging POM_PACKAGING
+                                        description POM_DESCRIPTION
+                                        url POM_URL
+
+                                        scm {
+                                                url POM_SCM_URL
+                                                connection POM_SCM_CONNECTION
+                                                developerConnection POM_SCM_DEV_CONNECTION
+                                        }
+
+                                        licenses {
+                                                license {
+                                                        name POM_LICENCE_NAME
+                                                        url POM_LICENCE_URL
+                                                        distribution POM_LICENCE_DIST
+                                                }
+                                        }
+
+                                        developers {
+                                                developer {
+                                                        id POM_DEVELOPER_ID
+                                                        name POM_DEVELOPER_NAME
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
+
+        signing {
+                required { isReleaseBuild() &amp;&amp; gradle.taskGraph.hasTask(&quot;uploadArchives&quot;) }
+                sign configurations.archives
+        }
+
+        //task androidJavadocs(type: Javadoc) {
+                //source = android.sourceSets.main.allJava
+        //}
+
+        //task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+                //classifier = 'javadoc'
+                //from androidJavadocs.destinationDir
+        //}
+
+        task androidSourcesJar(type: Jar) {
+                classifier = 'sources'
+                from android.sourceSets.main.java.sourceFiles
+        }
+
+        artifacts {
+                archives androidSourcesJar
+        }
+}
+</code></pre>
+
+<p>You may also download it from <a href="https://gist.github.com/zserge/fef8a67d7c58131fbbc6">here</a>.</p>
+
+<p>Put this file next to your <code>build.gradle</code> and create a <code>gradle.properties</code> file
+in the same directory:</p>
+
+<pre><code>POM_NAME=Foo
+POM_ARTIFACT_ID=foo
+POM_PACKAGING=aar
+VERSION_NAME=1.0.0
+VERSION_CODE=1
+GROUP=com.bitbucket.johndoe
+
+POM_DESCRIPTION=Foo library
+POM_URL=https://bitbucket.org/johndoe/foo
+POM_SCM_URL=https://bitbucket.org/johndoe/foo
+POM_SCM_CONNECTION=scm:hg:https://bitbucket.org/johndoe/foo
+POM_SCM_DEV_CONNECTION=scm:hg:https://bitbucket.org/johndoe/foo
+POM_LICENCE_NAME=MIT License
+POM_LICENCE_URL=http://www.opensource.org/licenses/mit-license.php
+POM_LICENCE_DIST=repo
+POM_DEVELOPER_ID=johndoe
+POM_DEVELOPER_NAME=johndoe
+
+NEXUS_USERNAME=johndoe
+NEXUS_PASSWORD=1234567890
+
+SNAPSHOT_REPOSITORY_URL=https://oss.sonatype.org/content/repositories/snapshots
+RELEASE_REPOSITORY_URL=https://oss.sonatype.org/service/local/staging/deploy/maven2
+
+signing.keyId=YYYYYYYY
+signing.password=1234567890
+signing.secretKeyRingFile=/home/johndoe/.gnupg/secring.gpg
+</code></pre>
+
+<p>This <code>gradle.properties</code> should not be added to the version control as it
+contains some private information.</p>
+
+<p>Finally, in your build.gradle just add this line somewhere at the end:</p>
+
+<pre><code>apply from: 'maven-push.gradle'
+</code></pre>
+
+<p>Now you&rsquo;re almost ready to publish.</p>
+
+<h2>Ensure you have gpg set up</h2>
+
+<p>You should sign your package with GPG. If you never used it - first create the
+GPG keys:</p>
+
+<pre><code>$ gpg --gen-key
+</code></pre>
+
+<p>Next, find your key ID:</p>
+
+<pre><code>$ gpg --list-keys
+</code></pre>
+
+<p>There the first line will be like <code>pub XXXXX/YYYYYYYY &lt;date&gt;</code>. Remember that
+&lsquo;YYYYYYYY&rsquo; part, it&rsquo;s you key ID.</p>
+
+<p>Now, publish your keys:</p>
+
+<pre><code>$ gpg --keyserver hkp://keyserver.ubuntu.com --send-keys YYYYYYYY
+$ gpg --keyserver hkp://pgp.mit.edu --send-keys YYYYYYYY
+</code></pre>
+
+<p>You may use other key servers as well. You may also want to ensure your keys
+were published:</p>
+
+<pre><code>$ gpg --keyserver hkp://pgp.mit.edu --search-keys johndoe@example.com # Use your email
+</code></pre>
+
+<h2>Pushing the archives</h2>
+
+<p>Now you can do:</p>
+
+<pre><code>$ gradle uploadArchives
+</code></pre>
+
+<p>Your library will be built, signed and pushed to the sonatype repo. Please,
+ensure that &lsquo;signing&rsquo; stage was not skipped. It is skipped if your library name
+is ending with &ldquo;-SNAPSHOT&rdquo;, but for releases signing is mandatory.</p>
+
+<p>If all went fine - go to the <a href="https://oss.sonatype.org/#stagingRepositories">OSSRH web
+UI</a> and look for your &lsquo;staging&rsquo;
+library. It should be somewhere at the end of the list. Select it, and press
+&lsquo;Close&rsquo; button. Closing a library actually means that you&rsquo;re ready to release
+it. Another option is &lsquo;dropping&rsquo; a library, which means removing it from the
+list. If closing went fine - you should see a &lsquo;Release&rsquo; button active. Press it
+and then get back to JIRA and post a comment there that you promoted you
+library.</p>
+
+<p>After that you should get a response from Sonatype that your library will be
+available in ~10 minutes and it will be synced with the Maven Central in the
+next few hours.</p>
+
+<p>To me that meant that I could use my library in other projects in a few minutes
+after I released it (e.g. using in gradle like &lsquo;compile groupID:name:version&rsquo;),
+but the search.maven.org found it only next morning.</p>
+
+<p>So, that&rsquo;s it, and if you still have any problems - ask Sonatype support, I
+found them to be very helpful. Happy coding!</p>
+
+		<p>Posted on 2014-08-10</p>
+		<section class="social">
+			<section>
+				<a href="http://www.facebook.com/share.php?u=http://zserge.com/blog/gradle-maven-publish.html&amp;title=simple%20library%20publishing%20with%20Gradle" style="background-color: #3b5997">like</a>
+				&nbsp;
+				<a href="http://twitter.com/intent/tweet?status=simple%20library%20publishing%20with%20Gradle&#43;http://zserge.com/blog/gradle-maven-publish.html%20via%20@zsergo" style="background-color: #41b7d8">tweet</a>
+				&nbsp;
+				<a href="https://plus.google.com/share?url=http://zserge.com/blog/gradle-maven-publish.html" style="background-color: #d64937">+1</a>
+			</section>
+			<section>
+				<a href="/rss.xml" style="background-color: #f26522">rss</a>
+				&nbsp;
+				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
+				&nbsp;
+				<a href="https://plus.google.com/u/0/+SergeZaitsev" style="background-color: #d64937">+me</a>
+				&nbsp;
+				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
+			</section>
+		</section>
+		<section><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+<noscript>
+</noscript>
+
+</section>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>

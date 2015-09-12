@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Microframework for embedded systems development</title>
+		<meta content="" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="nikl.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Microframework for embedded systems development" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="nikl.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>nikl</h1>
+
+<p>Nikl is a micro-framework for small embedded devices like AVR
+microcontrollers.</p>
+
+<h2>HISTORY</h2>
+
+<p>One day I decided to write a real-time OS. It had multitasking, semaphores and
+supported only ARM architecture. Then I tried to port it to use with the AVRs,
+but context switching was slow, memory was very limited and my OS became
+generally useless.</p>
+
+<p>Then, I started another project called avOS, that some kind of a kernel that
+was not real-time, and was widely using protothreads for pseudo-multitasking.
+Later the project was abandoned, but now I&rsquo;m trying to give it a new born.</p>
+
+<h2>PHILOSOPHY</h2>
+
+<ul>
+<li>No .c files, until they are really needed</li>
+<li>This implies - no build system. You can take any combinations of modules you
+need and just copy or symlink them to your project directory</li>
+</ul>
+
+<h2>STRUCTURE</h2>
+
+<p>You should see &ldquo;/inc&rdquo; folder. There is where all the modules are stored.
+Another folder is &ldquo;/test&rdquo;. This is a folder with unit tests.</p>
+
+<p>Let&rsquo;s go deeper. Inside &ldquo;/inc&rdquo; folder you should find modules for</p>
+
+<ul>
+<li>bare-bone unit-testing (test.h)</li>
+<li>list-based data structures (list.h)</li>
+<li>FORTH virtual machine (ivm.h)</li>
+</ul>
+
+<p>For the IVM there is a simple compiler written in Python (see &ldquo;/utils/ivmc&rdquo;).</p>
+
+<h2>HOW TO USE TESTS</h2>
+
+<p>There is a bunch of unit-testing frameworks. But they all are an overkill for
+tiny embedded systems. If you just need to write a few tests for your device
+and have a possibility to detect which test failed - you can use test.h.</p>
+
+<p>Here&rsquo;s an example of typical usage. Assume we have a board that works with data
+on the SD card. We need to be sure that SD card is valid, and hardware is ready
+to use.  I still doubt if it is a correct usage of unit tests, as it seems like
+we test hardware, but this is how it works for me:</p>
+
+<pre><code>/* Use custom error notification, e.g. show line number on LCD,
+ * or send message and line number over UART, or just turn the
+ * error indicating LED on */
+#define TEST_NOTIFY(msg, line)  lcd_display_number(line)
+
+#include &lt;test.h&gt;
+
+/* Check that after hardware initialization SD card is present */
+int test_sdcard_available() {
+    int part_id;
+    sdcard_init();
+    check(sdcard_available() == 1);
+
+    /* Ensure that FAT partition ID is 1..4 */
+    part_id = sdcard_find_fat_partition();
+    check(part_id &gt; 0 &amp;&amp; part_id &lt;= 4);
+
+    return 0;
+}
+
+/* Check that toggling LED port works correctly */
+int test_leds() {
+    LED_PORT |= (1 &lt;&lt; GREEN_LED);
+    check(LED_PORT &amp; (1 &lt;&lt; GREEN_LED));
+    LED_PORT &amp;= ~(1 &lt;&lt; GREEN_LED);
+    check((LED_PORT &amp; ~(1 &lt;&lt; GREEN_LED)) == 0);
+}
+
+....
+
+test(test_sdcard_available(), &quot;sdcard test&quot;);
+test(test_leds(), &quot;LED test&quot;);
+
+...
+</code></pre>
+
+<p>Ain&rsquo;t it simple? You basically write test functions that do some assertions.
+Then you call these functions and if the return value is non-zero - it means
+that the test has failed. In this case TEST_NOTIFY function will be called and
+it&rsquo;s your chance to tell user that something was wrong</p>
+
+<ul>
+<li>your test functions must return 0 at the end to indicate success</li>
+<li>you need to test values using check(condition) macro.</li>
+<li>you need to run your test functions using test(func, descr) function</li>
+<li>if you use your own TEST_NOTIFY implementation you can print test name
+(msg argument) and line number (line argument), where the error occurred.</li>
+</ul>
+
+<h2>HOW TO USE LISTS</h2>
+
+<p>Lists are stolen from linux kernel in a shameless way. They are not so easy-to-use
+as more common <sys/queue.h>, but are more flexible.</p>
+
+<p>To define an object, that can be linked into the list, do:</p>
+
+<pre><code>typedef struct {
+    /* My data */
+    int value1;
+    int value2;
+    /* List pointer */
+    list_t list;
+} my_obj;
+</code></pre>
+
+<p>To create a list head, do:</p>
+
+<pre><code>list_t my_obj_list;
+</code></pre>
+
+<p>Next, initialize list:</p>
+
+<pre><code>list_init(&amp;my_obj_list);
+</code></pre>
+
+<p>And now you can do everything you want with your lists:</p>
+
+<pre><code>my_obj *a, *b, *c; /* object to add to the list */
+list_t *tmp; /* list iterator */
+
+list_add(&amp;my_obj_list, &amp;a-&gt;list);
+list_add(&amp;my_obj_list, &amp;b-&gt;list);
+list_add(&amp;my_obj_list, &amp;c-&gt;list);
+
+list_del(&amp;b-&gt;list);
+
+list_for_each(&amp;my_obj_list, tmp) {
+    /* This is how to get the object using list_entry() */
+    my_obj *iterator;
+    iterator = list_entry(tmp, my_obj, list);
+    printf(&quot;%d\n&quot;, iterator-&gt;value1);
+}
+</code></pre>
+
+<p>For now only double-linked lists are implemented. Soon single-linked lists and
+queues will be added.</p>
+
+<h2>HOW TO USE IVM</h2>
+
+<p>IVM is not that simple. See IVM.README for more details to how use it.</p>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>

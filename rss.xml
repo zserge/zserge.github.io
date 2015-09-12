@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+	<channel>
+		<title>zserge's blog</title>
+		<link>http://zserge.com/blog.html</link>
+		<description>My thoughts on software, simplicity and how to make it work together</description>
+		<language>en-us</language>
+		<pubDate>Sat, 12 Sep 2015 11:23:43 +0200
+</pubDate>
+		<lastBuildDate>Sat, 12 Sep 2015 11:23:43 +0200
+</lastBuildDate>
+
+		<item> <title>benchmarking go in the cloud</title> <link>http://zserge.com/blog/go-cloud-benchmark.html</link> <description>Compare performance of a simple Go web app running on Heroku, OpenShift, Digital Ocean and AWS</description> <pubDate>Fri, 04 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/go-cloud-benchmark.html</guid> </item>
+<item> <title>lua-sh: calling shell commands as functions</title> <link>http://zserge.com/blog/luash.html</link> <description>Subprocess interface for Lua, inspired by Python 'sh' module</description> <pubDate>Thu, 03 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/luash.html</guid> </item>
+<item> <title>how to sign release apk with gradle</title> <link>http://zserge.com/blog/android-signing.html</link> <description>Signing apks without boilerplate code</description> <pubDate>Sun, 09 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/android-signing.html</guid> </item>
+<item> <title>how palette was made</title> <link>http://zserge.com/blog/palette.html</link> <description>clean minimal color scheme picker for traditional palettes: material, flatui, ios, metro, solarized, tango</description> <pubDate>Thu, 06 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/palette.html</guid> </item>
+<item> <title>anvil: double o seven</title> <link>http://zserge.com/blog/anvil-0.0.7.html</link> <description>A preferred way to prepare your android apps. Shaken, not stirred.</description> <pubDate>Thu, 25 Jun 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-0.0.7.html</guid> </item>
+<item> <title>log - a drop-in replacement for android log class</title> <link>http://zserge.com/blog/log.html</link> <description>another logger for Android, tiny, easy-to-use, smart and flexible</description> <pubDate>Sun, 14 Jun 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/log.html</guid> </item>
+<item> <title>buck - life is too short to spend a minute for each build</title> <link>http://zserge.com/blog/buck-build-system.html</link> <description>Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it.</description> <pubDate>Wed, 27 May 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/buck-build-system.html</guid> </item>
+<item> <title>where anvil meets kotlin</title> <link>http://zserge.com/blog/anvil-kotlin.html</link> <description>Summing up the progress of anvil development</description> <pubDate>Thu, 16 Apr 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-kotlin.html</guid> </item>
+<item> <title>anvil: big progress for a small library</title> <link>http://zserge.com/blog/anvil-2.html</link> <description>Summing up the progress of anvil development</description> <pubDate>Thu, 16 Apr 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-2.html</guid> </item>
+<item> <title>anvil: the story of automatic rendering</title> <link>http://zserge.com/blog/anvil-1.html</link> <description>How to render your view automatically and stop worrying about UI state</description> <pubDate>Thu, 22 Jan 2015 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/anvil-1.html</guid> </item>
+<item> <title>android ui development made easy</title> <link>http://zserge.com/blog/android-mvx.html</link> <description>Bringing the ideas from Mithril, React, Bloop to Android</description> <pubDate>Wed, 14 Jan 2015 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/android-mvx.html</guid> </item>
+<item> <title>moved to new static site generator (again)</title> <link>http://zserge.com/blog/new-site-generator2.html</link> <description>self done is well done</description> <pubDate>Sat, 20 Dec 2014 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/new-site-generator2.html</guid> </item>
+<item> <title>ultimately minimal unit testing</title> <link>http://zserge.com/blog/minimal-testing.html</link> <description>a tiny libraries for testing in JS, Lua and Bash</description> <pubDate>Tue, 16 Dec 2014 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/minimal-testing.html</guid> </item>
+<item> <title>simple library publishing with gradle</title> <link>http://zserge.com/blog/gradle-maven-publish.html</link> <description>quick guide to maven central library publishing with gradle</description> <pubDate>Sun, 10 Aug 2014 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/gradle-maven-publish.html</guid> </item>
+<item> <title>mucks: now with the dvtm flavor!</title> <link>http://zserge.com/blog/mucks2.html</link> <description>mucks - a tiny session manager for tmux, screen and dvtm</description> <pubDate>Sat, 07 Jun 2014 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/mucks2.html</guid> </item>
+<item> <title>mucks: automating screen and tmux</title> <link>http://zserge.com/blog/mucks.html</link> <description>mucks - a session manager for screen and tmux</description> <pubDate>Fri, 25 Apr 2014 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/mucks.html</guid> </item>
+<item> <title>lambda support for android</title> <link>http://zserge.com/blog/android-lambda.html</link> <description>Bringing java 8 features to android platform</description> <pubDate>Thu, 09 Jan 2014 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/android-lambda.html</guid> </item>
+<item> <title>kotlin - a new hope</title> <link>http://zserge.com/blog/kotlin.html</link> <description>A new language for Android coding</description> <pubDate>Thu, 28 Nov 2013 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/kotlin.html</guid> </item>
+<item> <title>moved to new static site generator</title> <link>http://zserge.com/blog/new-site-generator.html</link> <description>self done is well done</description> <pubDate>Thu, 18 Jul 2013 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/new-site-generator.html</guid> </item>
+<item> <title>logdog - a colorized android logcat</title> <link>http://zserge.com/blog/logdog.html</link> <description>logdog is a better logcat</description> <pubDate>Mon, 20 May 2013 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/logdog.html</guid> </item>
+<item> <title>aaml - another android markup language</title> <link>http://zserge.com/blog/aaml.html</link> <description>writing android XMLs is easy now</description> <pubDate>Tue, 02 Apr 2013 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/aaml.html</guid> </item>
+<item> <title>new project: jknav</title> <link>http://zserge.com/blog/update-jknav.html</link> <description>my attempt to jk-navigation in browsers</description> <pubDate>Fri, 30 Nov 2012 00:00:00 +0100</pubDate> <guid>http://zserge.com/blog/update-jknav.html</guid> </item>
+<item> <title>cucu: a compiler you can understand (3/3)</title> <link>http://zserge.com/blog/cucu-part3.html</link> <description>Compilers is fun. Want to write your own one?</description> <pubDate>Thu, 25 Oct 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/cucu-part3.html</guid> </item>
+<item> <title>cucu: a compiler you can understand (2/3)</title> <link>http://zserge.com/blog/cucu-part2.html</link> <description>Compilers is fun. Want to write your own one?</description> <pubDate>Wed, 24 Oct 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/cucu-part2.html</guid> </item>
+<item> <title>cucu: a compiler you can understand (1/3)</title> <link>http://zserge.com/blog/cucu-part1.html</link> <description>Compilers is fun. Want to write your own one?</description> <pubDate>Tue, 23 Oct 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/cucu-part1.html</guid> </item>
+<item> <title>textizer: hack your android widgets</title> <link>http://zserge.com/blog/android-widget-for-geeks.html</link> <description>Never thought of writing your own android widget?</description> <pubDate>Sat, 25 Aug 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/android-widget-for-geeks.html</guid> </item>
+<item> <title>my minimalistic agile issue tracker</title> <link>http://zserge.com/blog/agile-issue-tracker.html</link> <description>Ever been frustrated by monstrous issue trackers?</description> <pubDate>Thu, 02 Aug 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/agile-issue-tracker.html</guid> </item>
+<item> <title>the first post</title> <link>http://zserge.com/blog/hello.html</link> <description>I'm just saying "Hi!"</description> <pubDate>Wed, 01 Aug 2012 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/hello.html</guid> </item>
+
+
+	</channel>
+</rss>

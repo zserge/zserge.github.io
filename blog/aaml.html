@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>AAML - another android markup language</title>
+		<meta content="writing android XMLs is easy now" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="blog/aaml.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="AAML - another android markup language" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="blog/aaml.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="writing android XMLs is easy now" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>AAML - another android markup language</h1>
+
+<p>Sometimes I do android apps development. I use terminal, tmux and vim - no
+Eclipse, no IntelliJ Idea or other IDEs.</p>
+
+<p>What I don&rsquo;t like in android development is XMLs. It&rsquo;s a lot of typing, and I
+don&rsquo;t like to type a lot. So, here&rsquo;s my attempt to make it easier for those
+who use minimal tools for android development. Maybe it would work for Eclipse,
+too.</p>
+
+<h2>Goals</h2>
+
+<ul>
+<li>Simple syntax: minimal punctuation, no closing tags</li>
+<li>Should suit for most XMLs: layouts, values, strings etc.</li>
+<li>Should have macros support to extend language and to define variables</li>
+<li>Should work on Linux, Macs and probably Windows</li>
+</ul>
+
+<h2>Example</h2>
+
+<p>A piece of code paints a thousand words.</p>
+
+<p>Here&rsquo;s AAML markup you edit manually:</p>
+
+<pre><code>:LinearLayout layout fill, padding 0dp 16dp, orientation vertical
+        :EditText
+                layout fill wrap
+                hint @string/to
+        :EditText
+                layout fill wrap
+                hint @string/subject
+        :EditText
+                layout fill 0dp 1
+                gravity top
+                hint @string/message
+        :Button#btn_send
+                layout 100dp wrap
+                gravity right
+                text @string/send
+</code></pre>
+
+<p>And here&rsquo;s what you get after converting it to XML:</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;fill_parent&quot;
+        android:paddingTop=&quot;0&quot;
+        android:paddingBottom=&quot;0&quot;
+        android:paddingLeft=&quot;16dp&quot;
+        android:paddingRight=&quot;16dp&quot;
+        android:orientation=&quot;vertical&quot;&gt;
+        &lt;EditText
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:hint=&quot;@string/to&quot; /&gt;
+        &lt;EditText
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:hint=&quot;@string/subject&quot; /&gt;
+        &lt;EditText
+                android:layout_width=&quot;fill_parent&quot;
+                android:layout_height=&quot;0dp&quot;
+                android:layout_weight=&quot;1&quot;
+                android:gravity=&quot;top&quot;
+                android:hint=&quot;@string/message&quot; /&gt;
+        &lt;Button
+                android:id=&quot;@+id/btn_send&quot;
+                android:layout_width=&quot;100dp&quot;
+                android:layout_height=&quot;wrap_content&quot;
+                android:gravity=&quot;right&quot;
+                android:text=&quot;@string/send&quot; /&gt;
+&lt;/LinearLayout&gt;
+</code></pre>
+
+<p>Sounds easy, right?</p>
+
+<h2>Implementation</h2>
+
+<p>I&rsquo;ve picked Python 3 to write AAML converter (though with python2 it seems to
+be working, too). Basically, AAML has three parts: reader, processor and writer.</p>
+
+<p>Reader is simple: everything that starts with a colon is a new element.
+Indentation level allows to nest elements.  Next, element attributes are comma
+separated and comma is automatically inserted after the end-of-line.  Normally
+the first word in the element is tag name, you should not use newline or comma
+to separate it form the element attributes. That&rsquo;s the whole syntax of AAML.</p>
+
+<p>Writer is simple, too. It just pretty-prints all elements.</p>
+
+<p>Processor expands aliases and macros.</p>
+
+<p>Alias is a single word that is substituted by another word. Useful for defining variables.</p>
+
+<p>Macro is a bit more complex. It has a name and a list of arguments. When
+expanded, first all arguments are expanded (if they are aliases), then a
+suitable macro is looked up in the environment and processed.</p>
+
+<p>Here&rsquo;s how it looks like. To define a macro use <code>def</code> tag (yeah, <code>def</code> is a
+keyword, you can&rsquo;t make an XML element called <code>def</code>). Then you write macro name
+and a number of arguments it supports. Macros can be overloaded, but no support
+for variable number of parameters so far. Then you write macro body. You can
+refer to macro parameters as positional arguments, e.g. <code>$1</code>, <code>$2</code> etc.
+Here&rsquo;s an example of some layout macros:</p>
+
+<pre><code># Aliases
+:def fill fill_parent
+:def wrap match_parent
+:def match wrap
+# Macros
+:def layout:3 layout_width $1, layout_height $2, layout_weight $3
+:def layout:2 layout_width $1, layout_height $2
+:def layout:1 layout $1 $1
+
+:TextView
+    layout fill
+:TextView
+    layout fill match
+:TextView
+    layout fill match 1
+</code></pre>
+
+<p>There are two more things to mention. Comments are allowed, but should take a
+separate line and start with <code>#</code>. Also, as you use android:id frequently, you
+can use syntax sugar like <code>TextView#my_text</code> to define a new id <code>my_text</code> (as
+an alternative to <code>TextView id &quot;@+id/my_text&quot;</code>).</p>
+
+<h2>Usage</h2>
+
+<p>You can get the sources at
+<a href="https://bitbucket.org/zserge/aaml">https://bitbucket.org/zserge/aaml</a>.
+You need Python to run it. No other dependencies required. If you use Vim there
+is also a tiny syntax highlighting script included (see <code>aaml.vim</code>).</p>
+
+<p>You can process either files or directories, like:</p>
+
+<pre><code># Read from stdin and write to stdout
+$ aaml - -
+# Convert one file
+$ aaml my_layout.aaml my_layout.xml
+# Convert all *.aaml files from directory aaml to *.xml files 
+# in the directory res
+$ aaml aaml res
+</code></pre>
+
+<p>You can always use <code>custom_rules.xml</code> to build XMLs from aaml files
+automatically with <code>ant debug</code> or <code>ant release</code>:</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project&gt;
+    &lt;target name=&quot;-pre-build&quot;&gt;
+        &lt;exec executable=&quot;aaml&quot;&gt;
+            &lt;arg value=&quot;aaml&quot;/&gt;
+            &lt;arg value=&quot;res&quot;/&gt;
+        &lt;/exec&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre>
+
+<p>No need to say that it&rsquo;s pretty much unstable yet and has issues. So, you are
+welcome to report them.</p>
+
+<p>Volunteers needed to add more syntax highlighting modules for Sublime Text,
+Emacs and other popular editors, to suggest standard macros for android
+development and to do testing.</p>
+
+<p>AAML is free software and distributed under MIT license.</p>
+
+		<p>Posted on 2013-04-02</p>
+		<section class="social">
+			<section>
+				<a href="http://www.facebook.com/share.php?u=http://zserge.com/blog/aaml.html&amp;title=AAML%20-%20another%20android%20markup%20language" style="background-color: #3b5997">like</a>
+				&nbsp;
+				<a href="http://twitter.com/intent/tweet?status=AAML%20-%20another%20android%20markup%20language&#43;http://zserge.com/blog/aaml.html%20via%20@zsergo" style="background-color: #41b7d8">tweet</a>
+				&nbsp;
+				<a href="https://plus.google.com/share?url=http://zserge.com/blog/aaml.html" style="background-color: #d64937">+1</a>
+			</section>
+			<section>
+				<a href="/rss.xml" style="background-color: #f26522">rss</a>
+				&nbsp;
+				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
+				&nbsp;
+				<a href="https://plus.google.com/u/0/+SergeZaitsev" style="background-color: #d64937">+me</a>
+				&nbsp;
+				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
+			</section>
+		</section>
+		<section><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+<noscript>
+</noscript>
+
+</section>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>

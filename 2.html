@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>the power of 2</title>
+		<meta content="" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="2.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="the power of 2" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="2.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>2</h1>
+
+<p>&ldquo;2&rdquo; helps you to jump between folders in your unix shell.
+It&rsquo;s just my attempt to <em>guess</em> where you want to navigate
+and help you with less typing.</p>
+
+<h2>how it works</h2>
+
+<p>Here&rsquo;s a <a href="http://ascii.io/a/1416">screencast</a> to see what I&rsquo;m talking about.</p>
+
+<p>A tiny script integrated with your shell populates the directories database
+while you are jumping around.</p>
+
+<p>Later, when you want to <code>cd</code> somewhere you just type a few letters (hints) -
+&ldquo;2&rdquo; will find the most suitable directory path using the fuzzy search and
+brings you there.</p>
+
+<p>If you want to know more - &ldquo;2&rdquo; has two parts (what a coincidence!).
+The first is a piece of a shell script (now <code>zsh</code> and <code>bash</code> are supported).
+This scripts monitors your moves around the filesystem tree and
+provides and alias for &ldquo;2&rdquo; and a hotkey for interactive mode (see below what
+it means).</p>
+
+<p>The second piece is a tool written in Go. It reads and writes the directories
+database and performs the actual search. The reasons I added a separate
+tool is to optimize search speed. But to tell you the truth - I didn&rsquo;t want
+to torture myself with writing a search algorithm in Bash :)</p>
+
+<h2>install</h2>
+
+<pre><code>$ hg clone ssh://hg@bitbucket.org/zserge/2
+$ cd 2
+$ go build
+$ sudo cp 2 /usr/local/bin
+$ sudo mkdir /usr/local/share/2
+$ sudo cp bashrc /usr/local/share/2
+$ sudo cp zshrc /usr/local/share/2
+</code></pre>
+
+<p>Then add the following lines to your <code>.bashrc</code> or <code>.zshrc</code> depending on what
+shell you use:</p>
+
+<pre><code>export _2IGNORE=&quot;/tmp/*&quot;
+source /usr/local/share/2/bashrc # or zshrc
+</code></pre>
+
+<p>The second line integrates &ldquo;2&rdquo; into your shell and the first line
+is used to configure it (to make it ignore some paths)</p>
+
+<h2>tricks</h2>
+
+<p>If you want &ldquo;2&rdquo; to understand you better first set up the ignored paths.
+I personally don&rsquo;t like it to remember my <code>/tmp</code> and all its subfolders
+because they are located in the <code>tmpfs</code> and there is no sense to store these
+paths in the persistent database. Also, I don&rsquo;t want it to remember my home
+directory (but still remember the subdirectories).</p>
+
+<p>You can put a list of ignored paths into the <code>_2IGNORE</code> environment variable
+separated by colons. In my case it looks like:</p>
+
+<pre><code>export _2IGNORE=&quot;/tmp/*:/home/serge&quot;
+</code></pre>
+
+<p>The star at the end of the path means a mask.</p>
+
+<p>Next, the hints that are closer to the end of the path are more important, thus
+for hint <code>&quot;sys&quot;</code> it&rsquo;s more likely to go to <code>/usr/include/sys</code> than to
+    <code>/sys/kernel/debug</code>.</p>
+
+<p>Hints are matched in the order you type them.</p>
+
+<p>Another thing to remember is that extra importance have hints that match the
+parts of the path after the separators: hint <code>&quot;inc&quot;</code> points <code>/usr/include</code>
+more obviously than hint <code>&quot;clu&quot;</code> even though <code>&quot;clu&quot;</code> is closer to the end of
+the path.</p>
+
+<p>That&rsquo;s all you need to know. Happy &ldquo;2&rdquo;-ing!</p>
+
+<h2>interactive mode</h2>
+
+<p>If you want to see what path matches your hints the best you can try
+interactive mode. It&rsquo;s still in its very early days, but might help someone.</p>
+
+<p>To activate interactive mode type Ctrl+2 in zsh or Alt+2 in bash.</p>
+
+<h2>other info</h2>
+
+<p>&ldquo;2&rdquo; is an open source software and is distributed under MIT license.</p>
+
+<p>The sources are hosted on <a href="https://bitbucket.org/zserge/2">Bitbucket</a>.</p>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>

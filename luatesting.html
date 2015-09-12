@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>luatesting - micro-pico-tiny framework for Lua unit testing</title>
+		<meta content="" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="luatesting.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="luatesting - micro-pico-tiny framework for Lua unit testing" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="luatesting.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>Luatesting</h1>
+
+<p>luatesting was born in sin, because the reason to create is was a
+<a href="http://en.wikipedia.org/wiki/Not_invented_here">NIH</a> principle
+(Not Invented Here).</p>
+
+<h2>Philosophy</h2>
+
+<p>Yes, I know about <a href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>.
+But I don&rsquo;t like it.
+It is good for huge enterprise-level apps. But I don&rsquo;t write
+enterprise apps.
+It is good for object-oriented languages. But Lua is not that
+object-oriented.</p>
+
+<p>Have you heard about Go language <a href="http://golang.org/pkg/testing/">testing</a>
+package? That&rsquo;s what I kept in mind when writing luatesting.</p>
+
+<h2>Code</h2>
+
+<p>The code repository is stored on
+<a href="https://bitbucket.org/zserge/luatesting/">bitbucket</a></p>
+
+<p>API is simple - there is just one function: <code>testing.run()</code></p>
+
+<p>You should use it like:</p>
+
+<pre><code>MyTestCase = {}
+function MyTestCase.test_some_stuff(t)
+    ....
+end
+function MyTestCase.test_other_stuff(t)
+    ....
+end
+
+local testing = require(&quot;luatesting&quot;)
+testing.run()
+</code></pre>
+
+<p>When <code>testing.run()</code> is called - all your global tables are scanned, and
+all methods containing the word &ldquo;test&rdquo; in the name are called.</p>
+
+<p>Sounds easy?</p>
+
+<h2>How to test</h2>
+
+<p>That was how to organize your test cases. Now let&rsquo;s see how to test a
+single case.</p>
+
+<p>Every test case gets a single parameter - an object, called <code>t</code>.</p>
+
+<p>There is no <code>assertEquals()</code> and friends, just a single object to report
+you test state. The <code>t</code> object has two methods:</p>
+
+<ul>
+<li><code>t.Error(msg)</code> - print a message, mark this test as failed, but continue
+running this test. There can be several errors in a single test</li>
+<li><code>t.Fail(msg)</code> - print a message, mark test as failed and terminate it</li>
+</ul>
+
+<p>If nothing was done to the <code>t</code> object - the test is passed successfully.</p>
+
+<p>Here&rsquo;s an example of a test case:</p>
+
+<pre><code>ParserTest = {
+    p = parser_create()
+}
+
+function ParserTest:test_single_number(t)
+    n = self.p:parse(&quot;123&quot;)
+    if n ~= 123 then 
+        t.Error(&quot;Failed to parse 123&quot;) 
+    end
+
+    n = self.p:parse(&quot;0.123&quot;)
+    if n ~= 0.123 then 
+        t.Error(&quot;Failed to parse 0.123&quot;) 
+    end
+end
+
+function ParserTest: test_array(t)
+    a = self.p:parse(&quot;[ item1, item2, item3 ]&quot;)
+    if #a ~= 3 then
+        -- We fail here, because there is no reason to continue
+        t.Fail(&quot;Array length is not 3&quot;)
+    end
+
+    if a[0] ~= &quot;item1&quot; or a[1] ~= &quot;item2&quot; or a[2] ~= &quot;item3&quot; then
+        t.Error(&quot;Array contents are wrong&quot;)
+    end
+end
+
+testing = require(&quot;luatesting&quot;)
+testing.run()
+</code></pre>
+
+<p>Here&rsquo;s good output:</p>
+
+<pre><code>OK: test_single_number
+OK: test_array
+</code></pre>
+
+<p>If something goes wrong you will see messages like this:
+    ERR:    Failed to parse 123
+    ERR:    Failed to parse 0.123
+    FAIL: Error length is not 3</p>
+
+<h2>Other info</h2>
+
+<p>My experience with Lua is VERY little, so if it&rsquo;s not enough Lua-esque -
+let me know how to improve it. Thanks!</p>
+
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>
