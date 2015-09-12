@@ -1,0 +1,8 @@
+doctype 5
+html[lang="en-US"]
+	head
+		meta[http-equiv="refresh"][content="0; url=https://github.com/zserge?tab=repositories"]
+	body
+		h1 Projects
+		p See a list of
+			a[href="https://github.com/zserge?tab=repositories"] my projects on github
