@@ -5,9 +5,9 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Sat, 12 Sep 2015 11:56:25 +0200
+		<pubDate>Sat, 12 Sep 2015 12:29:22 +0200
 </pubDate>
-		<lastBuildDate>Sat, 12 Sep 2015 11:56:25 +0200
+		<lastBuildDate>Sat, 12 Sep 2015 12:29:22 +0200
 </lastBuildDate>
 
 		<item> <title>benchmarking go in the cloud</title> <link>http://zserge.com/blog/go-cloud-benchmark.html</link> <description>Compare performance of a simple Go web app running on Heroku, OpenShift, Digital Ocean and AWS</description> <pubDate>Fri, 04 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/go-cloud-benchmark.html</guid> </item>
