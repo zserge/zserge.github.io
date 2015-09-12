@@ -1,7 +1,0 @@
-#!/bin/sh
-
-cp -r .pub/* ..
-git add -A
-git status
-git commit -m "site update $(date)" && git push
-
