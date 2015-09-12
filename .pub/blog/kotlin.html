@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>kotlin - a new hope</title>
+		<meta content="A new language for Android coding" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="blog/kotlin.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="kotlin - a new hope" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="blog/kotlin.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="A new language for Android coding" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>kotlin - a new hope</h1>
+
+<p>I&rsquo;ve been looking for Java alternatives since my first days of Android
+development. I can&rsquo;t say I don&rsquo;t like Java. It&rsquo;s a nice language, very easy to
+learn and pretty logical.  But the lack of proper functional style
+constructions often inspires me to check what&rsquo;s new in the field of JVM
+languages.</p>
+
+<p>So far I&rsquo;ve tried (tried, I never learnt these languages properly):</p>
+
+<ul>
+<li><em>Mirah</em> - a very nice Ruby-translated-to-Java language. Zero overhead, allows a
+lot of syntax sugar, but it failed to make a static class attribute when I
+tried it. I&rsquo;m sure now it&rsquo;s better, I just don&rsquo;t like Ruby.</li>
+<li><em>Clojure</em> - a Lisp. I had very big expectations about clojure, but it turned
+out to be slow, huge and had no libraries for Android.</li>
+<li><em>Kawa</em> - another Lisp. Scheme for JVM. Was nice, but seems like one had to make
+lisp-ish bindings for every part of Android before it becomes useful.</li>
+<li><em>Scala</em> - a better Java. Good. Popular. Slow. Big. I could bear the fact my
+binaries become larger, but the compilation time was unacceptable for me. I
+was looking for a language to make me more productive, but instead I had to
+wait for another minute waiting for my HelloWorld to compile.</li>
+</ul>
+
+<p>This week I discovered Kotlin, a language made by JetBrains (guys making
+IntelliJ IDEA).  The history of Kotlin starts in 2010, but Android support was
+added in 2012. The ideas behind this language are to make it safer than Java
+and faster/easier than Scala.</p>
+
+<p>As a demo app I was going to make a theremin-like app that played different
+notes when phone was tilted.</p>
+
+<h2>Kotlin - The Phantom Menace</h2>
+
+<p>I&rsquo;ve heard Kotlin has nice support of the IDE, but as a convinced vim user I decided to try it in console/vim environment.</p>
+
+<p>So, on the official <a href="http://kotlin.jetbrains.org/">website</a> I found no binaries.
+Instead, I found a link to Github release with source archives. That was not
+looking promising, as I have no installed Maven, Gradle or whatever is used these
+days to make Java world more complicated. Luckily, Kotlin build system was plain old Ant.</p>
+
+<p>Dealing with dependencies and compiling the compiler took a while, and in the
+<code>$SRC/dist/kotlinc</code> directory I found compiler binaries and runtime. Also, in the
+<code>$SRC/dist/kotlinc/tools</code> directory there was a j2k app (I thought it&rsquo;s a
+translator from Java to Kotlin), but it failed to run.</p>
+
+<h2>Kotlin - Empire Strikes Back</h2>
+
+<p>So, let&rsquo;s get back to Google stuff and make kotlin compiler work with Android
+build.xml. Customizations of build process are possible with <code>custom_rules.xml</code>.
+Again, good design of kotlin provides us with <code>kotlinc</code> Ant task, so we need
+to include that task into the <code>custom_rules.xml</code>.</p>
+
+<p>So, starting with <code>android create project</code> as usual, I added the following
+custom rules:</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project name=&quot;scala-android&quot;&gt;
+    &lt;property environment=&quot;env&quot;/&gt;
+    &lt;taskdef resource    = &quot;org/jetbrains/jet/buildtools/ant/antlib.xml&quot;&gt;
+        &lt;classpath&gt;
+            &lt;fileset dir = &quot;${env.KOTLIN_HOME}/lib&quot; includes = &quot;*.jar&quot;/&gt;
+        &lt;/classpath&gt;
+    &lt;/taskdef&gt;
+    &lt;target name=&quot;-post-compile&quot;&gt;
+        &lt;path id=&quot;project.javac.classpath&quot;&gt;
+            &lt;path refid=&quot;project.all.jars.path&quot; /&gt;
+            &lt;path refid=&quot;tested.project.classpath&quot; /&gt;
+            &lt;path path=&quot;${java.compiler.classpath}&quot; /&gt;
+            &lt;path path=&quot;${project.target.android.jar}&quot;/&gt;
+            &lt;path path=&quot;${out.classes.absolute.dir}&quot; /&gt;
+        &lt;/path&gt;
+        &lt;kotlinc src=&quot;src&quot; output=&quot;bin/classes&quot; 
+            classpathref=&quot;project.javac.classpath&quot; /&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre>
+
+<p>I&rsquo;m not good at Ant, but that works if <code>KOTLIN_HOME</code> environment variable is
+set correctly (it should point to the <code>kotlinc</code> folder). We use post-install
+hook, because R.java should be generated and compiled before compiling kotlin
+files.</p>
+
+<p>Then, copy Kotlin runtime from <code>$KOTLIN_HOME/libs</code> to your project <code>libs</code> directory.
+Runtime is small, so I hoped apk size won&rsquo;t get large, too.</p>
+
+<p>Now, create an empty source file <code>src/&lt;...package...&gt;/Main.kt</code>.</p>
+
+<h2>Kotlin - Return of the Jedi</h2>
+
+<p>So, let&rsquo;s write some Kotlin. Minimal activity example looks much like Java:</p>
+
+<pre><code>package kotlin.theremin
+
+import android.os.Bundle
+import android.app.Activity
+
+class Main(): Activity() {
+    protected override fun onCreate(savedInstanceState : Bundle?) {
+        super&lt;Activity&gt;.onCreate(savedInstanceState)
+        setContentView(R.layout.main)
+    }
+}
+</code></pre>
+
+<p>Semicolons are not needed anymore, methods are functions inside classes,
+inheritance looks a bit different as well as super calls.</p>
+
+<p>Interesting part here is <code>savedInstanceState : Bundle?</code>. Question mark means a
+null-safe type.  Also, parameter name is not recommended to be changed, since
+Kotlin may use named arguments in calls. That&rsquo;s very annoying if careless
+Android SDK developers defined arguments as &ldquo;p0&rdquo;, &ldquo;p1&rdquo; and so on. Good news
+it&rsquo;s only a warning, so I decided to ignore it when default parameter name is
+meaningless.</p>
+
+<p>Build, install, run - all should work. Build process doesn&rsquo;t feel slow, but
+compiler output (warnings, errors) is a bit hard to read, since at the end of
+the build logs there is a long stack trace if your code has errors, so I had to
+scroll up to see actual error messages.</p>
+
+<h2>Kotlin - Attack of the Clones</h2>
+
+<p>So, I could write some code in Kotlin. The strongest feeling was that Kotlin is
+a copy of Scala. I can&rsquo;t say it&rsquo;s bad. I think I would have spent more time to
+study Scala if it was not that slow, and if I saw real profit of how Scala can
+help me in Android development. Here&rsquo;s the code of theremin app in kotlin:</p>
+
+<pre><code>package kotlin.theremin
+
+import android.content.pm.ActivityInfo
+import android.util.Log
+import android.hardware.SensorEventListener
+import android.hardware.SensorEvent
+import android.hardware.SensorManager
+import android.content.Context
+import android.app.Activity
+import android.os.Bundle
+import android.media.AudioFormat
+import android.media.AudioManager
+import android.media.AudioTrack
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+
+class Main(): Activity() {
+
+    val tag = &quot;Theremin:Main&quot;
+
+    val audioThread = AudioThread()
+    var sensorManager : SensorManager? = null
+    var sensor : Sensor? = null
+
+    val sensorListener = object : SensorEventListener {
+        override fun onSensorChanged(e : SensorEvent?) {
+            val values = e?.values
+            if (values != null) {
+                val range = sensor!!.getMaximumRange()
+                var x = values[1]
+                if (x &lt; -90 || x &gt; 90) {
+                    return
+                }
+                x = (x + 90) / 180
+                audioThread.setPitch(x)
+                Log.d(tag, &quot;x = ${x}&quot;)
+            }
+        }
+        override fun onAccuracyChanged(sensor : Sensor?, accuracy: Int) {}
+    }
+
+    protected override fun onCreate(savedInstanceState : Bundle?) {
+        super&lt;Activity&gt;.onCreate(savedInstanceState)
+        setContentView(R.layout.main)
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager?
+
+        sensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ORIENTATION)
+        sensorManager?.registerListener(sensorListener, sensor,
+            SensorManager.SENSOR_DELAY_FASTEST)
+
+        audioThread.start()
+    }
+
+    protected override fun onDestroy() {
+        super&lt;Activity&gt;.onDestroy()
+        audioThread.interrupt()
+        sensorManager?.unregisterListener(sensorListener)
+    }
+}
+
+class AudioThread(): Thread() {
+
+    val sampleRate = 44100
+
+    var pitch : Int = 440
+
+    public override fun run() {
+        setPriority(Thread.MAX_PRIORITY)
+        val buffsize = AudioTrack.getMinBufferSize(sampleRate, 
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)/32
+        val audioTrack = AudioTrack(AudioManager.STREAM_MUSIC,
+                                                sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                                                AudioFormat.ENCODING_PCM_16BIT, buffsize,
+                                                AudioTrack.MODE_STREAM)
+        val samples = ShortArray(buffsize)
+        val amp = 10000
+        val twopi = 8*Math.atan(1.toDouble())
+        var ph = 0.0
+
+        audioTrack.play()
+        while (!Thread.interrupted()) {
+            var frequency = pitch
+            for (i in 0..buffsize-1) {
+                samples[i] = (amp*Math.sin(ph)).toShort()
+                ph += twopi*frequency/sampleRate
+            }
+            audioTrack.write(samples, 0, buffsize)
+        }
+        audioTrack.stop()
+        audioTrack.release()
+    }
+
+    public fun setPitch(p : Float) {
+        val note = Math.round(p * 8).toInt()
+        val scale = array(0, 2, 4, 5, 7, 9, 11, 12)
+        pitch = (Math.pow(2.0, scale[note].toDouble()/12) * 440).toInt()
+    }
+}
+</code></pre>
+
+<p>It was all in one source file, Main.kt. It plays major scale notes as you tilt
+the phone.  Sine generator code was stolen somewhere from the web, so it&rsquo;s not
+an example of how one should write it. But I hope it&rsquo;s enough to get
+first impression of how Kotlin looks like.</p>
+
+<p>Good news: overhead is only 200KB, Kotlin runtime is very small.</p>
+
+<h2>Kotlin - may the force be with you</h2>
+
+<p>Impressions. Very nice language. Logical, consistent, fast, small. Pretty stable.
+I think I will spend some time learning it.</p>
+
+<p>What I didn&rsquo;t like: null-safety is rather painful, than safe. Most android
+objects coming from the outside are marked as null-safe, so I had to write &ldquo;?&rdquo;
+everywhere or check for null. However, the risk of getting null in those cases
+is almost zero, so I would prefer not to care about it. But language prevents
+such flippancy.</p>
+
+<p>Converting types in math is also verbose, and often doesn&rsquo;t work automatically
+(well, not in the way I assumed it to work). I had to split expression into
+smaller ones to make them compile.</p>
+
+<p>Arrays are different. There is <code>IntArray</code> (like Java array) with no proper
+documentation on how to work with it, there is <code>Array&lt;Int&gt;</code>, which is Kotlin
+array, and they are different.</p>
+
+<p>I haven&rsquo;t found a way how to declare a volatile variable.</p>
+
+<p>However, theoretical possibility to make domain-specific functions and extreme
+flexibility of the language is really amazing.</p>
+
+<p>So, don&rsquo;t be afraid to try Kotlin, the more developers know about it, the
+larger is the community - the better is the language and tools. Hope you will
+like it.</p>
+
+<p>P.S. I will upload project sources and apk on bitbucket soon.</p>
+
+		<p>Posted on 2013-11-28</p>
+		<section class="social">
+			<section>
+				<a href="http://www.facebook.com/share.php?u=http://zserge.com/blog/kotlin.html&amp;title=kotlin%20-%20a%20new%20hope" style="background-color: #3b5997">like</a>
+				&nbsp;
+				<a href="http://twitter.com/intent/tweet?status=kotlin%20-%20a%20new%20hope&#43;http://zserge.com/blog/kotlin.html%20via%20@zsergo" style="background-color: #41b7d8">tweet</a>
+				&nbsp;
+				<a href="https://plus.google.com/share?url=http://zserge.com/blog/kotlin.html" style="background-color: #d64937">+1</a>
+			</section>
+			<section>
+				<a href="/rss.xml" style="background-color: #f26522">rss</a>
+				&nbsp;
+				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
+				&nbsp;
+				<a href="https://plus.google.com/u/0/+SergeZaitsev" style="background-color: #d64937">+me</a>
+				&nbsp;
+				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
+			</section>
+		</section>
+		<section><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+<noscript>
+</noscript>
+
+</section>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>
