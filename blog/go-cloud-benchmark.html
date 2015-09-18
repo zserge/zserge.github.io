@@ -223,6 +223,24 @@ Transfer/sec:     53.46KB
 
 <p>Yep, even slower than OpenShift. Tried multiple times.</p>
 
+<h2>Scaleway</h2>
+
+<p><strong>UPD Sep 18th</strong> I&rsquo;ve just discovered [Scaleway], someone mentioned that
+Camlistore can be installed there for only 3 EUR/month. They offer a 4-core ARM
+server with 2GB of RAM, and it can perfectly run Go (of course, the binraries
+compiled for ARM). Test app used all 4 cores (otherwise the speed was about 2-3
+times slower).</p>
+
+<pre><code>Running 10s test @ http://xxx.xx.xx.85:8080/ping
+  2 threads and 100 connections
+	Thread Stats   Avg      Stdev     Max   +/- Stdev
+		Latency   212.17ms  146.26ms   1.86s    91.67%
+		Req/Sec   255.42    109.43   595.00     73.20%
+	4977 requests in 10.01s, 583.24KB read
+Requests/sec:    497.07
+Transfer/sec:     58.25KB
+</code></pre>
+
 <h2>Summary</h2>
 
 <p>Just summing up:</p>
@@ -231,6 +249,7 @@ Transfer/sec:     53.46KB
 Heroku:              1122 / 1 free dyno, or 7$/month (0.009$/hour)
 DigitalOcean/Dokku:   727 / 5$/month (0.007$/hour), multiple containers
 OpenShift:            597 / 3 free cartridges, or 0.02$/hour
+Scaleway:             497 / 3.41$/month (0.005$/hour), multiple containers
 AWS T2.micro/Dokku:   456 / 0.013$/hour, multiple containers
 </code></pre>
 
@@ -240,7 +259,8 @@ seem to be single-core.</p>
 <ul>
 <li>DigitalOcean: 512MB RAM , 20GB SSD, 1TB of traffic.</li>
 <li>Heroku: 512MB RAM, <em>free gear must &ldquo;sleep&rdquo; for 6 hours a day</em>.</li>
-<li>OpenShift: 512MB Ram, 1GB storage.</li>
+<li>OpenShift: 512MB RAM, 1GB storage.</li>
+<li>Scaleway: 2GB RAM, 50GB SSD, unlimited traffic.</li>
 <li>AWS T2.micro: 615MB RAM</li>
 </ul>
 
@@ -255,8 +275,16 @@ some dramatic improvements to performance. Also the pricing&hellip;</p>
 be good for big apps, but for small experiments, well, they charge more than
 DigitalOcean does, yet they give about 40% worse performance.</p>
 
+<p>I&rsquo;ve tested Scaleway as soon as I have heard about it - low prices, more RAM,
+nice ARM architecture. Still, it seems to be slower than other platforms, but
+if you need larger storage or can optimize your app by running cache in RAM -
+it may be worth trying. It&rsquo;s close to the cheapest AWS instances, but is 3
+times cheaper and has more RAM.</p>
+
 <p>P.S. I understand that this benchmark can show different numbers in your case.
 But if you have any comments or different results - <a href="https://twitter.com/zsergo">let me know</a>!</p>
+
+<p>[Scaleway]:</p>
 
 		<p>Posted on 2015-09-04</p>
 		<section class="social">
