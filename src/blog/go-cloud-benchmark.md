@@ -266,4 +266,4 @@ But if you have any comments or different results - [let me know]!
 [Elastic BeanStalk]: http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html
 [EC2]: https://aws.amazon.com/ec2/
 [let me know]: https://twitter.com/zsergo
-[Scaleway]: 
+[Scaleway]: https://www.scaleway.com/

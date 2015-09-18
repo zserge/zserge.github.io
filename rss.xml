@@ -5,9 +5,9 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Fri, 18 Sep 2015 17:41:00 +0200
+		<pubDate>Fri, 18 Sep 2015 17:43:10 +0200
 </pubDate>
-		<lastBuildDate>Fri, 18 Sep 2015 17:41:00 +0200
+		<lastBuildDate>Fri, 18 Sep 2015 17:43:10 +0200
 </lastBuildDate>
 
 		<item> <title>anvil: move fast and break things</title> <link>http://zserge.com/blog/anvil-breaking-changes.html</link> <description>I have to break backwards-compatibility a lot and I'm sorry about it</description> <pubDate>Sun, 13 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-breaking-changes.html</guid> </item>
