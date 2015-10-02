@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Fri, 18 Sep 2015 17:43:10 +0200
+		<pubDate>Fri, 02 Oct 2015 14:07:01 +0200
 </pubDate>
-		<lastBuildDate>Fri, 18 Sep 2015 17:43:10 +0200
+		<lastBuildDate>Fri, 02 Oct 2015 14:07:01 +0200
 </lastBuildDate>
 
-		<item> <title>anvil: move fast and break things</title> <link>http://zserge.com/blog/anvil-breaking-changes.html</link> <description>I have to break backwards-compatibility a lot and I'm sorry about it</description> <pubDate>Sun, 13 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-breaking-changes.html</guid> </item>
+		<item> <title>anvil: time for a change</title> <link>http://zserge.com/blog/anvil-forge-merged.html</link> <description>I merged anvil-forge branch back to master and published a new version.</description> <pubDate>Thu, 01 Oct 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-forge-merged.html</guid> </item>
+<item> <title>anvil: move fast and break things</title> <link>http://zserge.com/blog/anvil-breaking-changes.html</link> <description>I have to break backwards-compatibility a lot and I'm sorry about it</description> <pubDate>Sun, 13 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/anvil-breaking-changes.html</guid> </item>
 <item> <title>benchmarking go in the cloud</title> <link>http://zserge.com/blog/go-cloud-benchmark.html</link> <description>Compare performance of a simple Go web app running on Heroku, OpenShift, Digital Ocean and AWS</description> <pubDate>Fri, 04 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/go-cloud-benchmark.html</guid> </item>
 <item> <title>lua-sh: calling shell commands as functions</title> <link>http://zserge.com/blog/luash.html</link> <description>Subprocess interface for Lua, inspired by Python 'sh' module</description> <pubDate>Thu, 03 Sep 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/luash.html</guid> </item>
 <item> <title>how to sign release apk with gradle</title> <link>http://zserge.com/blog/android-signing.html</link> <description>Signing apks without boilerplate code</description> <pubDate>Sun, 09 Aug 2015 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/android-signing.html</guid> </item>
