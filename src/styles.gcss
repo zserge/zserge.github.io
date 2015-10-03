@@ -16,7 +16,7 @@ body
 h1, h2, h3
   line-height: 1.2
   font-family: $font-header
-  font-weight: 100
+  font-weight: 300
   text-transform: uppercase
   a
     color: $black
