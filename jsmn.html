@@ -190,7 +190,7 @@ const char *js;
 int r;
 
 js = ...;
-r = jsmn_parse(&amp;parser, js, tokens, 256);
+r = jsmn_parse(&amp;parser, js, strlen(js), tokens, 256);
 </code></pre>
 
 <p>A non-negative return value of <code>jsmn_parse</code> is the number of tokens actually

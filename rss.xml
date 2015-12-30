@@ -5,9 +5,9 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Wed, 30 Dec 2015 08:52:10 +0800
+		<pubDate>Wed, 30 Dec 2015 09:09:12 +0800
 </pubDate>
-		<lastBuildDate>Wed, 30 Dec 2015 08:52:10 +0800
+		<lastBuildDate>Wed, 30 Dec 2015 09:09:12 +0800
 </lastBuildDate>
 
 		<item> <title>painless publishing of android libraries</title> <link>http://zserge.com/blog/jitpack.html</link> <description>from mavenCentral to jcenter to jitpack.io</description> <pubDate>Fri, 11 Dec 2015 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/jitpack.html</guid> </item>

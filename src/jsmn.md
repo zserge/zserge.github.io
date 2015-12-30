@@ -143,7 +143,7 @@ parser:
 	int r;
 
 	js = ...;
-	r = jsmn_parse(&parser, js, tokens, 256);
+	r = jsmn_parse(&parser, js, strlen(js), tokens, 256);
 
 A non-negative return value of `jsmn_parse` is the number of tokens actually
 used by the parser.
