@@ -140,7 +140,7 @@ parser:
 
 	jsmntok_t tokens[256];
 	const char *js;
-	jsmnerr_t r;
+	int r;
 
 	js = ...;
 	r = jsmn_parse(&parser, js, tokens, 256);
