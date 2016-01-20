@@ -11,7 +11,7 @@ easily integrated into the resource-limited projects or embedded systems.
 
 You can find more information about JSON format at [json.org][1].
 
-Library sources are available at [bitbucket.org/zserge/jsmn][2].
+Library sources are available at [https://github.com/zserge/jsmn][2].
 
 Philosophy
 ----------
