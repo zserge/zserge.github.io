@@ -223,7 +223,7 @@ This software is distributed under [MIT license][10]
  so feel free to integrate it in your commercial products.
 
 [1]: http://www.json.org/
-[2]: https://bitbucket.org/zserge/jsmn/wiki/Home
+[2]: https://github.com/zserge/jsmn
 [3]: http://lionet.livejournal.com/118853.html
 [4]: http://alisdair.mcdiarmid.org/2012/08/14/jsmn-example.html
 [5]: http://news.ycombinator.com/item?id=4386834
