@@ -23,7 +23,7 @@ If you have a lot of views like this - most likely you would like to move
 repetitive code into a single place and just keep a reference to them in the
 layout. That's what we call a style - a reusable set of view attributes.
 
-Andorid styles are normally written as XMLs:
+Android styles are normally written as XMLs:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -62,7 +62,7 @@ v(MyProgressBar.class, () -> {
 });
 ```
 
-This is still only a fallback option if you really have to use XML stules,
+This is still only a fallback option if you really have to use XML styles,
 because for most cases Anvil offers a much better solution to styling than XML.
 
 ## Custom Style class
@@ -95,7 +95,7 @@ So far it's very similar to XMLs, but let's see how it can be developed further.
 
 ## Calculated values
 
-Since we have the full power of a real programing language - we can describe
+Since we have the full power of a real programming language - we can describe
 dependencies between the values. For example if our text color is 20% darker
 than some common accent color - we can write it as an expression. It also
 applies to other values like sizes, margins, weights etc - they may be derived
@@ -148,8 +148,8 @@ textView(() -> {
 });
 ```
 
-The style definitions look more compact and it's very flexible - we can even
-include certain conditional constrains. For example if we want our view to be
+The style definitions look more compact and they are very flexible - we can even
+include certain conditional constraints. For example if we want our view to be
 full-screen in landscape and have bigger font - it can be part of the style:
 
 ```java
@@ -169,7 +169,7 @@ public final class Style {
 
 ## Overriding styles
 
-My personal favourite in making styles is passing a renderable lambda
+My personal favourite way of making styles is passing a renderable lambda
 to override the style if needed:
 
 ```

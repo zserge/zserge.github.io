@@ -60,7 +60,7 @@ from the Android Developers website:</p>
 repetitive code into a single place and just keep a reference to them in the
 layout. That&rsquo;s what we call a style - a reusable set of view attributes.</p>
 
-<p>Andorid styles are normally written as XMLs:</p>
+<p>Android styles are normally written as XMLs:</p>
 
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;resources&gt;
@@ -97,7 +97,7 @@ v(MyProgressBar.class, () -&gt; {
 });
 </code></pre>
 
-<p>This is still only a fallback option if you really have to use XML stules,
+<p>This is still only a fallback option if you really have to use XML styles,
 because for most cases Anvil offers a much better solution to styling than XML.</p>
 
 <h2>Custom Style class</h2>
@@ -128,7 +128,7 @@ static methods or constant fields):</p>
 
 <h2>Calculated values</h2>
 
-<p>Since we have the full power of a real programing language - we can describe
+<p>Since we have the full power of a real programming language - we can describe
 dependencies between the values. For example if our text color is 20% darker
 than some common accent color - we can write it as an expression. It also
 applies to other values like sizes, margins, weights etc - they may be derived
@@ -179,8 +179,8 @@ textView(() -&gt; {
 });
 </code></pre>
 
-<p>The style definitions look more compact and it&rsquo;s very flexible - we can even
-include certain conditional constrains. For example if we want our view to be
+<p>The style definitions look more compact and they are very flexible - we can even
+include certain conditional constraints. For example if we want our view to be
 full-screen in landscape and have bigger font - it can be part of the style:</p>
 
 <pre><code class="language-java">public final class Style {
@@ -199,7 +199,7 @@ full-screen in landscape and have bigger font - it can be part of the style:</p>
 
 <h2>Overriding styles</h2>
 
-<p>My personal favourite in making styles is passing a renderable lambda
+<p>My personal favourite way of making styles is passing a renderable lambda
 to override the style if needed:</p>
 
 <pre><code>public static void codeFontView(Anvil.Renderable r) {
