@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Anvil howto: view styling</title>
+		<meta content="How to use view styles in Anvil: traditional XML approach and more flexible styling with code" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="blog/anvil-howto-style-views.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Anvil howto: view styling" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="blog/anvil-howto-style-views.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="How to use view styles in Anvil: traditional XML approach and more flexible styling with code" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Fonts -->
+		<link href="//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic" rel="stylesheet" type="text/css" />
+		<link href="//fonts.googleapis.com/css?family=Roboto+Mono:100,200,300,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>Anvil howto: view styling</h1>
+
+<p>A common question I hear about Anvil is how to style views.</p>
+
+<p>Let&rsquo;s recall how it&rsquo;s been traditionally done in Android. Here&rsquo;s an example
+from the Android Developers website:</p>
+
+<pre><code class="language-xml">&lt;TextView
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;wrap_content&quot;
+    android:textColor=&quot;#00FF00&quot;
+    android:typeface=&quot;monospace&quot;
+    android:text=&quot;@string/hello&quot; /&gt;
+</code></pre>
+
+<p>If you have a lot of views like this - most likely you would like to move
+repetitive code into a single place and just keep a reference to them in the
+layout. That&rsquo;s what we call a style - a reusable set of view attributes.</p>
+
+<p>Andorid styles are normally written as XMLs:</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;resources&gt;
+    &lt;style name=&quot;CodeFont&quot; parent=&quot;@android:style/TextAppearance.Medium&quot;&gt;
+        &lt;item name=&quot;android:layout_width&quot;&gt;fill_parent&lt;/item&gt;
+        &lt;item name=&quot;android:layout_height&quot;&gt;wrap_content&lt;/item&gt;
+        &lt;item name=&quot;android:textColor&quot;&gt;#00FF00&lt;/item&gt;
+        &lt;item name=&quot;android:typeface&quot;&gt;monospace&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+</code></pre>
+
+<p>While Anvil doesn&rsquo;t support such styles as a first-class citizen - it still
+supports them by using XML layouts or by sub-classing a view with the default
+style overridden:</p>
+
+<pre><code>// In XML:
+&lt;TextView id=&quot;@+id/my_text&quot; style=&quot;@style/CodeFont&quot; /&gt;
+// In Java inject your XML layout and bind data to the views
+xml(R.layout.my_text_layout, () -&gt; {
+	withId(R.id.my_text, () -&gt; {
+		text(R.string.hello);
+	});
+});
+
+// Subclass ProgressBar
+public class MyProgressBar extends ProgressBar {
+	public MyProgressBar(Context c) {
+		super(c, null, android.R.attr.progressBarStyleSmall);
+	}
+}
+v(MyProgressBar.class, () -&gt; {
+	...
+});
+</code></pre>
+
+<p>This is still only a fallback option if you really have to use XML stules,
+because for most cases Anvil offers a much better solution to styling than XML.</p>
+
+<h2>Custom Style class</h2>
+
+<p>You may create a custom <code>Style</code> utility class (e.g. a final class with just
+static methods or constant fields):</p>
+
+<pre><code class="language-java">public final class Style {
+	public static class CodeFont {
+		public final static int width = FILL;
+		public final static int height = WRAP;
+		public final static int textColor = Color.BLUE;
+		public final static Typeface typeface = Typeface.MONOSPACE;
+	}
+}
+</code></pre>
+
+<p>Now you may use this style in Anvil layouts:</p>
+
+<pre><code class="language-java">textView(() -&gt; {
+	size(Style.CodeFont.width, Style.CodeFont.height);
+	textColor(Style.CodeFont.textColor);
+	typeface(Style.CodeFont.typeface);
+});
+</code></pre>
+
+<p>So far it&rsquo;s very similar to XMLs, but let&rsquo;s see how it can be developed further.</p>
+
+<h2>Calculated values</h2>
+
+<p>Since we have the full power of a real programing language - we can describe
+dependencies between the values. For example if our text color is 20% darker
+than some common accent color - we can write it as an expression. It also
+applies to other values like sizes, margins, weights etc - they may be derived
+from some base style.</p>
+
+<p>Now if you want to change you app accent color from blue to red - you only need
+to change it in one place.</p>
+
+<pre><code class="language-java">public final class Style {
+	public static class Base {
+		public final static int accentColor = Color.BLUE;
+		public final static int textSize = sip(16);
+	}
+	public static class CodeFont {
+		public final static int textSize = Base.textSize * 0.8;
+		public final static int textColor = darken(Base.accentColor, 0.2);
+	}
+}
+</code></pre>
+
+<h2>Functions, not constants</h2>
+
+<p>However it&rsquo;s more useful use functions instead:</p>
+
+<pre><code class="language-java">public final class Style {
+	public static void monospaceText() {
+		typeface(Typeface.MONOSPACE);
+	}
+	public static void bigView() {
+		size(MATCH, MATCH);
+		padding(dip(20));
+	}
+	public static void darkCodeText() {
+		textSize(Base.textSize * 0.8);
+		textColor(darken(Base.accentColor* 0.8));
+	}
+	// Now we can use other style functions as mixins
+	public static void codeFont() {
+		bigView();
+		monospaceText();
+		darkCodeText();
+	}
+}
+
+textView(() -&gt; {
+	Style.codeFont();
+	text(&quot;Hello&quot;);
+});
+</code></pre>
+
+<p>The style definitions look more compact and it&rsquo;s very flexible - we can even
+include certain conditional constrains. For example if we want our view to be
+full-screen in landscape and have bigger font - it can be part of the style:</p>
+
+<pre><code class="language-java">public final class Style {
+	public static void codeFont() {
+		if (isPortrait) {
+			size(MATCH, WRAP);
+			textSize(sip(18);
+		} else {
+			size(MATCH, MATCH);
+			textSize(sip(20);
+		}
+		textColor(darken(Base.accentColor* 0.8));
+	}
+}
+</code></pre>
+
+<h2>Overriding styles</h2>
+
+<p>My personal favourite in making styles is passing a renderable lambda
+to override the style if needed:</p>
+
+<pre><code>public static void codeFontView(Anvil.Renderable r) {
+	// View class
+	textView(() -&gt; {
+		// With common style values
+		if (isPortrait) {
+			size(MATCH, WRAP);
+			textSize(Base.textSize * 0.8);
+		} else {
+			size(MATCH, MATCH);
+			textSize(Base.textSize);
+		}
+		textColor(darken(Base.accentColor* 0.8));
+		// Let the caller to override style
+		r.view();
+	});
+}
+
+// Usage:
+codeFontView(() -&gt; {
+	text(&quot;Hello&quot;); // Has default style attributes
+});
+
+codeFontView(() -&gt; {
+	text(&quot;World&quot;);
+	textColor(Color.RED); // Has default style attributes, but textColor overridden
+});
+</code></pre>
+
+<p>It&rsquo;s useful if you want to separate how your view looks from how your view
+behaves - you may move look-and-feel styles into a utility class, but leave
+your data bindings and listeners inside your main class.</p>
+
+<p>As you can see, Anvil is more flexible than XMLs and you may architect your
+styles any way you like by using constants, expressions, overriding styles or
+mixing them together.</p>
+
+		<p>Posted on 2016-03-28</p>
+		<section class="social">
+			<section>
+				<a href="http://www.facebook.com/share.php?u=http://zserge.com/blog/anvil-howto-style-views.html&amp;title=Anvil%20howto:%20view%20styling" style="background-color: #3b5997">like</a>
+				&nbsp;
+				<a href="http://twitter.com/intent/tweet?status=Anvil%20howto:%20view%20styling&#43;http://zserge.com/blog/anvil-howto-style-views.html%20via%20@zsergo" style="background-color: #41b7d8">tweet</a>
+				&nbsp;
+				<a href="https://plus.google.com/share?url=http://zserge.com/blog/anvil-howto-style-views.html" style="background-color: #d64937">+1</a>
+			</section>
+			<section>
+				<a href="/rss.xml" style="background-color: #f26522">rss</a>
+				&nbsp;
+				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
+				&nbsp;
+				<a href="https://plus.google.com/u/0/+SergeZaitsev" style="background-color: #d64937">+me</a>
+				&nbsp;
+				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
+			</section>
+		</section>
+		<section><div id="disqus_thread"></div><script type="text/javascript">
+var disqus_shortname='zserge';
+	(function() {
+		var dsq = document.createElement('script');
+		dsq.type = 'text/javascript';
+		dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+	</script>
+<noscript>
+</noscript>
+
+</section>
+		<footer>
+			<p>
+				&copy;2012&ndash;2015 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>
