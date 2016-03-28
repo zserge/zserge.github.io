@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Mon, 28 Mar 2016 14:54:36 +0800
+		<pubDate>Mon, 28 Mar 2016 18:02:36 +0800
 </pubDate>
-		<lastBuildDate>Mon, 28 Mar 2016 14:54:36 +0800
+		<lastBuildDate>Mon, 28 Mar 2016 18:02:36 +0800
 </lastBuildDate>
 
-		<item> <title>the evolution of android architecture</title> <link>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</link> <description>Android history: from no architecture to MVP to MVVM to Redux</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</guid> </item>
+		<item> <title>the stockholm syndrome of android xml</title> <link>http://zserge.com/blog/anvil-xml-support.html</link> <description>We love XMLs, but there might be a better way</description> <pubDate>Tue, 29 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-xml-support.html</guid> </item>
+<item> <title>the evolution of android architecture</title> <link>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</link> <description>Android history: from no architecture to MVP to MVVM to Redux</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</guid> </item>
 <item> <title>anvil howto: view styling</title> <link>http://zserge.com/blog/anvil-howto-style-views.html</link> <description>How to use view styles in Anvil: traditional XML approach and more flexible styling with code</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-howto-style-views.html</guid> </item>
 <item> <title>two way data bindings in anvil</title> <link>http://zserge.com/blog/anvil-two-way-bindings.html</link> <description>How to register callbacks in your views to change data bound to the same views</description> <pubDate>Tue, 15 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-two-way-bindings.html</guid> </item>
 <item> <title>painless publishing of android libraries</title> <link>http://zserge.com/blog/jitpack.html</link> <description>from mavenCentral to jcenter to jitpack.io</description> <pubDate>Fri, 11 Dec 2015 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/jitpack.html</guid> </item>
