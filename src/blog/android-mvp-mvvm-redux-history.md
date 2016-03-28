@@ -81,8 +81,8 @@ public void onSubmitClicked(View v) {
 ```
 
 Also by that time we already had Ice Cream Sandwich and Jelly Bean released.
-Later that year Google have released KitKat, the most popular android version
-so far.
+Later that year Google have released KitKat, the most popular Android OS
+version so far.
 
 How this compares to web development? Well, web developers in 2013 moved from
 jQuery's spaghetti to some MVC frameworks. They have been using Backbone.js,
@@ -101,7 +101,7 @@ to be a trouble-maker.
 
 They also have shown that there is almost no benefits in using fragments versus
 using custom viewgroups (well, assuming that Fragment from the support library
-is actually a custom viewgroup it not a big surprise).
+is actually a custom viewgroup is not a big surprise).
 
 This seems to be the first time when a technology so strongly forced by Google
 has been fairly criticized and the criticism was widely accepted.
@@ -204,7 +204,7 @@ Also we've recently implemented [Redux](https://github.com/trikita/jedux)
 architecture for Android which really feels superior to MVVM in most cases.
 
 I'm glad to see that Android developers are now open to the paradigm shifts and
-are happy to try new tools and instruments. This means that sooner or later by
+happy to try new tools and instruments. This means that sooner or later by
 trial and error, by natural selection and other evolutionary tricks we will get
 an (almost) perfect development ecosystem that finally make the developers
 happy.
