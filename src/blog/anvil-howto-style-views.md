@@ -5,7 +5,8 @@ date: 2016-03-28
 ---
 # {{title}}
 
-A common question I hear about Anvil is how to style views.
+A common question I hear about [Anvil](https://github.com/zserge/anvil) is how
+to style views.
 
 Let's recall how it's been traditionally done in Android. Here's an example
 from the Android Developers website:
