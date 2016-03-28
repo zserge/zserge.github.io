@@ -121,7 +121,7 @@ CompoundButton callbacks by specifying at least one argument type in lambda, e.g
 <p>This should cover all the standard views that are commonly used in android
 apps. The only one left aside is SearchView. First of all, it requires API
 level 11 while Anvil current minSdk is 10. Next, it&rsquo;s a really problematic one
-because it has the same issues as TextView plus its own strange misbehaviorus
+because it has the same issues as TextView plus its own strange misbehaviors
 like hooking into back button or glitches with expand/collapse. Finally, I
 don&rsquo;t think people use SearchView a lot as a real two-way input type. As far as
 I know it&rsquo;s most often used inside action bars where Anvil is of little help.</p>
@@ -154,8 +154,8 @@ lambda with just a CharSequence.</p>
 <h2>Minor changes</h2>
 
 <p>Talking of text views, do you know that <code>setTextSize()</code> in Android takes a
-value in &ldquo;sp&rdquo; (implicitely), while in XMLs we&rsquo;re used to specify &ldquo;sp&rdquo;
-explicitely.</p>
+value in &ldquo;sp&rdquo; (implicitly), while in XMLs we&rsquo;re used to specify &ldquo;sp&rdquo;
+explicitly.</p>
 
 <p>This means that <code>android:textSize=&quot;27sp&quot;</code> and <code>textView.setTextSize(sip(27))</code>
 result in different text sizes.</p>
