@@ -18,7 +18,7 @@ had the following code in every activity:
 
 ```java
 TextView mCounterText;
-Button mCounterIncrmentButton;
+Button mCounterIncrementButton;
 
 int mClicks = 0;
 
