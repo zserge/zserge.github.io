@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Mon, 28 Mar 2016 18:05:36 +0800
+		<pubDate>Tue, 29 Mar 2016 13:44:06 +0800
 </pubDate>
-		<lastBuildDate>Mon, 28 Mar 2016 18:05:36 +0800
+		<lastBuildDate>Tue, 29 Mar 2016 13:44:06 +0800
 </lastBuildDate>
 
 		<item> <title>the stockholm syndrome of android xml</title> <link>http://zserge.com/blog/anvil-xml-support.html</link> <description>We love XMLs, but there might be a better way</description> <pubDate>Tue, 29 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-xml-support.html</guid> </item>
+<item> <title>how to architect anvil apps</title> <link>http://zserge.com/blog/anvil-app-architecture.html</link> <description>Anvil simplifies your UI code, but what about your controllers and models?</description> <pubDate>Tue, 29 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-app-architecture.html</guid> </item>
 <item> <title>the evolution of android architecture</title> <link>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</link> <description>Android history: from no architecture to MVP to MVVM to Redux</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</guid> </item>
 <item> <title>anvil howto: view styling</title> <link>http://zserge.com/blog/anvil-howto-style-views.html</link> <description>How to use view styles in Anvil: traditional XML approach and more flexible styling with code</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-howto-style-views.html</guid> </item>
 <item> <title>two way data bindings in anvil</title> <link>http://zserge.com/blog/anvil-two-way-bindings.html</link> <description>How to register callbacks in your views to change data bound to the same views</description> <pubDate>Tue, 15 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-two-way-bindings.html</guid> </item>
