@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Wed, 11 May 2016 19:32:07 +0800
+		<pubDate>Tue, 19 Jul 2016 13:06:32 +0800
 </pubDate>
-		<lastBuildDate>Wed, 11 May 2016 19:32:07 +0800
+		<lastBuildDate>Tue, 19 Jul 2016 13:06:32 +0800
 </lastBuildDate>
 
-		<item> <title>anvil 0.4.0 + support libraries</title> <link>http://zserge.com/blog/anvil-support-libraries.html</link> <description>For a long time Anvil worked only with normal SDK views, but now you may use support library views as well</description> <pubDate>Wed, 11 May 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-support-libraries.html</guid> </item>
+		<item> <title>my experience with asm.js</title> <link>http://zserge.com/blog/my-experience-with-asmjs.html</link> <description>Rewriting parts of the app in C to improve performance</description> <pubDate>Mon, 18 Jul 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/my-experience-with-asmjs.html</guid> </item>
+<item> <title>anvil 0.4.0 + support libraries</title> <link>http://zserge.com/blog/anvil-support-libraries.html</link> <description>For a long time Anvil worked only with normal SDK views, but now you may use support library views as well</description> <pubDate>Wed, 11 May 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-support-libraries.html</guid> </item>
 <item> <title>the stockholm syndrome of android xml</title> <link>http://zserge.com/blog/anvil-xml-support.html</link> <description>We love XMLs, but there might be a better way</description> <pubDate>Tue, 29 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-xml-support.html</guid> </item>
 <item> <title>how to architect anvil apps</title> <link>http://zserge.com/blog/anvil-app-architecture.html</link> <description>Anvil simplifies your UI code, but what about your controllers and models?</description> <pubDate>Tue, 29 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/anvil-app-architecture.html</guid> </item>
 <item> <title>the evolution of android architecture</title> <link>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</link> <description>Android history: from no architecture to MVP to MVVM to Redux</description> <pubDate>Mon, 28 Mar 2016 00:00:00 +0800</pubDate> <guid>http://zserge.com/blog/android-mvp-mvvm-redux-history.html</guid> </item>
