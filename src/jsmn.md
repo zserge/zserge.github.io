@@ -172,7 +172,7 @@ Non-strict mode
 ---------------
 
 By default jsmn is working in a non-strict mode. It allows you to use it for 
-other useful formats that JSON. In non-struct mode jsmn accepts:
+other useful formats that JSON. In non-strict mode jsmn accepts:
 
 * non-quoted primitive values other than true/false/null/numbers
 * only primitive values without a root object
