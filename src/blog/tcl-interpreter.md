@@ -50,7 +50,7 @@ command.
 
 There is no data types other than a string. Square brackets inside the
 strings are interpolated, e.g. the expression inside the brackets is evaluated
-and its result if put into the original string. For example, in `puts [add 1
+and its result is put into the original string. For example, in `puts [add 1
 2]` the square brackets part gets substituted by `3` and then `puts 3` is
 executed.
 
@@ -67,11 +67,11 @@ if {$x > 0} {
 }
 ```
 
-The command is `if`, the second word is `$x > 0` (which is substituted by `if`
-internally), the third word is `{puts Positive}`, then `else`, then `{puts
-Negative}`. `If` substitutes the second word and evaluates the third or the fifth
-one depending on the result. Loops, procedures etc - everything is just a
-command operating with strings.
+The command is `if`, the second word is `$x > 0` (which is substituted later by
+the command internally), the third word is `{puts Positive}`, then `else`, then
+`{puts Negative}`. `If` substitutes the second word and evaluates the third or
+the fifth one depending on the result. Loops, procedures etc - everything is
+just a command operating with strings.
 
 ## Existing interpreters
 
@@ -97,7 +97,7 @@ weekend. My goals were:
 * Extreme minimalism. It should fit on an MCU with 16K of NAND.
 * It should be easy to extend by writing your own commands in C.
 * All parts should be isolated and should be easy to replace/customize.
-* Default implementation should prefer size of performance.
+* Default implementation should prefer size over performance.
 * Lexer should tell when the end of the command is met so that we could read
 	user input byte by byte and execute command only when it's fully read.
 * All parts of the interpreter should be covered with tests.
@@ -112,7 +112,8 @@ next project, so let me explain how it works.
 
 ## Lexer
 
-Any symbol can be part of the word, except for the following special symbols:
+Any symbol can be a part of the partcl word, except for the following special
+symbols:
 
 * Whitespace symbols: space and tab, used to delimit words
 * Command terminators: newline, semicolon or EOF
@@ -143,10 +144,9 @@ any memory and it doesn't mutate the original string (making it possible to
 store scripts in ROM).
 
 A special macro `tcl_each(s, len, skip_error)` can be used to iterate over all
-the tokens in the string. If `skip_error` is false - the loop ends when the
-string ends, otherwise the loop breaks on syntax errors such as unexpected EOF.
-This allows to validate the input string without evaluating it and detect when
-a full command has been read.
+the tokens in the string. If `skip_error` is true - then unexpected EOF is not
+considered to be an error. This allows to validate the input string without
+evaluating it and detect when a full command has been read.
 
 A good use case is reading commands from the serial port byte by byte. You can
 accumulate data in a buffer without executing it until the lexer reports the
@@ -164,7 +164,7 @@ but takes precious memory space.
 
 Partcl has a special `tcl_value_t` type and a number of functions to work with
 it.  By default it's just a char pointer, but one can rewrite ~100 lines to
-optimize it for his needs (e.g. use a pool of strings, or handle lists
+optimize it for their needs (e.g. use a pool of strings, or handle lists
 separately). In other words, we have an abstract type and the implementation
 may vary.
 
@@ -199,7 +199,7 @@ linked lists.
 ## Environments
 
 Tcl interpreter uses a stack of environments where variables are stored.
-Environment is handled by 3 functions and it can be customized if need (e.g. to
+Environment is handled by 3 functions and it can be customized if needed (e.g.
 use hash maps to speed up variable lookup):
 
 ```
@@ -225,18 +225,18 @@ A typical command is just a C function of the following look:
 static int tcl_cmd_puts(struct tcl *tcl, tcl_value_t *args, void *arg) {
 	tcl_value_t *text = tcl_list_at(args, 1);
 	puts(tcl_string(text));
-	return FNORMAL;
+	return FNORMAL; /* continue to the next command normally */
 }
 ```
 
 It takes an interpreter object, a list of arguments and an optional pointer to
-some context. Some commands have fixed arity, then interpreter controls it. For
-zero arity the command must control it internally, which makes it possible to
-use variadic arguments.
+some context. Some commands have fixed arity, then the interpreter controls it.
+For zero arity the command must control it internally, which makes it possible
+to use variadic arguments.
 
 ## What's next?
 
-It was a fun to write a real Tcl interpreter. It was even more fun to actually
+It was fun to write a real Tcl interpreter. It was even more fun to actually
 use it on a real MCU. Good test coverage and no memory leaks (according to
 valgrind) make it a good candidate for low-end scripting.
 
@@ -245,10 +245,10 @@ libc (for `<strings.h>` and malloc/free).
 
 I'm not sure what to do next with it, but here are some ideas:
 
-- Run some benchmarks to see how fast is the lexer and the interpterer.
+- Run some benchmarks to see how fast the lexer and the interpterer are.
 - Make an alternative implementation for `tcl_value_t` that uses real lists and
 	caches numbers.
-- Make a library of commands for lists, hash maps, strings, for loops etc.
+- Make a library of commands for lists, hash maps, strings, `for` loops etc.
 
 If you find it interesting - feel free to contribute or report issues at
 https://github.com/zserge/partcl

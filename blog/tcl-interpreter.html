@@ -87,7 +87,7 @@ command.</p>
 
 <p>There is no data types other than a string. Square brackets inside the
 strings are interpolated, e.g. the expression inside the brackets is evaluated
-and its result if put into the original string. For example, in <code>puts [add 1
+and its result is put into the original string. For example, in <code>puts [add 1
 2]</code> the square brackets part gets substituted by <code>3</code> and then <code>puts 3</code> is
 executed.</p>
 
@@ -103,11 +103,11 @@ command, and not a special language syntax:</p>
 }
 </code></pre>
 
-<p>The command is <code>if</code>, the second word is <code>$x &gt; 0</code> (which is substituted by <code>if</code>
-internally), the third word is <code>{puts Positive}</code>, then <code>else</code>, then <code>{puts
-Negative}</code>. <code>If</code> substitutes the second word and evaluates the third or the fifth
-one depending on the result. Loops, procedures etc - everything is just a
-command operating with strings.</p>
+<p>The command is <code>if</code>, the second word is <code>$x &gt; 0</code> (which is substituted later by
+the command internally), the third word is <code>{puts Positive}</code>, then <code>else</code>, then
+<code>{puts Negative}</code>. <code>If</code> substitutes the second word and evaluates the third or
+the fifth one depending on the result. Loops, procedures etc - everything is
+just a command operating with strings.</p>
 
 <h2>Existing interpreters</h2>
 
@@ -134,7 +134,7 @@ weekend. My goals were:</p>
 <li>Extreme minimalism. It should fit on an MCU with 16K of NAND.</li>
 <li>It should be easy to extend by writing your own commands in C.</li>
 <li>All parts should be isolated and should be easy to replace/customize.</li>
-<li>Default implementation should prefer size of performance.</li>
+<li>Default implementation should prefer size over performance.</li>
 <li>Lexer should tell when the end of the command is met so that we could read
 user input byte by byte and execute command only when it&rsquo;s fully read.</li>
 <li>All parts of the interpreter should be covered with tests.</li>
@@ -150,7 +150,8 @@ next project, so let me explain how it works.</p>
 
 <h2>Lexer</h2>
 
-<p>Any symbol can be part of the word, except for the following special symbols:</p>
+<p>Any symbol can be a part of the partcl word, except for the following special
+symbols:</p>
 
 <ul>
 <li>Whitespace symbols: space and tab, used to delimit words</li>
@@ -181,10 +182,9 @@ any memory and it doesn&rsquo;t mutate the original string (making it possible t
 store scripts in ROM).</p>
 
 <p>A special macro <code>tcl_each(s, len, skip_error)</code> can be used to iterate over all
-the tokens in the string. If <code>skip_error</code> is false - the loop ends when the
-string ends, otherwise the loop breaks on syntax errors such as unexpected EOF.
-This allows to validate the input string without evaluating it and detect when
-a full command has been read.</p>
+the tokens in the string. If <code>skip_error</code> is true - then unexpected EOF is not
+considered to be an error. This allows to validate the input string without
+evaluating it and detect when a full command has been read.</p>
 
 <p>A good use case is reading commands from the serial port byte by byte. You can
 accumulate data in a buffer without executing it until the lexer reports the
@@ -202,7 +202,7 @@ but takes precious memory space.</p>
 
 <p>Partcl has a special <code>tcl_value_t</code> type and a number of functions to work with
 it.  By default it&rsquo;s just a char pointer, but one can rewrite ~100 lines to
-optimize it for his needs (e.g. use a pool of strings, or handle lists
+optimize it for their needs (e.g. use a pool of strings, or handle lists
 separately). In other words, we have an abstract type and the implementation
 may vary.</p>
 
@@ -236,7 +236,7 @@ linked lists.</p>
 <h2>Environments</h2>
 
 <p>Tcl interpreter uses a stack of environments where variables are stored.
-Environment is handled by 3 functions and it can be customized if need (e.g. to
+Environment is handled by 3 functions and it can be customized if needed (e.g.
 use hash maps to speed up variable lookup):</p>
 
 <pre><code>static struct tcl_env *tcl_env_alloc(struct tcl_env *parent);
@@ -260,18 +260,18 @@ as a command shell and not as a programming language.</p>
 <pre><code>static int tcl_cmd_puts(struct tcl *tcl, tcl_value_t *args, void *arg) {
 	tcl_value_t *text = tcl_list_at(args, 1);
 	puts(tcl_string(text));
-	return FNORMAL;
+	return FNORMAL; /* continue to the next command normally */
 }
 </code></pre>
 
 <p>It takes an interpreter object, a list of arguments and an optional pointer to
-some context. Some commands have fixed arity, then interpreter controls it. For
-zero arity the command must control it internally, which makes it possible to
-use variadic arguments.</p>
+some context. Some commands have fixed arity, then the interpreter controls it.
+For zero arity the command must control it internally, which makes it possible
+to use variadic arguments.</p>
 
 <h2>What&rsquo;s next?</h2>
 
-<p>It was a fun to write a real Tcl interpreter. It was even more fun to actually
+<p>It was fun to write a real Tcl interpreter. It was even more fun to actually
 use it on a real MCU. Good test coverage and no memory leaks (according to
 valgrind) make it a good candidate for low-end scripting.</p>
 
@@ -281,10 +281,10 @@ libc (for <code>&lt;strings.h&gt;</code> and malloc/free).</p>
 <p>I&rsquo;m not sure what to do next with it, but here are some ideas:</p>
 
 <ul>
-<li>Run some benchmarks to see how fast is the lexer and the interpterer.</li>
+<li>Run some benchmarks to see how fast the lexer and the interpterer are.</li>
 <li>Make an alternative implementation for <code>tcl_value_t</code> that uses real lists and
 caches numbers.</li>
-<li>Make a library of commands for lists, hash maps, strings, for loops etc.</li>
+<li>Make a library of commands for lists, hash maps, strings, <code>for</code> loops etc.</li>
 </ul>
 
 <p>If you find it interesting - feel free to contribute or report issues at
