@@ -1,5 +1,5 @@
 title: Where Anvil meets Kotlin
-description: Summing up the progress of anvil development
+description: A minimal extension to add Kotlin support to Anvil
 keywords: anvil, android, render, UI, mvc, mvvm, mvp, mithril, kotlin, scala
 date: 2015-04-16
 ---

@@ -1,5 +1,5 @@
 title: "cucu: a compiler you can understand (2/3)"
-description: Compilers is fun. Want to write your own one?
+description: Compilers is fun. Want to write your own one? Part 2 - parser.
 keywords: compiler, programming, C, smallC, easy, tiny, small, tutorial, parser, variables
 date: 2012-10-24
 ---

@@ -1,5 +1,5 @@
 title: moved to new static site generator (again)
-description: self done is well done
+description: there's always room for improvement
 date: 2014-12-20
 ---
 # {{ title }}
