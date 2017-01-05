@@ -17,11 +17,10 @@ reading good books.
 
 If you want to subscribe to my works, you can do it via:
 
-* RSS - http://zserge.com/rss.xml
 * GitHub - https://github.com/zserge
-* BitBucket - https://bitbucket.org/zserge
 * Twitter - https://twitter.com/zsergo
 * Google Plus - [SergeZaitsev](https://plus.google.com/u/0/+SergeZaitsev)
+* RSS - http://zserge.com/rss.xml
 
 The easiest way to contact me is probably via email: zaitsev.serge@gmail.com
 
