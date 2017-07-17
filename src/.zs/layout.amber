@@ -47,7 +47,7 @@ html[lang="en-US"]
 
 		if date
 			p Posted on {{ date }}
-			section.social
+			section.contacts.buttons
 				section
 					a
 						[style="background-color: #3b5997"]
@@ -83,7 +83,6 @@ html[lang="en-US"]
 						[style="background-color: #333333"]
 						[href="https://github.com/zserge"]
 						| &lt;/&gt;me
-			section {{ disqus }}
 
 		footer
 			p
