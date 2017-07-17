@@ -86,7 +86,7 @@ header
   a
     min-width: 72px
 
-.social
+.buttons
   display: flex
   justify-content: space-between
   flex-wrap: wrap
