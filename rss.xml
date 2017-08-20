@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Mon, 17 Jul 2017 11:31:40 +0300
+		<pubDate>Sun, 20 Aug 2017 12:08:49 +0300
 </pubDate>
-		<lastBuildDate>Mon, 17 Jul 2017 11:31:40 +0300
+		<lastBuildDate>Sun, 20 Aug 2017 12:08:49 +0300
 </lastBuildDate>
 
-		<item> <title>syntactic sugar in c - (ab)using "for" loops</title> <link>http://zserge.com/blog/c-for-loop-tricks.html</link> <description>C metaprogramming with loops and commas, pretending that it's a good idea</description> <pubDate>Mon, 17 Jul 2017 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/c-for-loop-tricks.html</guid> </item>
+		<item> <title>cross-platform web ui for c and go</title> <link>http://zserge.com/blog/webview.html</link> <description>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings</description> <pubDate>Sun, 20 Aug 2017 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/webview.html</guid> </item>
+<item> <title>syntactic sugar in c - (ab)using "for" loops</title> <link>http://zserge.com/blog/c-for-loop-tricks.html</link> <description>C metaprogramming with loops and commas, pretending that it's a good idea</description> <pubDate>Mon, 17 Jul 2017 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/c-for-loop-tricks.html</guid> </item>
 <item> <title>partcl - a tiny command language</title> <link>http://zserge.com/blog/tcl-interpreter.html</link> <description>Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests</description> <pubDate>Thu, 11 Aug 2016 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/tcl-interpreter.html</guid> </item>
 <item> <title>my experience with asm.js</title> <link>http://zserge.com/blog/my-experience-with-asmjs.html</link> <description>Rewriting parts of the app in C to improve performance</description> <pubDate>Mon, 18 Jul 2016 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/my-experience-with-asmjs.html</guid> </item>
 <item> <title>anvil 0.4.0 + support libraries</title> <link>http://zserge.com/blog/anvil-support-libraries.html</link> <description>For a long time Anvil worked only with normal SDK views, but now you may use support library views as well</description> <pubDate>Wed, 11 May 2016 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/anvil-support-libraries.html</guid> </item>
