@@ -16,7 +16,8 @@ body
   font-family: $font-normal
   font-size: 20px
   color: $black
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased
+  font-weight: 300
 
 h1, h2, h3
   line-height: 1.2
