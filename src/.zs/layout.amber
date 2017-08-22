@@ -40,7 +40,6 @@ html[lang="en-US"]
 					a[href="/blog.html"] posts
 				section
 					a[href="https://twitter.com/zsergo"] @me
-					a[href="https://plus.google.com/u/0/+SergeZaitsev"] +me
 					a[href="https://github.com/zserge"] </>me
 
 		{{ content }}
@@ -73,11 +72,6 @@ html[lang="en-US"]
 						[style="background-color: #41b7d8"]
 						[href="https://twitter.com/zsergo"]
 						| @me
-					| &nbsp;
-					a
-						[style="background-color: #d64937"]
-						[href="https://plus.google.com/u/0/+SergeZaitsev"]
-						| +me
 					| &nbsp;
 					a
 						[style="background-color: #333333"]

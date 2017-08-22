@@ -34,7 +34,6 @@
 				</section>
 				<section>
 					<a href="https://twitter.com/zsergo">@me</a>
-					<a href="https://plus.google.com/u/0/+SergeZaitsev">+me</a>
 					<a href="https://github.com/zserge">&lt;/>me</a>
 				</section>
 			</nav>
@@ -163,7 +162,7 @@ var tmpl = template.Must(template.New(&quot;&quot;).Parse(`
 	&lt;/head&gt;
 	&lt;body&gt;
 	  &lt;form action=&quot;/exit&quot;&gt;
-			&lt;h1&gt;Hello, !&lt;/h1&gt;
+			&lt;h1&gt;Hello, {{ .Name }}!&lt;/h1&gt;
 			&lt;input type=&quot;submit&quot; value=&quot;Exit&quot; /&gt;
 		&lt;/form&gt;
 	&lt;/body&gt;
@@ -215,8 +214,6 @@ or found a bug, or have a suggestion to make - feel free to contribute!</p>
 				&nbsp;
 				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
 				&nbsp;
-				<a href="https://plus.google.com/u/0/+SergeZaitsev" style="background-color: #d64937">+me</a>
-				&nbsp;
 				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
 			</section>
 		</section>
@@ -230,16 +227,16 @@ or found a bug, or have a suggestion to make - feel free to contribute!</p>
 		</footer>
 		<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
 <script>
-	WebFontConfig = {
-    google: {
-      families: ['Merriweather:300', 'Lato', 'Roboto Mono']
-    }
-	};
-	(function(d) {
-		var wf = d.createElement('script'), s = d.scripts[0];
-		wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
-		s.parentNode.insertBefore(wf, s);
-	})(document);
+    WebFontConfig = {
+	google: {
+	    families: ['PT Serif', 'Roboto', 'Roboto Mono']
+	}
+    };
+    (function(d) {
+	var wf = d.createElement('script'), s = d.scripts[0];
+	wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
+	s.parentNode.insertBefore(wf, s);
+    })(document);
 </script>
 
 		<script>

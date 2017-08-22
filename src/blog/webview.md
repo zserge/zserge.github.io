@@ -1,6 +1,8 @@
 title: Cross-platform web UI for C and Go
 description: Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings
 keywords: webkit, mshtml, gtk, cocoa, winapi, gui, golang
+# This is used in the text, I can't inline it because it conflicts with common template delimiters
+markdownhack: "{{ .Name }}"
 date: 2017-08-20
 ---
 
@@ -130,7 +132,7 @@ var tmpl = template.Must(template.New("").Parse(`
 	</head>
 	<body>
 	  <form action="/exit">
-			<h1>Hello, {{ .Name }}!</h1>
+			<h1>Hello, {{ markdownhack }}!</h1>
 			<input type="submit" value="Exit" />
 		</form>
 	</body>

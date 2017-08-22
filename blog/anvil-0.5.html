@@ -2,18 +2,18 @@
 <html lang="en-US">
 	<head>
 		<meta charset="UTF-8" />
-		<title>zserge's blog</title>
-		<meta content="Home page of Serge Zaitsev" name="description" />
+		<title>Anvil ½: as simple as possible but not simpler</title>
+		<meta content="More features with less code and fewer methods" name="description" />
 		<meta content="Serge Zaitsev" name="author" />
 		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
 		<meta content="width=device-width" name="viewport" />
 		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
-		<link href="index.html" rel="canonical" />		<!-- OpenGraph data -->
-		<meta content="zserge&#39;s blog" property="og:title" />
+		<link href="blog/anvil-0.5.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Anvil ½: as simple as possible but not simpler" property="og:title" />
 		<meta content="article" property="og:type" />
-		<meta content="index.html" property="og:url" />
+		<meta content="blog/anvil-0.5.html" property="og:url" />
 		<meta content="http://zserge.com/logo.png" property="og:image" />
-		<meta content="Home page of Serge Zaitsev" property="og:description" />
+		<meta content="More features with less code and fewer methods" property="og:description" />
 		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
 		<meta content="summary" name="twitter:card" />
 		<meta content="@zsergo" name="twitter:site" />		<!-- Styles -->
@@ -38,30 +38,34 @@
 				</section>
 			</nav>
 		</header>
-		<p>Hello, I&rsquo;m <a href="/about.html">Serge</a> and here&rsquo;s some of my recent
-<a href="/blog.html">blog posts</a>:</p>
+		<h1>Anvil ½: as simple as possible but not simpler</h1>
 
-<h1><a href="blog/webview.html">Cross-platform web UI for C and Go</a></h1>
+<p>Problem: too many methods
+Problem: unsync (breaks with XML)
+Problem: abusive support views.
+Problem: custom components are hard to work with.
+Problem: hard to attach view data.</p>
 
-<p>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings (<a href="blog/webview.html">4 min to read</a>)</p>
+<p>New method: Anvil.render(view)
+New optional argument: Anvil.unmount(view, removeViews)
+New renderable function: skip()
+New renderable function: Anvil.attr(name, value)</p>
 
-<h1><a href="blog/c-for-loop-tricks.html">Syntactic sugar in C - (ab)using &ldquo;for&rdquo; loops</a></h1>
-
-<p>C metaprogramming with loops and commas, pretending that it&rsquo;s a good idea (<a href="blog/c-for-loop-tricks.html">8 min to read</a>)</p>
-
-<h1><a href="blog/tcl-interpreter.html">Partcl - a tiny command language</a></h1>
-
-<p>Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests (<a href="blog/tcl-interpreter.html">8 min to read</a>)</p>
-
-<h1><a href="blog/my-experience-with-asmjs.html">My experience with asm.js</a></h1>
-
-<p>Rewriting parts of the app in C to improve performance (<a href="blog/my-experience-with-asmjs.html">6 min to read</a>)</p>
-
-<h1><a href="blog/anvil-support-libraries.html">Anvil 0.4.0 + support libraries</a></h1>
-
-<p>For a long time Anvil worked only with normal SDK views, but now you may use support library views as well (<a href="blog/anvil-support-libraries.html">4 min to read</a>)</p>
-
-<p><a href="/blog.html">All posts</a></p>
+<p>Removed virtual nodes, views are as fast.
+Removed attribute lambdas, switch/case is faster and takes less methods.
+Added pluggable attribute setters:
+    public interface AttributeSetter<T> {
+        boolean set(View v, String name, T value, T prevValue);
+    }
+Added default reflection-based property setter.
+Added pluggable view factories:
+    public interface ViewFactory {
+        View fromClass(Context c, Class&lt;? extends View&gt; v);
+        View fromXml(ViewGroup parent, int xmlId);
+    }
+Added get/set functions to attach meta data to views
+Removed x() function, only o() is left.
+XML replaces, not appends.</p>
 
 		<footer>
 			<p>

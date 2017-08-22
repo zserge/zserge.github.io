@@ -2,8 +2,8 @@ $font-normal-system: Georgia, Times, "Times New Roman", serif
 $font-header-system: Helvetica, Arial, sans-serif
 $font-mono-system: Inconsolata, Consolas, "Liberation Mono", monospace
 
-$font-normal: "Merriweather", serif
-$font-header: "Lato", sans-serif
+$font-normal: "PT Serif", serif
+$font-header: "Roboto", sans-serif
 $font-mono: "Roboto Mono", monospace
 
 $black: rgba(0, 0, 0, 0.87)
@@ -13,21 +13,23 @@ body
   padding: 0 10px
   max-width: 740px 
   line-height: 1.6
-  font-family: $font-normal-system
+  font-family: $font-normal
   font-size: 20px
   color: $black
 
 h1, h2, h3
   line-height: 1.2
-  font-family: $font-header-system
+  font-family: $font-header
   font-weight: 400
   text-transform: uppercase
   a
     color: $black
+h1
+  font-size: 1.95em
 
 h2, h3
   text-align: right
-  font-size: 24px
+  font-size: 1.25em
   border-bottom: 2px solid $black
 
 p
@@ -50,7 +52,7 @@ img
   max-width: 100%
 
 code
-  font-family: $font-normal-system
+  font-family: $font-normal
   font-style: italic
 
 pre
@@ -62,7 +64,7 @@ pre
   border-radius: 2px
   padding: 1em
   code
-    font-family: $font-mono-system
+    font-family: $font-mono
     font-style: normal
 
 header
