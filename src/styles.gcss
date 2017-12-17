@@ -12,7 +12,7 @@ body
   margin: 40px auto
   padding: 0 10px
   max-width: 740px 
-  line-height: 1.6
+  line-height: 1.5
   font-family: $font-normal
   font-size: 20px
   color: $black
@@ -24,13 +24,14 @@ h1, h2, h3
   font-family: $font-header
   font-weight: 400
   text-transform: uppercase
+  margin-top: 1.34em
+  margin-bottom: 0.67em
   a
     color: $black
 h1
   font-size: 1.95em
 
 h2, h3
-  text-align: right
   font-size: 1.25em
   border-bottom: 2px solid $black
 
@@ -54,25 +55,26 @@ img
   max-width: 100%
 
 code
-  font-family: $font-normal
-  font-style: italic
+  font-family: $font-mono
+  font-size: 18px
+  color: rgba(0, 0, 0, 0.6)
 
 pre
   overflow-y: auto
-  font-size: 14px
   line-height: 20px
   background: #eee
-  color: rgba(0, 0, 0, 87)
   border-radius: 2px
   padding: 1em
   code
     font-family: $font-mono
-    font-style: normal
+    font-size: 14px
+    color: rgba(0, 0, 0, 87)
 
 header
   display: flex
   justify-content: space-between
   align-items: center
+  margin-bottom: 3em
   nav, section, a, .logo, .empty
     display: flex
     justify-content: center
@@ -107,10 +109,10 @@ header
 footer
   font-size: 12px
 
-.wf-active body, .wf-active code
+.wf-active body
   font-family: $font-normal
 .wf-active h1, h2, 3
   font-family: $font-header
-.wf-active pre code
+.wf-active pre code, .wf-active code
   font-family: $font-mono
 
