@@ -5,9 +5,9 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Sun, 17 Dec 2017 15:58:46 +0200
+		<pubDate>Sun, 17 Dec 2017 19:07:20 +0200
 </pubDate>
-		<lastBuildDate>Sun, 17 Dec 2017 15:58:46 +0200
+		<lastBuildDate>Sun, 17 Dec 2017 19:07:20 +0200
 </lastBuildDate>
 
 		<item> <title>cross-platform web ui for c and go</title> <link>http://zserge.com/blog/webview.html</link> <description>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings</description> <pubDate>Sun, 20 Aug 2017 00:00:00 +0300</pubDate> <guid>http://zserge.com/blog/webview.html</guid> </item>

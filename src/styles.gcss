@@ -25,7 +25,7 @@ h1, h2, h3
   font-weight: 400
   text-transform: uppercase
   margin-top: 1.34em
-  margin-bottom: 0.67em
+  margin-bottom: 0
   a
     color: $black
 h1
@@ -37,6 +37,8 @@ h2, h3
 
 p
   text-align: justify
+  margin-top: 0.67em
+  margin-bottom: 1em
 
 a
   color: #0076df
