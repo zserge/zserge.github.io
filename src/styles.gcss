@@ -91,6 +91,8 @@ header
     color: #fff
     min-width: 48px
     min-height: 48px
+    font-size: 28px
+    border-radius: 2px
   a
     min-width: 72px
 
