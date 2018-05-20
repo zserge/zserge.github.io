@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Tue, 27 Feb 2018 11:16:31 +0100
+		<pubDate>Sun, 20 May 2018 17:33:15 +0200
 </pubDate>
-		<lastBuildDate>Tue, 27 Feb 2018 11:16:31 +0100
+		<lastBuildDate>Sun, 20 May 2018 17:33:15 +0200
 </lastBuildDate>
 
-		<item> <title>cross-platform web ui for c and go</title> <link>http://zserge.com/blog/webview.html</link> <description>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings</description> <pubDate>Sun, 20 Aug 2017 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/webview.html</guid> </item>
+		<item> <title>how to configure zsh</title> <link>http://zserge.com/blog/terminal.html</link> <description>A brief tutorial on how to make your terminal environment look modern but is still remain very minimal and performant.</description> <pubDate>Mon, 07 May 2018 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/terminal.html</guid> </item>
+<item> <title>cross-platform web ui for c and go</title> <link>http://zserge.com/blog/webview.html</link> <description>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings</description> <pubDate>Sun, 20 Aug 2017 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/webview.html</guid> </item>
 <item> <title>syntactic sugar in c - (ab)using "for" loops</title> <link>http://zserge.com/blog/c-for-loop-tricks.html</link> <description>C metaprogramming with loops and commas, pretending that it's a good idea</description> <pubDate>Mon, 17 Jul 2017 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/c-for-loop-tricks.html</guid> </item>
 <item> <title>partcl - a tiny command language</title> <link>http://zserge.com/blog/tcl-interpreter.html</link> <description>Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests</description> <pubDate>Thu, 11 Aug 2016 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/tcl-interpreter.html</guid> </item>
 <item> <title>my experience with asm.js</title> <link>http://zserge.com/blog/my-experience-with-asmjs.html</link> <description>Rewriting parts of the app in C to improve performance</description> <pubDate>Mon, 18 Jul 2016 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/my-experience-with-asmjs.html</guid> </item>
