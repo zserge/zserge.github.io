@@ -149,7 +149,7 @@ func (h *Histogram) Add(n float64) {
 	// Insert new bin with a single value into the sorted array of bins
 	for i := range h.bins {
 		if h.bins[i].value &gt; n {
-			h.bins = append(h.bins[:i], append([]bins{newbin}, h.bins[i:]...)...)
+			h.bins = append(h.bins[:i], append([]bin{newbin}, h.bins[i:]...)...)
 			return
 		}
 	}
@@ -158,28 +158,23 @@ func (h *Histogram) Add(n float64) {
 func (h *Histogram) trim() {
 	for len(h.bins) &gt; maxBins {
 		// Find two adjacent bins with the closest values
-		minDelta := 1e99
-		minDeltaIndex := 0
-		for i := 1; i &lt; len(h.bins); i++ {
-			if delta := h.bins[i].value - h.bins[i-1].value; delta &lt; minDelta {
-				minDelta = delta
-				minDeltaIndex = i
+		d := float64(0)
+		i := 0
+		for j := 1; j &lt; len(h.bins); j++ {
+			if delta := h.bins[j].value - h.bins[j-1].value; delta &lt; d || j == 1 {
+				d = delta
+				i = j
 			}
 		}
 		// Merge bins
-		totalCount := h.bins[minDeltaIndex-1].count + h.bins[minDeltaIndex].count
-		mergedbin := bin{
-			value: (h.bins[minDeltaIndex-1].value*
-				h.bins[minDeltaIndex-1].count +
-				h.bins[minDeltaIndex].value*
-					h.bins[minDeltaIndex].count) /
-				totalCount, // weighted average
-			count: totalCount, // summed heights
+		count := h.bins[i-1].count + h.bins[i].count
+		merged := bin{
+			value: (h.bins[i-1].value*h.bins[i-1].count + h.bins[i].value*h.bins[i].count) / count,
+			count: count,
 		}
 		// Remove the second bin
-		head := append(make([]bin, 0), h.bins[0:minDeltaIndex-1]...)
-		tail := append([]bin{mergedbin}, h.bins[minDeltaIndex+1:]...)
-		h.bins = append(head, tail...)
+		h.bins = append(h.bins[:i-1], h.bins[i:]...)
+		h.bins[i-1] = merged
 	}
 }
 </code></pre>
