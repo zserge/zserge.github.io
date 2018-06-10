@@ -5,12 +5,13 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Sun, 20 May 2018 21:03:10 +0200
+		<pubDate>Sun, 10 Jun 2018 13:23:12 +0200
 </pubDate>
-		<lastBuildDate>Sun, 20 May 2018 21:03:10 +0200
+		<lastBuildDate>Sun, 10 Jun 2018 13:23:12 +0200
 </lastBuildDate>
 
-		<item> <title>how to configure zsh</title> <link>http://zserge.com/blog/terminal.html</link> <description>A brief tutorial on how to make your terminal environment look modern but is still remain very minimal and performant.</description> <pubDate>Mon, 07 May 2018 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/terminal.html</guid> </item>
+		<item> <title>implementing metrics in go</title> <link>http://zserge.com/blog/metrics.html</link> <description>The easiest way to add metrics to your web service in Go</description> <pubDate>Sun, 10 Jun 2018 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/metrics.html</guid> </item>
+<item> <title>how to configure zsh</title> <link>http://zserge.com/blog/terminal.html</link> <description>A brief tutorial on how to make your terminal environment look modern but is still remain very minimal and performant.</description> <pubDate>Mon, 07 May 2018 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/terminal.html</guid> </item>
 <item> <title>cross-platform web ui for c and go</title> <link>http://zserge.com/blog/webview.html</link> <description>Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings</description> <pubDate>Sun, 20 Aug 2017 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/webview.html</guid> </item>
 <item> <title>syntactic sugar in c - (ab)using "for" loops</title> <link>http://zserge.com/blog/c-for-loop-tricks.html</link> <description>C metaprogramming with loops and commas, pretending that it's a good idea</description> <pubDate>Mon, 17 Jul 2017 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/c-for-loop-tricks.html</guid> </item>
 <item> <title>partcl - a tiny command language</title> <link>http://zserge.com/blog/tcl-interpreter.html</link> <description>Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests</description> <pubDate>Thu, 11 Aug 2016 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/tcl-interpreter.html</guid> </item>

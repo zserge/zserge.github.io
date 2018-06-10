@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Implementing metrics in Go</title>
+		<meta content="The easiest way to add metrics to your web service in Go" name="description" />
+		<meta content="Serge Zaitsev" name="author" />
+		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width" name="viewport" />
+		<link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+		<link href="favicon.png" rel="shortcut icon" type="image/png" />
+		<link href="http://zserge.com/rss.xml" rel="alternate" title="RSS" type="application/rss+xml" />
+		<link href="blog/metrics.html" rel="canonical" />		<!-- OpenGraph data -->
+		<meta content="Implementing metrics in Go" property="og:title" />
+		<meta content="article" property="og:type" />
+		<meta content="blog/metrics.html" property="og:url" />
+		<meta content="http://zserge.com/logo.png" property="og:image" />
+		<meta content="The easiest way to add metrics to your web service in Go" property="og:description" />
+		<meta content="en_US" property="og:locale" />		<!-- Twitter card data -->
+		<meta content="summary" name="twitter:card" />
+		<meta content="@zsergo" name="twitter:site" />		<!-- Styles -->
+		<link href="/styles.css" rel="stylesheet" type="text/css" />		<!-- Favicons -->
+		<link href="/favicon.ico" rel="shortcut icon" />
+		<link href="/favicon.128.png" rel="apple-touch-icon-precomposed" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a class="logo" href="/">Z</a>
+			</nav>
+			<div class="empty"></div>
+			<nav>
+				<section>
+					<a href="/about.html">about</a>
+					<a href="/blog.html">posts</a>
+				</section>
+				<section>
+					<a href="https://twitter.com/zsergo">@me</a>
+					<a href="https://github.com/zserge">&lt;/>me</a>
+				</section>
+			</nav>
+		</header>
+		<h1>Implementing metrics in Go</h1>
+
+<p>Metrics are data points representing your system behaviour over time. People
+instrument their long-running apps with metrics to see if there are or were any
+problems and if the system behaves as expected.</p>
+
+<p>There are various metric types, but most common ones are counters, gauges and
+histograms.</p>
+
+<h2>Metric types</h2>
+
+<p>Counter is simply an increasing number. You may use counters to track the
+number of served requests, number of errors, and so on. If you are only
+interested to see how many times a certain event has happened during the given
+time frame - use a counter.</p>
+
+<p>Counters are probably the simplest metrics and the only information they
+provide is a single number - counter value.</p>
+
+<p>Gauge is also a number, but it may go up and down. You may use gauges to
+track the memory usage, CPU load, temperature and other measured values.</p>
+
+<p>Unlike counters, gauges often track not only their current value, but also
+their mean, minimum and maximum values for each time interval.</p>
+
+<p>However, mean is not always the right characteristic to look at. In practice
+there are many cases when percentiles are more meaningful that a mean. To track
+percentiles histogram metrics are used.</p>
+
+<p>For those who are unaware of percentiles - it is a number such that a certain
+percentage of values fall below that number. Here&rsquo;s a <a href="https://www.dynatrace.com/news/blog/why-averages-suck-and-percentiles-are-great/">good
+explanation</a> when percentiles could be more useful than averages.</p>
+
+<p>The most typical use case is tracking response times. For example, 95th
+percentile of the response times shows the maximum response time of the 95% of
+the requests.</p>
+
+<h2>Implementation</h2>
+
+<p>I like explaining things by showing how they work. All the code below is
+simplified and the real implementation is slightly different (here we don&rsquo;t
+focus on thread safety, division by zero errors etc).</p>
+
+<p>Let&rsquo;s consider a generic meter. What can it do? It can accept an incoming
+numerical value, one at a time, or it can be reset back to its zero state.</p>
+
+<pre><code>type Metric interface {
+	Add(n float64)
+	Reset()
+}
+</code></pre>
+
+<p>There are two approaches to do metircs. One is to record every single event and
+run queries each time to calculate the metrics. It&rsquo;s the most precise and
+flexible approach, although it&rsquo;s time-consuming and needs more storage. Another
+is to calculate metric values on the fly. It often uses less memory and is good
+enough for most use cases, so we will go this way.</p>
+
+<p>Let&rsquo;s start with the counter, since it is probably the easiest metric to
+implement:</p>
+
+<pre><code>type Counter float64
+func (c *Counter) Add(n float64) { *c = *c + Counter(n) }
+func (c *Counter) Reset() { *c = 0 }
+</code></pre>
+
+<p>Gauge needs to track mean, min and max values. To calculate rolling mean we
+need to count the number of events and their sum value:</p>
+
+<pre><code>type Gauge struct {
+	count int
+	sum   float64
+	min   float64
+	max   float64
+}
+func (g *Gauge) Reset() { g.count, g.sum, g.min, g.max = 0, 0, 0, 0 }
+func (g *Gauge) mean() float64 { return g.sum / g.count }
+func (g *Gauge) Add(n float64) {
+	if n &lt; g.min { g.min = n }
+	if n &gt; g.max { g.max = n }
+	g.count++
+	g.sum = g.sum + n
+}
+</code></pre>
+
+<p>Finally, histograms. There seems to be no easy way to build precise histograms
+without remembering all the data entries. However there are some algorithms to
+construct approximate histograms on the fly.</p>
+
+<p>One such algorithm has a fixed number of bins, puts a new incoming value into
+an individual bin and when there are too many bins - it merges two most similar
+ones.</p>
+
+<pre><code>type bin struct {
+	value float64
+	count float64
+}
+type Histogram struct {
+	bins  []bin
+	total uint64
+}
+func (h *Histogram) Reset() { h.bins, h.total = 0, nil }
+func (h *Histogram) Add(n float64) {
+	defer h.trim()
+	h.total++
+	newbin := bin{value: n, count: 1}
+	// Insert new bin with a single value into the sorted array of bins
+	for i := range h.bins {
+		if h.bins[i].value &gt; n {
+			h.bins = append(h.bins[:i], append([]bins{newbin}, h.bins[i:]...)...)
+			return
+		}
+	}
+	h.bins = append(h.bins, newbin)
+}
+func (h *Histogram) trim() {
+	for len(h.bins) &gt; maxBins {
+		// Find two adjacent bins with the closest values
+		minDelta := 1e99
+		minDeltaIndex := 0
+		for i := 1; i &lt; len(h.bins); i++ {
+			if delta := h.bins[i].value - h.bins[i-1].value; delta &lt; minDelta {
+				minDelta = delta
+				minDeltaIndex = i
+			}
+		}
+		// Merge bins
+		totalCount := h.bins[minDeltaIndex-1].count + h.bins[minDeltaIndex].count
+		mergedbin := bin{
+			value: (h.bins[minDeltaIndex-1].value*
+				h.bins[minDeltaIndex-1].count +
+				h.bins[minDeltaIndex].value*
+					h.bins[minDeltaIndex].count) /
+				totalCount, // weighted average
+			count: totalCount, // summed heights
+		}
+		// Remove the second bin
+		head := append(make([]bin, 0), h.bins[0:minDeltaIndex-1]...)
+		tail := append([]bin{mergedbin}, h.bins[minDeltaIndex+1:]...)
+		h.bins = append(head, tail...)
+	}
+}
+</code></pre>
+
+<p>This approach may not be the most precise, but it shows the overall picture of
+how your data is distributed.</p>
+
+<h2>Timelines and multiple metrics</h2>
+
+<p>Once we&rsquo;ve implemented individual metrics - we can easliy build a timeline.
+Timeline is a slice of buckets, where each bucket contains metric values for
+one time slot. Timeline is rotated as time goes.</p>
+
+<p>Also, it is often helpful to store timelines with multiple precisions. E.g. to
+store one month of data with hourly precision and 6 hours of data with 30
+seconds precision.</p>
+
+<p>Since all metrics share a common interface - a combination of metrics can also
+implement the same interface.</p>
+
+<p>I won&rsquo;t provide actual implementations here, since they are really trivial.
+To construct a metric there will be thee constructor functions: <code>NewCounter</code>,
+<code>NewGauge</code> or <code>NewHistogram</code>. If no parameters are given - you will get a
+single meter. You may also provide a number of precision strings to get
+historical timelines of the given metric type. Precision strings look like
+&ldquo;30m1s&rdquo; which means &ldquo;I want a timeline for 30 minutes of historical data with 1
+second precision&rdquo;:</p>
+
+<pre><code>// A meter that keeps gauges for 30 days, 48 hours and 15 minutes of time with
+// different precision:
+m := metric.NewGauge(&quot;30d1h&quot;, &quot;48h5m&quot;, &quot;15m1s&quot;)
+...
+m.Add(someValue)
+</code></pre>
+
+<h2>expvar and web interface</h2>
+
+<p>Now we can construct metrics and push data. Two questions remain: how to access
+metrics throughout your app code and how to actually read metric data.</p>
+
+<p>Go provides an infamous <code>expvar</code> package to keep &ldquo;exposed&rdquo; public variables.
+This variables can be read using a builtin HTTP endpoint <code>/debug/metrics</code> as a
+JSON. I think it is a good idea not to reinvent the wheel and just integrate
+out metrics with <code>expvar</code>. It is done by simply implementing a <code>String()</code>
+method that prints metric data as a JSON string.</p>
+
+<p>In addition to that, <code>expvar</code> also provides a simple API to register metric and
+to get it, although some type casting is needed:</p>
+
+<pre><code>// Register metrics
+expvar.Publish(&quot;num_errors&quot;, metric.NewCounter(&quot;15m10s&quot;))
+expvar.Publish(&quot;latency&quot;, metric.NewHistogram(&quot;5m1s&quot;, &quot;15m30s&quot;, &quot;1h1m&quot;))
+
+// Measure time and update the metric
+start := time.Now()
+...
+expvar.Get(&quot;latency&quot;).(metric.Metric).Add(time.Since(start).Seconds())
+
+// Update counter
+expvar.Get(&quot;num_errors&quot;).(metric.Metric).Add(1)
+</code></pre>
+
+<p>I like using standard libraries as much as possible, but I also believe that
+visual representation of data is better than reading plain JSON. So this
+metrics package includes an opinionated web UI:</p>
+
+<pre><code>http.Handle(&quot;/debug/metrics&quot;, metric.Handler(metric.Exposed))
+</code></pre>
+
+<p>Here&rsquo;s how it looks like:</p>
+
+<p><img src="/images/metrics-web-ui.png" alt="Web interface" /></p>
+
+<p>On some graphs there are three lines. Of gauges the black line is the mean,
+while gray lines are min and max. For histograms the black line is 99th
+percentile, while gray lines are 90th and 50th percentiles.</p>
+
+<p>The web UI uses no javascript and is very fast even if the number of metrics is
+high.</p>
+
+<h2>Summary</h2>
+
+<p>You may find all the source code at <a href="https://github.com/zserge/metric">https://github.com/zserge/metric</a>. It&rsquo;s very
+small, a single file of ~300 lines of code and a few more lines for the user
+interface. The library has no external dependencies and it&rsquo;s really
+featherweight.</p>
+
+<p>If you are building something big and it should scale well - consider using
+real tools such as Prometheus, InfluxDB or StatsD. But for smaller projects if
+you want to avoid wasting time to configure all those tools - feel free to use
+this package, the setup is no harder than just importing a package and you can
+start tracking you metrics almost immediately.</p>
+
+<p>Of course, if you found an issue or have a suggestion - don&rsquo;t hesitate to drop
+me a line or open an issue!</p>
+
+		<p>Posted on 2018-06-10</p>
+		<section class="contacts buttons">
+			<section>
+				<a href="http://www.facebook.com/share.php?u=http://zserge.com/blog/metrics.html&amp;title=Implementing%20metrics%20in%20Go" style="background-color: #3b5997">like</a>
+				&nbsp;
+				<a href="http://twitter.com/intent/tweet?status=Implementing%20metrics%20in%20Go&#43;http://zserge.com/blog/metrics.html%20via%20@zsergo" style="background-color: #41b7d8">tweet</a>
+				&nbsp;
+				<a href="https://plus.google.com/share?url=http://zserge.com/blog/metrics.html" style="background-color: #d64937">+1</a>
+			</section>
+			<section>
+				<a href="/rss.xml" style="background-color: #f26522">rss</a>
+				&nbsp;
+				<a href="https://twitter.com/zsergo" style="background-color: #41b7d8">@me</a>
+				&nbsp;
+				<a href="https://github.com/zserge" style="background-color: #333333">&lt;/&gt;me</a>
+			</section>
+		</section>
+		<footer>
+			<p>
+				&copy;2012&ndash;2018 &middot;
+				<a href="http://zserge.com">Serge Zaitsev</a>
+				&middot; 
+				<a href="mailto:zaitsev.serge@gmail.com">zaitsev.serge@gmail.com</a>
+			</p>
+		</footer>
+		<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+<script>
+    WebFontConfig = {
+	google: {
+	    families: ['PT Serif', 'Roboto', 'Roboto Mono']
+	}
+    };
+    (function(d) {
+	var wf = d.createElement('script'), s = d.scripts[0];
+	wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';
+	s.parentNode.insertBefore(wf, s);
+    })(document);
+</script>
+
+		<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33644825-1', 'zserge.com');
+	ga('send', 'pageview');
+</script>
+
+
+	</body>
+</html>
