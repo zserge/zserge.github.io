@@ -5,9 +5,9 @@
 		<link>http://zserge.com/blog.html</link>
 		<description>My thoughts on software, simplicity and how to make it work together</description>
 		<language>en-us</language>
-		<pubDate>Sun, 10 Jun 2018 14:10:34 +0200
+		<pubDate>Fri, 29 Jun 2018 09:49:14 +0200
 </pubDate>
-		<lastBuildDate>Sun, 10 Jun 2018 14:10:34 +0200
+		<lastBuildDate>Fri, 29 Jun 2018 09:49:14 +0200
 </lastBuildDate>
 
 		<item> <title>implementing metrics in go</title> <link>http://zserge.com/blog/metrics.html</link> <description>The easiest way to add metrics to your web service in Go</description> <pubDate>Sun, 10 Jun 2018 00:00:00 +0200</pubDate> <guid>http://zserge.com/blog/metrics.html</guid> </item>
