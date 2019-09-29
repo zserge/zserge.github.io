@@ -1,0 +1,151 @@
+<!doctype html><html><head><meta charset=utf-8><title>How to architect Anvil apps</title><meta name=description content="Anvil simplifies your UI code, but what about your controllers and models?"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/anvil-app-architecture/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>How to architect Anvil apps</h1><p>If you only have a few UI elements, a small data class and your controllers
+have only a few actions to perform - you may consider using no architecture at
+all.</p><p>Just make a global &ldquo;controller&rdquo; object and/or a global data object. By &ldquo;global&rdquo;
+I mean you may use dependency injection, or propagate the instance from the
+root activity to its child views, or make it a singleton.</p><p>Simply bind data to your views and call controller methods from your event
+listeners. Here&rsquo;s an example of a counter app where Counter object is
+propagated from the Activity to its child views:</p><pre><code class=language-java>public class Counter {
+  // If your model is more than one variable - you might want to move it to a
+  // separate class
+  private int count = 0;
+  public void incr() { this.count++; }
+  public int getCount() { return count; }
+}
+
+public class MainActivity extends Activity {
+  final Counter counter = new Conuter();
+  public void onCreate(Bundle b) {
+    super.onCreate(b);
+    setContentView(new CounterView(this));
+  }
+}
+
+public CounterView extends RenderableView {
+  private final Counter counter;
+  public CounterView(Context c) {
+    super(c);
+    this.counter = ((MainActivity) c).counter;
+  }
+  public void view() {
+    linearLayout(() -&gt; {
+      textView(() -&gt; {
+        text(&quot;Count: &quot; + this.counter.getCount());
+      });
+      button(() -&gt; {
+        onClick(v -&gt; this.counter.incr());
+      });
+    });
+  }
+}
+</code></pre><p>Of course this approach doesn&rsquo;t scale well. If your app grows or your
+requirements are too flexible - consider using Redux.</p><h2 id=redux>Redux</h2><p>Anvil guarantees that your views always reflect your most recent data. Redux
+guarantees that your data is always in the predictable state.</p><p>Together they allow you to write consistent apps that behave and look exactly
+as planned, they are easy to develop, to test and to debug.</p><p><a href=http://redux.js.org>Redux</a> itself is a pattern and there is a number of
+Redux implementations for Android. I will focus on
+<a href=https://github.com/trikita/jedux>Jedux</a> here, but
+<a href=https://github.com/glung/redux-java>redux-java</a> and
+<a href=https://github.com/brianegan/bansa>bansa</a> are also worth checking.</p><p>Redux defines three main parts: state (your data model), actions (small
+messages that are emitted to trigger some state changes) and a reducer (a pure
+function that takes an incoming action and returns an updated state).</p><p>To tie it all together you will need a global <code>Store</code> object. That&rsquo;s the only
+class you have to learn in Redux and it has two major methods:</p><ul><li>Store.dispatch(action): State - post an action message and get an updated state</li><li>Store.getState(): State - get current state</li></ul><p>It is highly recommended to keep your State class immutable, e.g. when you
+modify it - you get a new object. This will save you from synchronization
+problems and will simplify your code a lot. If you don&rsquo;t like writing immutable
+builders manually - I recommend to use
+<a href=http://immutables.github.io>Immutables</a> library.</p><h2 id=redux-counter>Redux counter</h2><p>Let&rsquo;s start with a State. For a counter app it will just hold a number. I&rsquo;m
+using Immutables here, but you may write it manually (especially if you use
+Kotlin with its great data classes):</p><pre><code class=language-java>@Value.Immutable
+public inteface State {
+  int count();
+}
+</code></pre><p>Now, define your action types:</p><pre><code class=language-java>enum Action { INCR, DECR }
+</code></pre><p>Create a store:</p><pre><code class=language-java>// Create an initial state object
+State initialState = new ImmutableState.builder.count(0).build();
+// Create reducer (can be a lambda)
+Store.Renderer&lt;Action, State&gt; reducer = (action, state) -&gt; {
+  switch (action) {
+    case INCR:
+      return ImmutableState.copyOf(state).withCount(state.count() + 1);
+    case DECR:
+      return ImmutableState.copyOf(state).withCount(state.count() - 1);
+  }
+  // If we can't handle an action - we should return current state
+  return state;
+};
+// Create a store with the given reducer and initial state
+Store&lt;Action, State&gt; store = new Store(reducer, initialState);
+</code></pre><p>Finally bind your views to the state and emit actions inside the listeners:</p><pre><code class=language-java>textView(() -&gt; {
+  text(&quot;Count: &quot; + store.getState().count());
+});
+button(() -&gt; {
+  onClick(v -&gt; store.dispatch(INCR));
+});
+</code></pre><h2 id=redux-middleware>Redux Middleware</h2><p>Your reducer is a pure function that must have no side effects. It&rsquo;s probably
+the most boring part of the Redux app.</p><p>Now, what if you have to do some <em>real</em> job in your app? Like starting some
+threads, running network operations or dealing with other android APIs?</p><p>That&rsquo;s what middlewares are for. Middleware is a simple way to hook into an
+action stream, intercept actions, run side-effect tasks and either propagate
+the action further, or skip it, or emit another action instead.</p><p>Each middleware knows about the incoming message, the current state, the next
+middleware in the chain, and it has a reference to the global store object so
+it can emit other actions if needed.</p><p>Example: you need to download a file when the button is clicked.</p><p>On button click you emit <code>START_DOWNLOAD</code> action. <code>Downloader</code> middleware
+receives that action, starts a downloading thread (or service). A thread may
+emit <code>UPDATE_PROGRESS</code> actions periodically and <code>DOWNLOAD_FINISHED</code> once it&rsquo;s
+done. All actions are passed into the store, where a reducer could update the
+state (e.g. toggle the &ldquo;isDownloading&rdquo; flag or &ldquo;progress&rdquo; value).</p><p>Reducer function does the following:</p><pre><code class=language-java>switch (action) {
+  case START_DOWNLOAD:
+    return ImmutableState.copyOf(state)
+      .isDownloading(true).progress(0).build();
+  case UPDATE_PROGRESS:
+    return ImmutableState.copyOf(state)
+      .progress(actionValue).build();
+  case FINISH_DOWNLOAD:
+    return ImmutableState.copyOf(state)
+      .isDownloading(false).build();
+}
+</code></pre><p>State is bound to certain views, for example:</p><pre><code class=language-java>button(() -&gt; {
+  // Let user click the button only if no download happens at the moment
+  enabled(store.getState().isDownloading() == false);
+  onClick(v -&gt; store.dispatch(new Action&lt;&gt;(START_DOWNLOAD, someUrl)));
+});
+progressBar(() -&gt; {
+  max(100);
+  // Show progress only if something is downloading
+  visibility(store.getState().isDownloading());
+  progress(store.getState().progress());
+});
+</code></pre><p>You middleware can be any custom class implementing the following interface:</p><pre><code class=language-java>public interface Middleware&lt;A, S&gt; {
+		void dispatch(Store&lt;A, S&gt; store, A action, NextDispatcher&lt;A&gt; next);
+}
+</code></pre><p>See the
+<a href=https://github.com/trikita/jedux/blob/master/library/src/main/java/trikita/jedux/Logger.java>Logger</a>
+middleware for an example of how middleware can be written.</p><p>Middlewares are passed as variadic arguments into the store constructor:</p><pre><code class=language-java>new Store(reducer, initialState,
+	new Logger(&quot;myApp&quot;),
+	new Downloader(context, cacheDir));
+</code></pre><p>Middlewares are usually small and focused. Each middleware reacts on a certain
+group of action types, so you can use different Enums and use instanceof to see
+if an action belongs to your middleware.</p><h2 id=build-your-own-architecture>Build your own architecture</h2><p>Jedux doesn&rsquo;t force you to implement certain interface or to use certain data
+types.</p><p>Your state can be of any type and it can have any nested sub-states (e.g. for
+authorization there might be one set of state variables, for user profile
+another and so on).</p><p>Your action can be on any type, from raw strings or integer constants to enums
+and data classes.</p><p>Your reducer must be pure, but you may split it into smaller functions, each
+handling a subset of actions (and most likely - a sub-state). Since reducers by
+default return the current state - you can easily combine reducer functions.
+The ones that could not handle the message will return the current sub-state,
+join them together and you will get a new state object without producing much
+garbage.</p><p>Your middlewares are now your controllers. Pass the context into their
+constructors if needed, let them control the services and other APIs.
+But keep them small and isolated. Each middleware should do one thing.</p><p>The only place where your isolated and self-contained parts meet is your custom
+Application class (or any other place where you create a global store). You may
+even live without dependency injection, and still be able to test each part of
+your app individually.</p><p>Here are the <a href=https://github.com/trikita/jedux>sources of Jedux</a> - it&rsquo;s only
+about 100 lines of code to read. Try it in some simple projects and see how it
+feels. You will like it.</p><p class=date style=text-align:right><em>Mar 29, 2016</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fanvil-app-architecture%2f&title=How%20to%20architect%20Anvil%20apps">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=How%20to%20architect%20Anvil%20apps+https://zserge.com/%2fposts%2fanvil-app-architecture%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

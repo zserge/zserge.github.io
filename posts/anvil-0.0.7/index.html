@@ -1,0 +1,96 @@
+<!doctype html><html><head><meta charset=utf-8><title>Anvil: Double O Seven</title><meta name=description content="A preferred way to prepare your android apps. Shaken, not stirred."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/anvil-0.0.7/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Anvil: Double O Seven</h1><h1 id=anvil-version-0-0-7-released>Anvil: version 0.0.7 released!</h1><p>If you missed the news - <a href=https://github.com/zserge/anvil>Anvil</a> is a tiny
+reactive UI library for Android. It&rsquo;s based on the concept of the virtual
+layout (much like React.js) and brings declarative layouts with data bindings,
+componentization, styles, animations etc in pure Java.</p><p>It also supports Kotlin, which is a great language and I hope it will replace
+Java on Android some day.</p><p>Version 0.0.6 was suprisingly stable, but life goes on, and here&rsquo;s version 0.0.7.</p><h2 id=config-helper>config() helper</h2><p>If you really have to work with real views and not the virtual layout - you can
+do it now. It&rsquo;s helpful for SurfaceViews, TextureViews and other views where
+just setting the attributes is not enough.</p><p>Also it can be helpful if you want to migrate to Anvil gradually - you can move
+layouts to Java, but let the configuration of the views (binding callbacks,
+setting styles and attrobutes) happen in existing methods:</p><pre><code>public void initUi() {
+    mMyButton = (Button) findViewById(MY_BUTTON);
+    mMyButton.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+        }
+    });
+}
+
+public ViewNode view() {
+    return
+        v(LinearLayout.class,
+            config(v -&gt; initUi), // initUi will be called when layout is ready
+            v(Button.class,
+                id(MY_BUTTON)));
+}
+</code></pre><p>Of course, it&rsquo;s highly recommented to use config() wisely and let Anvil deal
+with your data binding.</p><h2 id=better-syntax-for-views>better syntax for views</h2><p>Some people requested to add more sugar to view trees, so now there is a
+generated file Views.java which simplifies the tree construction of the
+existing view classes from the Android SDK JAR:</p><pre><code>// Normal Anvil variant
+v(LinearLayout.class,
+    v(Button.class,
+        text(R.string.click_me)
+        onClick(onButtonClick)),
+    v(TextView.class,
+        text(someText))
+
+// &quot;Sugarized&quot; variant, aligning parens is a matter of taste, of course
+linearLayout(
+    button(
+        text(R.string.click_me),
+        onClick(onButtonClick)
+    ),
+    textView(
+        text(someText)
+    )
+)
+</code></pre><p>Another advantage is that you don&rsquo;t need to import every view class that you&rsquo;re
+using in your layouts.</p><p>Of course, the traditional v() approach remains, and is the only way you can
+add your custom classes into the view tree.</p><h2 id=relative-layout>relative layout</h2><p>With 0.0.7 you can now use it like:</p><pre><code>v(RelativeLayout.class,
+    size(FILL, FILL),
+    padding(dip(16), 0),
+
+    v(EditText.class,
+        id(ID_NAME),
+        hint(&quot;Reminder time&quot;),
+        size(FILL, WRAP)),
+
+    v(Spinner.class,
+        id(ID_DATES),
+        size(0, WRAP)
+            .align(BELOW, ID_NAME)
+            .align(ALIGN_PARENT_LEFT)
+            .align(LEFT_OF, ID_TIMES)),
+
+    v(Spinner.class,
+        id(ID_TIMES),
+        size(dip(96), WRAP)
+            .align(BELOW, ID_NAME)
+            .align(ALIGN_PARENT_RIGHT)),
+
+    v(Button.class,
+        text(&quot;Done&quot;),
+        size(dip(96), WRAP)
+            .align(BELOW, ID_TIMES)
+            .align(ALIGN_PARENT_RIGHT)));
+</code></pre><h2 id=other-things>other things</h2><p>There&rsquo;s been many bug fixes and small changes since 0.0.6.</p><p>Probably the most notable minor improvement is that you can now call
+Anvil.render() from any thread, not just the UI thread. It simplifies code a
+lot in background tasks where you don&rsquo;t care about the Context, but modify the
+data that is reflected in the UI somehow.</p><h2 id=matter-of-state-importance>Matter of state importance</h2><p>One last thing to list here is states. Anvil&rsquo;s strong point is declarative
+animations. You can declare them right in your layout - how they behave, when
+they are started/stopped etc. Then you can trigger them by just changing one
+boolean variable.</p><p>However when your animations start to chain and depend on each other - it can
+become pretty messy (but still cleaner than if you used only andorid SDK).</p><p>Now there are States - tiny two-state finite state machines that can slowly (or immidiately)
+switch from one state (&ldquo;on&rdquo;) to another (&ldquo;off&rdquo;) and back. Binding animations to
+the states instead of raw boolean variables gives your more flexibility over
+time and sequence of data changes that involve view animations.</p><p>However I have to acknowledge you that States API is still experimental and
+might be changed in future versions.</p><p class=date style=text-align:right><em>Jun 25, 2015</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fanvil-0.0.7%2f&title=Anvil%3a%20Double%20O%20Seven">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=Anvil%3a%20Double%20O%20Seven+https://zserge.com/%2fposts%2fanvil-0.0.7%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

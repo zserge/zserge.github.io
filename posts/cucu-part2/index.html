@@ -1,0 +1,265 @@
+<!doctype html><html><head><meta charset=utf-8><title>cucu: a compiler you can understand (2/3)</title><meta name=description content="Compilers is fun. Want to write your own one? Part 2 - parser."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/cucu-part2/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>cucu: a compiler you can understand (2/3)</h1><h1 id=cucu-a-compiler-u-can-understand-part-nbsp-2>cucu: a compiler u can understand (part&nbsp;2)</h1><p>So far, we have defined language grammar and have written a lexer. In this part
+we will write a parser for our language. Before we start, we need some helper
+functions:</p><pre><code>int peek(char *s) {
+    return (strcmp(tok, s) == 0);
+}
+
+int accept(char *s) {
+    if (peek(s)) {
+        readtok();
+        return 1;
+    }
+    return 0;
+}
+
+int expect(char *s) {
+    if (accept(s) == 0) {
+        error(&quot;Error: expected '%s'\n&quot;, s);
+    }
+}
+</code></pre><p><code>peek()</code> returns non-zero value if the next token is equal to the given string.
+<code>accept()</code> reads the next token, if it&rsquo;s equal to the given string, otherwise it
+returns 0. And <code>expect()</code> helps us to check language syntax.</p><h2 id=the-harder-part>the harder part</h2><p>As you can see from the language grammar, statements and various expression
+types are strongly interconnected. It means we have to write all parser
+functions at once, keeping in mind the recursion. Let&rsquo;s go again from top
+to bottom. Here&rsquo;s our top-level compiler() functions:</p><pre><code>static int typename();
+static void statement();
+
+static void compile() {
+    while (tok[0] != 0) { /* until EOF */
+        if (typename() == 0) {
+            error(&quot;Error: type name expected\n&quot;);
+        }
+        DEBUG(&quot;identifier: %s\n&quot;, tok);
+        readtok();
+        if (accept(&quot;;&quot;)) {
+            DEBUG(&quot;variable definition\n&quot;);
+            continue;
+        } 
+        expect(&quot;(&quot;);
+        int argc = 0;
+        for (;;) {
+            argc++;
+            typename();
+            DEBUG(&quot;function argument: %s\n&quot;, tok);
+            readtok();
+            if (peek(&quot;)&quot;)) {
+                break;
+            }
+            expect(&quot;,&quot;);
+        }
+        expect(&quot;)&quot;);
+        if (accept(&quot;;&quot;) == 0) {
+            DEBUG(&quot;function body\n&quot;);
+            statement();
+        }
+    }
+}
+</code></pre><p>It reads type name, then an identifier. If it&rsquo;s followed by a semicolon -
+it&rsquo;s a variable declaration. If it&rsquo;s followed by a paren - it&rsquo;s a function.
+Function scans function arguments one by one, and if function is not
+followed by a semicolon - it&rsquo;s a definition (function with a body), otherwise -
+it&rsquo;s just a declaration (just function name and prototype).</p><p>Here, <code>typename()</code> is function that just skips the valid type name. We accept
+only <code>int</code> and <code>char</code> and various pointers to them (<code>char *</code>):</p><pre><code>static int typename() {
+    if (peek(&quot;int&quot;) || peek(&quot;char&quot;)) {
+        readtok();
+        while (accept(&quot;*&quot;));
+        return 1;
+    }
+    return 0;
+}
+</code></pre><p>The most interesting part is the <code>statement()</code> function. It parses a single
+statement, which can be a block, a local variable definition/declaration,
+a <code>return</code> statement etc. Here how it should look like:</p><pre><code>static void statement() {
+    if (accept(&quot;{&quot;)) {
+        while (accept(&quot;}&quot;) == 0) {
+            statement();
+        }
+    } else if (typename()) {
+        DEBUG(&quot;local variable: %s\n&quot;, tok);
+        readtok();
+        if (accept(&quot;=&quot;)) {
+            expr();
+            DEBUG(&quot; :=\n&quot;);
+        }
+        expect(&quot;;&quot;);
+    } else if (accept(&quot;if&quot;)) {
+        /* TODO */
+    } else if (accept(&quot;while&quot;)) {
+        /* TODO */
+    } else if (accept(&quot;return&quot;)) {
+        if (peek(&quot;;&quot;) == 0) {
+            expr();
+        }
+        expect(&quot;;&quot;);
+        DEBUG(&quot;RET\n&quot;);
+    } else {
+        expr();
+        expect(&quot;;&quot;);
+    }
+}
+</code></pre><p>So, if it&rsquo;s a block <code>{ .. }</code> - just read statements until end of block is met.
+If it starts with a type name - it&rsquo;s a local variable. Conditional statements
+(&ldquo;if/then/else&rdquo;) and loops are just stubs for now. Think of how you would
+implement them according to the grammar we use.</p><p>Anyway, most of the statement contain expressions inside. So, we need to make a
+function that parses an expression. Expression parser is a recursive descent
+parser, so it&rsquo;s a number of functions that call each other recursively until
+primary expression is found. Primary expression as we can see from the grammar
+is a number (constant) or an identifier (variable or function).</p><pre><code>static void prim_expr() {
+    if (isdigit(tok[0])) {
+        DEBUG(&quot; const-%s &quot;, tok);
+    } else if (isalpha(tok[0])) {
+        DEBUG(&quot; var-%s &quot;, tok);
+    } else if (accept(&quot;(&quot;)) {
+        expr();
+        expect(&quot;)&quot;);
+    } else {
+        error(&quot;Unexpected primary expression: %s\n&quot;, tok);
+    }
+    readtok();
+}
+
+static void postfix_expr() {
+    prim_expr();
+    if (accept(&quot;[&quot;)) {
+        expr();
+        expect(&quot;]&quot;);
+        DEBUG(&quot; [] &quot;);
+    } else if (accept(&quot;(&quot;)) {
+        if (accept(&quot;)&quot;) == 0) {
+            expr();
+            DEBUG(&quot; FUNC-ARG\n&quot;);
+            while (accept(&quot;,&quot;)) {
+                expr();
+                DEBUG(&quot; FUNC-ARG\n&quot;);
+            }
+            expect(&quot;)&quot;);
+        }
+        DEBUG(&quot; FUNC-CALL\n&quot;);
+    }
+}
+
+static void add_expr() {
+    postfix_expr();
+    while (peek(&quot;+&quot;) || peek(&quot;-&quot;)) {
+        if (accept(&quot;+&quot;)) {
+            postfix_expr();
+            DEBUG(&quot; + &quot;);
+        } else if (accept(&quot;-&quot;)) {
+            postfix_expr();
+            DEBUG(&quot; - &quot;);
+        }
+    }
+}
+
+static void shift_expr() {
+    add_expr();
+    while (peek(&quot;&lt;&lt;&quot;) || peek(&quot;&gt;&gt;&quot;)) {
+        if (accept(&quot;&lt;&lt;&quot;)) {
+            add_expr();
+            DEBUG(&quot; &lt;&lt; &quot;);
+        } else if (accept(&quot;&gt;&gt;&quot;)) {
+            add_expr();
+            DEBUG(&quot; &gt;&gt; &quot;);
+        }
+    }
+}
+
+static void rel_expr() {
+    shift_expr();
+    while (peek(&quot;&lt;&quot;)) {
+        if (accept(&quot;&lt;&quot;)) {
+            shift_expr();
+            DEBUG(&quot; &lt; &quot;);
+        }
+    }
+}
+
+static void eq_expr() {
+    rel_expr();
+    while (peek(&quot;==&quot;) || peek(&quot;!=&quot;)) {
+        if (accept(&quot;==&quot;)) {
+            rel_expr();
+            DEBUG(&quot; == &quot;);
+        } else if (accept(&quot;!=&quot;)) {
+            rel_expr();
+            DEBUG(&quot;!=&quot;);
+        }
+    }
+}
+
+static void bitwise_expr() {
+    eq_expr();
+    while (peek(&quot;|&quot;) || peek(&quot;&amp;&quot;)) {
+        if (accept(&quot;|&quot;)) {
+            eq_expr();
+            DEBUG(&quot; OR &quot;);
+        } else if (accept(&quot;&amp;&quot;)) {
+            eq_expr();
+            DEBUG(&quot; AND &quot;);
+        }
+    }
+}
+
+static void expr() {
+    bitwise_expr();
+    if (accept(&quot;=&quot;)) {
+        expr();
+        DEBUG(&quot; := &quot;);
+    }
+}
+</code></pre><p>It&rsquo;s a big piece of code, but don&rsquo;t be afraid - it&rsquo;s really simple.
+Every function that parses expression type first tries to call a
+more prioritized expression parser. Then, if an expected operator is found -
+it calls more prioritized expression parser again. Now it has parsed both
+parts of a binary expression (like x+y, or x&amp;y, or x==y), so it can perform
+an operation and return. Some expression can be &ldquo;chained&rdquo; (like a+b+c+d), so
+we parse them with loops.</p><p>We put debug output after every expression parser function. This will give us
+an interesting result. For example, if we parse this piece of code:</p><pre><code>int main(int argc, char **argv) {
+    int i = 2 + 3;
+    char *s;
+    func(i+2, i == 2 + 2, s[i+2]);
+    return i &amp; 34 + 2;
+}
+</code></pre><p>we will get this ouput:</p><pre><code>identifier: main
+function argument: argc
+function argument: argv
+function body
+local variable: i
+ const-2  const-3  +  :=
+local variable: s
+ var-func  var-i  const-2  +  FUNC-ARG
+ var-i  const-2  const-2  +  ==  FUNC-ARG
+ var-s  var-i  const-2  +  []  FUNC-ARG
+ FUNC-CALL
+ var-i  const-34  const-2  +  AND RET
+</code></pre><p>All our expressions are written in a postfix form (instead of <code>2+3</code> it&rsquo;s <code>2 3
++</code>). This is a natural form for stack machines, when operands are placed on
+the stack, then a function called pops up the operands, processes them and puts
+the result back on the stack.</p><p>Though it might not be an optimal architecture for most modern CPUs, which are
+register-based, it&rsquo;s still very simple and fits our compiler needs.</p><h2 id=symbols>symbols</h2><p>Ok, we are good. We&rsquo;ve got a lexer and a parser in less than 300 lines of code.
+What we need to do is to add some functions to work with the symbols (like
+variable names, or functions). A compiler should have a table of symbols to
+quickly find their addresses, so when you write &ldquo;i = 0&rdquo; - it means put zero
+into the location at address 0x1234 in RAM (if symbol &ldquo;i&rdquo; has address 0x1234 in
+memory).
+Also, when you call &ldquo;func()&rdquo; it means - jump to address 0x5678 (if symbol &ldquo;func&rdquo;
+has value of 0x5678).</p><p>We use the following structure for symbols:</p><pre><code>struct sym {
+    char type;
+    int addr;
+    char name[];
+};
+</code></pre><p>Here <code>type</code> has special meaning. We use a single-letter codes to detect symbol
+type:</p><ul><li><code>L</code> - is a local variable. <code>addr</code> stores variable location on the stack</li><li><code>A</code> - function argument. <code>addr</code> also stores the location on the stack</li><li><code>U</code> - undefined global variable. <code>addr</code> stores absolute address in RAM.</li><li><code>D</code> - defined global variable. Same as above.</li></ul><p>So far, I&rsquo;ve added two functions: <code>sym_find(char *s)</code> to find symbol by its
+name, and <code>sym_declare()</code> to add a new symbol.</p><p>Now we&rsquo;re are ready to develop <a href=/blog/cucu-part3.html>backend architecture &rarr;</a></p><p><em>Check <a href=/blog/cucu-part1.html>part 1</a> if you missed something</em></p><p class=date style=text-align:right><em>Oct 24, 2012</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fcucu-part2%2f&title=cucu%3a%20a%20compiler%20you%20can%20understand%20%282%2f3%29">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=cucu%3a%20a%20compiler%20you%20can%20understand%20%282%2f3%29+https://zserge.com/%2fposts%2fcucu-part2%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

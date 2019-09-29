@@ -1,0 +1,158 @@
+<!doctype html><html><head><meta charset=utf-8><title>ultimately minimal unit testing</title><meta name=description content="a tiny libraries for testing in JS, Lua and Bash"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/minimal-testing/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>ultimately minimal unit testing</h1><p>Most large software projects include automated testing and the reasons are
+obvious. But what about smaller, even toy projects? There should be some
+extremely lightweight unit-testing frameworks/libraries that would easily fit
+even the smallest project needs.</p><p>Unit testing should be easy to start. Otherwise people won&rsquo;t bother with
+writing tests at all (unless they are forced to). People don&rsquo;t like learning
+complex frameworks to run just a dozen of tests.</p><p>So here&rsquo;s how my perfect unit testing library would look like:</p><ul><li>It should be easy to learn. The API should be no larger than 4-5 functions,
+so I could catch it in a minute or so even if I&rsquo;m absolutely new to testing.</li><li>It should be easy to install. It should have no dependencies, it should be
+probably a single file. If the programming platform assumes to have a package
+manager - it should be one command that would install the testing tool in a
+couple of seconds. And I should be able to just open a text editor and start
+writing tests after that.</li><li>Tests should be easy to structure. Your programming language provides your
+with the modularity. Put your test functions in a module, then write
+assertions in your test functions.</li><li>It should have minimal assertions. Really, those Assert.assertNotEquals or
+assert.has_no.errors are not much easier than a plain if-then condition. See
+how Go language made this - they simply give you a way to fail your current
+test. The rest if up to you. You have the whole programming language with
+conditionals, loops, functions after all! So custom assertion helper can be
+written in a minute or two if you really need it.</li><li>Flexible reporting. I used to be an embedded developer and I&rsquo;ve seen the
+environments where you can&rsquo;t even print error message on screen since there
+was no screen. Instead you could save an error code into some EEPROM cell and
+verify it after the tests are done.</li><li>Easy to control execution. Order of tests should be predictable. If a
+language supports asynchronous execution - tests should support it too. If a
+language supports mocking - tests should provide some basic mocking too.</li></ul><p>Having these requirements in mind I made a couple of tiny testing libraries, I
+used them in some real-life projects and now I&rsquo;m happy to share with you.</p><p>All of the libraries have common API of just 4 functions: <code>test</code>, <code>ok</code>, <code>eq</code>
+and <code>spy</code>. Try to guess what they do?</p><h2 id=lua-gambiarra>Lua: gambiarra</h2><p>This is the one I used many times. Somehow Lua lacks good testing tools.
+<a href=http://olivinelabs.com/busted/>Busted</a> is bloated and hard to install if you
+can&rsquo;t use luarocks. <a href=https://github.com/silentbicycle/lunatest>Lunatest</a>
+and <a href=https://github.com/bluebird75/luaunit>Luaunit</a> are bloated and follow the
+JUnit style, which does not really help for small projects.</p><p>I made <a href=http://bitbucket.org/zserge/gambiarra>gambiarra</a>. Here&rsquo;s a minimal test module:</p><pre><code>-- Gambiarra.lua is a single file that can be just copied into your source
+-- tree and included. Once included it defines a test() function, that's the
+-- only function is defines.
+local test = require('gambiarra')
+
+-- That's how you declare a new test. You pass a test name, a function and
+-- optionally an async flag. If no async flag is passed, or if it's false
+-- the test will finish right after the test function returns.
+-- Otherwise you will have to call next() after the test is actually
+-- finished.
+test('My first test', function(next)
+        -- Inside a test function you can use three more functions:
+        --   ok, eq and spy
+
+        -- ok(cond, [msg]) is the only assertion helper.
+        ok(2 + 2 == 5, 'two plus two equals five')
+
+        -- spy([f]) returns  function that records its every call (arguments,
+        -- return values, errors) and optionally delegates the execution to
+        -- the wrapped function
+        local f = spy(mycallback)
+        myfunc(f)
+
+        -- arguments are stored in the f.called table. Table is nil if the spy
+        -- was never called
+        ok(f.called, 'callback was called')
+        ok(#f.called == 2,' callback was called twice')
+
+        -- eq(a, b) is a helper to deeply compare two variables. It works with most Lua data types.
+        -- It's a handy way to compare tables.
+        ok(eq(f.called[1], {'arg1', 'arg2'}), 'first call with two args: arg1 and arg2')
+
+        -- Finally, you can use asynchronous code in your library, just call
+        -- next() when you're done
+        someasyncfunc(function()
+            next() -- Go to the next test
+    end)
+end, true)
+</code></pre><p>Simple? The whole library is about 120 lines of code, and gives you as much
+power as any other testing framework does. By default it prints some colorful
+test results to the console, but can be easily changed with a custom test handler:</p><pre><code>test(function(event, testname, assertmsg)
+    if event == 'pass' then ...       -- assertion passed
+    elseif event == 'fail' then ...   -- assertion failed
+    elseif event == 'except' then ... -- exception happened
+    elseif event == 'start' then ...    -- new test started
+    elseif event == 'end' then ...  -- test finished
+    end
+end)
+</code></pre><p>And if you want to learn more - you can always read the <a href=http://bitbucket.org/zserge/gambiarra>code</a>.</p><h2 id=javascript-klud-js>Javascript: klud.js</h2><p>It was the first library of this family because I though that a testing library
+can be 1kB in size. Klud.js is similar to QUnit by its functionality but is
+much smaller.</p><p>It&rsquo;s available on <a href=http://bitbucket.org/zserge/klud.js>bitbucket</a>, on
+<a href=http://microjs.com>microjs.com</a> and via <code>npm install kludjs</code> and it has the
+same API as the Lua version has:</p><pre><code>var test = require('kludjs');
+
+test('setTimeout should work', function(next) {
+    ok(typeof setTimeout === 'function', 'setTimeout is a function');
+    var time = Date.now();
+    setTimeout(function() {
+        var delta = Date.now() - time;
+        ok(delta &gt;= 1000, 'setTimeout took ' + delta + ' ms');
+        next();
+    }, 1000);
+}, true);
+</code></pre><p>I used it for testing my <a href=http://lhorie.github.io/mithril/>Mithril</a> code.</p><p>In fact the same test code works in the browser and in Node.js!</p><h2 id=unix-shell-bricolage>Unix shell: bricolage</h2><p>Unix shell is an insteresting case. It&rsquo;s kind of a programming language, but
+there is a big lack of modern tools for it. And even if you don&rsquo;t want to use
+UNIX Shell - you still have to because it&rsquo;s available in every linux system and
+it seems to be the only scripting language so widely available in the embedded
+linux world.</p><p>I used assert.sh and stub.sh in the past, they are really nice, but they are
+full of bashisms. So I decided to make my own testing library.</p><p>What are the specifics of the unix shell testing?</p><ul><li>Good: it&rsquo;s syncrhonous. You can use <code>&amp;</code> to spawn a background process, but
+you will do <code>wait</code> after that, so your test routine is likely to be
+synchronous.</li><li>Good: it&rsquo;s simple and even kind of functional. You can create new functions
+in the runtime with <code>eval</code>. Oh, don&rsquo;t tell me it&rsquo;s a bad way.</li><li>Bad: too many shells. Zsh, Bash, Mksh (android), Dash (ubuntu), busybox sh, &hellip;</li><li>Bad: no local variables (read: no portable local variables)</li><li>Bad: no arrays (read: no portable arrays)</li></ul><p>With this in mind I found that a text file seems to be the most portable data
+structure to use in UNIX Shell.</p><pre><code># A test is a function. $T is a variable where test keeps its internal files
+mytest() {
+    # ok is the only assertion helper
+    # It uses `test` to check the condition, so syntax is common
+    ok 1 -eq 1
+    ok foo = foo
+    foo=&quot;Foo bar&quot;
+    ok &quot;$foo&quot; = &quot;Foo bar&quot;
+
+    # You can use `spy` to make a wrapper over a command.
+    spy date
+
+    date
+
+    # Command output will be written into &lt;spy&gt;.stdout file:
+    ok &quot;$(cat $T/spy.date.stdout)&quot; = &quot;foo&quot;
+
+    # Fake spy output can be specified in the &lt;spy&gt; file:
+    echo foo &gt; $T/spy.date
+    date
+
+    # You can assert it using tail, sed, awk and other common unix tools
+    ok &quot;$(tail -n 1 $T/spy.date.stdout)&quot; = &quot;foo&quot;
+}
+
+# You may override test reports as you need
+pass() { echo PASS $* }
+fail() { echo FAIL $* }
+
+# You have to run your tests manually
+bricolage mytest
+
+# Clean test data
+rm -rf $T
+</code></pre><p>Here&rsquo;s the <a href=http://bitbucket.org/zserge/bricolage>library code</a></p><p>The resulting test library is extremely small (50 LOC), but I haven&rsquo;t used it
+much yet so I can&rsquo;t say if it&rsquo;s stable enough.</p><p>What I like about it is that you can use it not only for shell code, but also
+for functional testing of some command-line apps.</p><h2 id=what-about-c-go-java>What about C, Go, Java?</h2><p>C does not have lambdas. So spies don&rsquo;t make much sense in C if you have define
+spy functions during the compile phase - you can do it manually. Now, ok() can
+be replaced by a simple #define. eq() is either <code>==</code> or <code>memcmp</code>. And test() is
+just your function. So C is too low-level for this approach.</p><p>Go already has a perfect standard testing package. Yes, if/then are a bit
+annoying, and the lack of structure/method mocking, too. But in general it&rsquo;s a
+very lightweight and easy to use library, and I really enjoy it.</p><p>Java&hellip; I don&rsquo;t believe there would be an alternative to JUnit in this field,
+however a lot of things can be done in a simpler manner. For example I always
+struggle with asynchronous code testing. On the other hand, Mockito is a very
+sweet tool, so I don&rsquo;t complain.</p><p>I wonder if there are other languages don&rsquo;t have simple testing tools? What
+about Objective-C, Swift, Io, Tcl (no, I really don&rsquo;t know)?</p><p>Anyway, summing up, testing can be fun, testing can be simple. And
+overcomplicated testing tools should not be an excuse to no unit testing.</p><p class=date style=text-align:right><em>Dec 16, 2014</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fminimal-testing%2f&title=ultimately%20minimal%20unit%20testing">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=ultimately%20minimal%20unit%20testing+https://zserge.com/%2fposts%2fminimal-testing%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

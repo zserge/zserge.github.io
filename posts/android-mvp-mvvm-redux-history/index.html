@@ -1,0 +1,130 @@
+<!doctype html><html><head><meta charset=utf-8><title>The evolution of Android architecture</title><meta name=description content="Android history: from no architecture to MVP to MVVM to Redux"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/android-mvp-mvvm-redux-history/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>The evolution of Android architecture</h1><p>Android is probably the second most popular development platform after the web.
+Web development practices tend to change every month if not every week. As soon
+as a tool or a library becomes mature and stable - they call it deprecated and
+seek for a new replacement. Now let&rsquo;s see how Android development tools and
+paradigms have evolved over the past few years and how it compares to the web.</p><h2 id=year-2010-classic-android>Year 2010: classic Android</h2><p>In 2010 we&rsquo;ve been all still learning Android. We wrote UI layouts in XMLs and
+had the following code in every activity:</p><pre><code class=language-java>TextView mCounterText;
+Button mCounterIncrementButton;
+
+int mClicks = 0;
+
+public void onCreate(Bundle b) {
+  super.onCreate(b);
+
+  mCounterText = (TextView) findViewById(R.id.tv_clicks);
+  mCounterIncrementButton = (Button) findViewById(R.id.btn_increment);
+
+  mCounterIncrementButton.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+      mClicks++;
+      mCounterText.setText(&quot;&quot;+mClicks);
+    }
+  });
+}
+</code></pre><p>This resembles a lot of the jQuery ages in web development. The snippet below
+is a jQuery equivalent of the above Androd code:</p><pre><code class=language-javascript>var clicks = 0;
+$('.incr-button').on('click', function() {
+  clicks++;
+  $('.counter').text(clicks);
+});
+</code></pre><p>Just to remind, in 2010 web developers already had HTML5 rising with media
+queries to support multiple screens, CSS3 to support hardware-accelerated
+animations and so on. JQuery and Sencha ExtJS were leading libraries and
+developers have been writing spaghetti code, which everyone hated.</p><h2 id=year-2013>Year 2013</h2><p>In three years we&rsquo;ve been all tired of the clumsy Eclipse and tons of redundant
+code we wrote in every app.</p><p>The year of 2013 brought us two famous libraries to solve the most obvious
+problems.</p><p><a href=https://github.com/orfjackal/retrolambda>Retrlolambda</a>. Thanks, @orfjackal.
+It helped a lot. Replacing all listeners with compact lambdas was a breath of
+fresh air.</p><p><a href=https://github.com/JakeWharton/butterknife>ButterKnife</a>. Thanks,
+@jakewharton. We finally got rid of all those setOnXXXListeners and
+findViewByIds.</p><p>Our code now looked more clear:</p><pre><code class=language-java>@Bind(R.id.tv_clicks) mCounterText;
+@OnClick(R.id.btn_increment)
+public void onSubmitClicked(View v) {
+	mClicks++;
+	mCounterText.setText(&quot;&quot;+mClicks);
+}
+</code></pre><p>Also by that time we already had Ice Cream Sandwich and Jelly Bean released.
+Later that year Google have released KitKat, the most popular Android OS
+version so far.</p><p>How this compares to web development? Well, web developers in 2013 moved from
+jQuery&rsquo;s spaghetti to some MVC frameworks. They have been using Backbone.js,
+Angular.js and Ember.js. Angular is probably the most prominent one in the list
+- it moved away from manipulating DOM nodes (views) directly and offered
+declarative data binding instead. The views updated automatically as you
+changed your data which felt really reactive.</p><h2 id=year-2014>Year 2014</h2><p>The most important event to me in 2014 was the article
+<a href=https://corner.squareup.com/2014/10/advocating-against-android-fragments.html>&ldquo;Advocating against fragments&rdquo;</a>.
+Written by the engineers from Square it explained why Android Fragments, the
+concept advertised by Google and blindly trusted by many developers turned out
+to be a trouble-maker.</p><p>They also have shown that there is almost no benefits in using fragments versus
+using custom viewgroups (well, assuming that Fragment from the support library
+is actually a custom viewgroup is not a big surprise).</p><p>This seems to be the first time when a technology so strongly forced by Google
+has been fairly criticized and the criticism was widely accepted.</p><p>Also that year we could finally have dropped the support of Android Gingerbread
+if we cared about the top 90% of the devices.</p><p>Finally, that year of 2014 have started the glory of MVP
+(Model-View-Presenter) architectural pattern. Most Squareup libraries have
+promoted this pattern and people gladly followed it. We&rsquo;ve learned to separate
+our view presentation layer from the data layer.</p><p>While this also led to a noticeable code bloat (the price you pay for making
+your presenter and view match the interfaces) - it opened the doors to actually
+useful unit testing.</p><p>Web development trends that year have shown the rise of React.js. Another
+paradigm shift resulted in high-performance modular UI components. The
+simplicity and efficiency of the React ideas brought a crowd of the followers,
+some of them made tiny custom React-like libraries: Mithril, Riot, Bloop etc.</p><p>React simplicity and flexibility caused it to gain popularity very quickly and
+it became a strong alternative to Angular.</p><h2 id=year-2015>Year 2015</h2><p>In the middle of 2015 Google presented its Data Binding library (still in
+beta). There has been some earlier attempts to achieve Model-View-ViewModel (MVVM) in
+android (<a href=http://robobinding.github.io/RoboBinding>Robobinding</a> is probably the most
+famous one).</p><p>Google made their data binding library in the spirit of Angular - XML acts as
+a custom template with a special language to denote data bindings. Then
+some code is generated to actually render views bound to that data.</p><pre><code class=language-xml>&lt;layout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&gt;
+   &lt;data&gt;
+       &lt;variable name=&quot;counter&quot; type=&quot;com.example.Counter&quot;/&gt;
+       &lt;variable name=&quot;counter&quot; type=&quot;com.example.ClickHandler&quot;/&gt;
+   &lt;/data&gt;
+   &lt;LinearLayout
+       android:orientation=&quot;vertical&quot;
+       android:layout_width=&quot;match_parent&quot;
+       android:layout_height=&quot;match_parent&quot;&gt;
+       &lt;TextView android:layout_width=&quot;wrap_content&quot;
+           android:layout_height=&quot;wrap_content&quot;
+           android:text=&quot;@{counter.value}&quot;/&gt;
+       &lt;Buttonandroid:layout_width=&quot;wrap_content&quot;
+           android:layout_height=&quot;wrap_content&quot;
+           android:text=&quot;@{handlers.clickHandle}&quot;/&gt;
+   &lt;/LinearLayout&gt;
+&lt;/layout&gt;
+</code></pre><p>At this point many people started shifting
+<a href=http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/>from MVP to MVVM</a>.</p><p>Android developer community seems to be split into several groups. Some only
+use the technologies backed up by Google. This is the most conservative group.</p><p>Others trust some well-known developers or companies as well. Of course there
+is a group of people who always try something new - Groovy, Scala, Clojure,
+Mirah, new libraries and frameworks. It&rsquo;s risky and often causes more troubles,
+but this is what actually drives the evolution.</p><p>I personally was afraid of Retrolambda because I thought that patching binary
+code can break things at any moment. But now I trust retrolambda and have lots
+of production apps using it.</p><p>Same about <a href=https://kotlinlang.org>Kotlin</a>. I have been looking for a sane
+Java replacement for years and when Kotlin became more or less stable - I gave
+it a try. Until year 2015 I was afraid that Google might break something and
+Kotlin may stop working. But so far it&rsquo;s been surprisingly well. Now I use
+Kotlin in some of my projects and I like it.</p><p><a href=https://buckbuild.com>Buck</a> is also a notable example. Google&rsquo;s Gradle is a
+leading build system in Android development. However Buck developers from
+Facebook do lots of work to make a really fast build system with predictable
+(reproducible) results. I&rsquo;ve tried Buck in a few projects and it was much,
+much faster than Gradle. Still waiting for <a href=http://bazel.io>Bazel</a> to
+officially support Android or Buck to become more popular.</p><h2 id=modern-times>Modern Times</h2><p>In the past Android developers used to be a step behind the web development
+trends. It&rsquo;s not bad, there was time to watch the rise and fall of the
+technologies and apply the ones that survived.</p><p>But evolution always wins. We got better tools anyway, despite Google ignoring
+developer requests.</p><p>I started <a href=https://github.com/zserge/anvil>Anvil</a> in 2015 as an attempt to
+bring reactive views to Android. I admit that now we have serious competitors
+like <a href=https://facebook.github.io/react-native>React Native</a> or Google Data
+Binding library. Still, Anvil has lots of advantages which I will describe in
+the following posts.</p><p>Also we&rsquo;ve recently implemented <a href=https://github.com/trikita/jedux>Redux</a>
+architecture for Android which really feels superior to MVVM in most cases.</p><p>I&rsquo;m glad to see that Android developers are now open to the paradigm shifts and
+happy to try new tools and instruments. This means that sooner or later by
+trial and error, by natural selection and other evolutionary tricks we will get
+an (almost) perfect development ecosystem that finally make the developers
+happy.</p><p class=date style=text-align:right><em>Mar 28, 2016</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fandroid-mvp-mvvm-redux-history%2f&title=The%20evolution%20of%20Android%20architecture">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=The%20evolution%20of%20Android%20architecture+https://zserge.com/%2fposts%2fandroid-mvp-mvvm-redux-history%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

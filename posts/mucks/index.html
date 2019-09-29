@@ -1,0 +1,71 @@
+<!doctype html><html><head><meta charset=utf-8><title>mucks: automating screen and tmux</title><meta name=description content="mucks - a session manager for screen and tmux"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=favicon.ico><link rel="shortcut icon" type=image/png href=favicon.png><link rel=alternate type=application/rss+xml title=RSS href=rss.xml><link rel=canonical href=https://zserge.com//posts/mucks/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico><link rel=apple-touch-icon-precomposed href=/favicon.128.png></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>mucks: automating screen and tmux</h1><p>I can&rsquo;t imagine my daily work in terminal without multiplexers.
+I used to use GNU Screen a couple of years ago, then I switched to Tmux.</p><p>There has been a lot of talks about screen vs tmux, and then vs byubu. I still
+use both, and I still like both. What I was really missing is session
+management.</p><p>Since my laptop&rsquo;s uptime is normally more than a month - I just created windows
+manually and started programs manually and then just attached/detached until
+the next reboot. Honestly, I never heard about session management tools until
+yesterday. Then I stumbled upon tmuxinator&hellip;</p><p>Install ruby to just manage terminal sessions?! What&rsquo;s wrong with this world?!</p><p>So, I quickly googled for other alternatives, and found that most of them are
+tmux-oriented, and it seems like nobody cares about the good old GNU Screen.</p><p>That&rsquo;s how I started my own session manager for both, tmux and screen.</p><h2 id=mucks>mucks</h2><p>Mucks (btw, it also means &ldquo;protest&rdquo; in German) is written in UNIX Shell, and I
+hope has no bashisms. Seems like the only external program it uses (other than
+screen and tmux) is sed, so in theory it should be highly portable.</p><p>It&rsquo;s also just one file of ~100LOC, so it should not be hard to read or to
+install it. I also tried to do some tests at least for the configuration parser
+(right, there are test frameworks for UNIX Shell as well).</p><p>So, just download the sources (or at least one <a href=https://raw.githubusercontent.com/zserge/mucks/master/mucks>mucks</a> file) - and you&rsquo;re ready to use it:</p><pre><code>git clone https://github.com/zserge/mucks
+</code></pre><p>Now let&rsquo;s create a simple session</p><h2 id=sessions>sessions</h2><p>Each session is described in a separate configuration file. You may store all your session files in your home directory and run them as:</p><pre><code>$ mucks ~/myproject.mucksrc
+</code></pre><p>Or you may store session configurations inside the project directories:</p><pre><code>$ cd ~/myproject # There should be a file called .mucksrc
+$ mucks          # It picks .mucksrc automatically
+</code></pre><p>Here&rsquo;s an example of such a mucksrc file I just used:</p><pre><code>#
+# Mucks project
+#
+name: mucks
+dir: /home/serge/src/serge/mucks
+mux: tmux
+
+[vim]
+vim mucks test.sh mucksrc.example -p
+
+[shell]
+
+[man]
+man tmux
+- vsplit
+man screen
+</code></pre><p>Here&rsquo;s how it looks in my tmux and screen:</p><p><img src=/images/mucks1.png alt=Screen></p><p><img src=/images/mucks2.png alt=Tmux></p><p>You may see on tmux the screen is split in two for man pages, while in screen
+these are still two separate windows (not panes). This is because of the
+different nature of how screen and tmux handle panes - in screen panes are not
+parts of the window, but are rather global for the whole session (each pane
+contains all of the windows). Also, in screen splits disappear during the
+detach, so I decided to create new windows for screen splits, so user still
+could manually organize them if he wants.</p><h2 id=language>language</h2><p>There are two sections in each session config - a header with global session
+settings and a layout section with the list of windows.</p><p>Header is just a list of variables and their values separated by a colon:</p><pre><code>name: My project
+foo: bar
+</code></pre><p>At the moment only the following variables are supported:</p><ul><li>name - name of the session, it is used for the terminal window title</li><li>dir - a working directory of the session. Handy if you want to run mucks from any directory outside of the project</li><li>mux - which multiplexor to use. Possible values are &ldquo;tmux&rdquo; or &ldquo;screen&rdquo;</li></ul><p>Layout section looks like an INI file, each window title is a section and
+below is text to be typed into the window and some internal commands to be
+performed:</p><pre><code># This opens a window called &quot;code editor&quot;
+# running vim with list of files shown
+[code editor]
+vim
+ihello^[
+</code></pre><p>Yes, section body is not a shell command, but exact keys to be typed into the
+window. It allows to run some vim commands like &lsquo;gt&rsquo; or to open certain web
+pages in w3m, or open ssh sessions and do something remotely.</p><p>Every line that starts with a dash (&ldquo;-&rdquo;) is an internal command. These are now
+used to set up pane layout, but probably later they will be more powerful. At
+the moment only &ldquo;hsplit&rdquo; and &ldquo;vsplit&rdquo; commands are supported - they split
+current window horizontally or vertically (sorry, that works only in tmux, as
+mentioned above).</p><p>As you can see, session configuration file is extremely simple, yet it can
+save a lot of typing for complex sessions.</p><h2 id=what-s-next>what&rsquo;s next?</h2><p>For my humble needs even the current version of mucks is usable. Adding more
+features? I can think of more complex layouts, proportional splits etc. Also
+I&rsquo;d like to have automatic detection of tmux and screen depending on which one
+is available.</p><p>Probably I should add the support of byubu and wemux.</p><p>I would be happy to add the support of dvtm, they have added a fifo to send
+internal commands to a running dvtm instance recently, but I&rsquo;m not sure how
+flexible it is now.</p><p>And how do you use terminal multiplexor sessions?</p><p class=date style=text-align:right><em>Apr 25, 2014</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=http://zserge.com/%2fposts%2fmucks%2f&title=mucks%3a%20automating%20screen%20and%20tmux">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=mucks%3a%20automating%20screen%20and%20tmux+https://zserge.com/%2fposts%2fmucks%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
