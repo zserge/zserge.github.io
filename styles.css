@@ -136,3 +136,17 @@ h2,
 .wf-active code {
 	font-family: "Roboto Mono", monospace;
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+	header .logo { color: #444; background-color: #e4e4e4; }
+  body, h1 a, h2 a, h3 a { background-color: #444; color: #e4e4e4; }
+	pre, pre code { background: #333; color: #e4e4e4; }
+	h2, h3 { border-bottom: 1px solid #e4e4e4; }
+	code { color: #aaa; }
+  a { color: #e39777; }
+  img {
+    filter: grayscale(30%);
+  }
+}
+
