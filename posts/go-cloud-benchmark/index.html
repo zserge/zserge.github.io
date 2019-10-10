@@ -82,8 +82,8 @@ Transfer/sec:     42.63KB
 </code></pre><p>Wait&hellip; I wish someone could explain this to me - how scaling onto another gear
 makes the app 3 times slower? Tried the test multiple times, results are pretty
 much the same.</p><h2 id=digitalocean-dokku>DigitalOcean + Dokku</h2><p><a href=http://digitalocean.com>Digital Ocean</a> is a well-known hosting provider. Although you can not get a
-free VM, you can buy the cheapest one for 5$ per month and install <a href=https://progrium.viewdocs.io/dokku/>Dokku</a>
-there.</p><p><a href=https://progrium.viewdocs.io/dokku/>Dokku</a> is a DIY Heroku alternative. It uses <a href=https://www.docker.com>Docker</a> and <a href=https://github.com/gliderlabs/herokuish/tree/master/buildpacks>Heroku buildpacks</a>
+free VM, you can buy the cheapest one for 5$ per month and install <a href=http://dokku.viewdocs.io/dokku/>Dokku</a>
+there.</p><p><a href=http://dokku.viewdocs.io/dokku/>Dokku</a> is a DIY Heroku alternative. It uses <a href=https://www.docker.com>Docker</a> and <a href=https://github.com/gliderlabs/herokuish/tree/master/buildpacks>Heroku buildpacks</a>
 to create app containers.</p><p>So I only added a remote git branch pointing to my existing 5$ DigitalOcean VM
 and made a git push. A few seconds later my app was up and running.</p><pre><code>Running 30s test @ http://dokku.trikita.co:32777/ping
   2 threads and 100 connections
