@@ -6,7 +6,7 @@ shiny <a href=https://github.com/zserge/mucks>mucks app</a> written in AWK langu
 different shells treat quotes in the &ldquo;read&rdquo; command very differently, and I found
 no easy way to overcome it.</p><p>That&rsquo;s how AWK came to the rescue. A more mature, yet much simpler language
 made my code cleaner and shorter.</p><p>Users would not notice it, since the configuration file syntax remains the
-same.</p><h2 id=previously-on-mucks>Previously on &ldquo;Mucks&rdquo;</h2><p>For those who missed the <a href=http://zserge.com/blog/mucks.html>first part</a> - the
+same.</p><h2 id=previously-on-mucks>Previously on &ldquo;Mucks&rdquo;</h2><p>For those who missed the <a href=/posts/mucks/>first part</a> - the
 session configuration file is normally called <code>.mucksrc</code> and stays in the
 directory you call mucks from (e.g. <code>cd myproject &amp;&amp; mucks</code>).</p><p>File has two parts: header and layout declaration.</p><p>Header may declare some session-wide variables, e.g.:</p><ul><li><code>mux: &lt;tmux|screen|dvtm&gt;</code> - the default muxer. If not specified - it will be
 takes from the <code>$MUCKS</code> variable or defaulted to &ldquo;tmux&rdquo; if that is empty,
