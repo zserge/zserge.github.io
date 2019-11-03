@@ -9,32 +9,33 @@
 createElement('div', {onClick: handleClick},
   createElement('h1', {className: 'header'}, 'Hello'));
 </code></pre><p>In fact, the latter syntax has been known even before React became famous, and it was called <a href=https://github.com/hyperhype/hyperscript>hyperscript</a>. It is identical to <code>createElement()</code>, but uses a shorter <code>h(tag, props, ...children)</code> function to define the layout.</p><p>In our ugly React clone we will have the same <code>h()</code> function that would do nothing, but put arguments into an object for further processing during the render phase:</p><pre><code>// Our tiny Hyperscript function.
-// 'e' is element name (tag or component)
-// 'p' is properties map
-// 'c' is child elements array
-const h = (e, p, ...c) =&gt; ({e, p, c});
-</code></pre><p>Now, let&rsquo;s see how we can render the hyperscript layout.</p><h2 id=rendering>Rendering</h2><p>In general, we need a <code>render(virtNodes, domNode)</code> function that would render a list of virtual nodes as child elements of some existing real DOM node.</p><p>Often, only one virtual node will be passed as a parameter, but sometimes it would be a list. So we use <code>[].concat()</code> trick to handle both cases (single element will be converted into an array, while the arrays will be flattened).</p><p>Then, we loop over each and every virtual node. In our dumb React clone, a node can be an object (a result of hyperscript calls), a string (plain text in between the DOM nodes) or a function (a functional component that returns a hyperscript structure when evaluated).</p><p>We evaluate functional components by calling the functions with the assigned properties map, children list and a special <code>forceUpdate</code> function parameter that would re-render the whole component once called. We will need it later to add dynamic behavior to our stateful components.</p><p>Then, we create a &ldquo;builder&rdquo; function that would build a new DOM element or text node, depending on the virtual node type. We don&rsquo;t call it yet, until we check how different is our virtual node from the real DOM element we encountered.</p><p>If the real DOM element is missing, or the tag is different - we call our builder and insert the newly built DOM element instead.</p><p>Then we store all virtual node properties into the real DOM node. They will be used to compare virtual and real nodes in the next rending cycle. Then we re-assign node properties, if they got different from the ones stored in the real DOM node.</p><p>At this point a DOM node is identical to our virtual node, and we call rendering function recursively for node children.</p><p>Finally, after all virtual nodes have been processed and mirrored in the real DOM, there might be some leftovers from the previous renders in the real DOM tree. So we remove all remaining DOM elements that come after the last rendered virtual node.</p><pre><code>const h = (e, p, ...c) =&gt; ({e, p, c});
+// 'el' is element name (tag or component)
+// 'props' is properties map
+// 'children' is child elements array
+const h = (el, props, ...children) =&gt; ({el, props, children});
+</code></pre><p>Now, let&rsquo;s see how we can render the hyperscript layout.</p><h2 id=rendering>Rendering</h2><p>In general, we need a <code>render(virtNodes, domNode)</code> function that would render a list of virtual nodes as child elements of some existing real DOM node.</p><p>Often, only one virtual node will be passed as a parameter, but sometimes it would be a list. So we use <code>[].concat()</code> trick to handle both cases (single element will be converted into an array, while the arrays will be flattened).</p><p>Then, we loop over each and every virtual node. In our dumb React clone, a node can be an object (a result of hyperscript calls), a string (plain text in between the DOM nodes) or a function (a functional component that returns a hyperscript structure when evaluated).</p><p>We evaluate functional components by calling the functions with the assigned properties map, children list and a special <code>forceUpdate</code> function parameter that would re-render the whole component once called. We will need it later to add dynamic behavior to our stateful components.</p><p>Then, we create a &ldquo;builder&rdquo; function that would build a new DOM element or text node, depending on the virtual node type. We don&rsquo;t call it yet, until we check how different is our virtual node from the real DOM element we encountered.</p><p>If the real DOM element is missing, or the tag is different - we call our builder and insert the newly built DOM element instead.</p><p>Then we store all virtual node properties into the real DOM node. They will be used to compare virtual and real nodes in the next rending cycle. Then we re-assign node properties, if they got different from the ones stored in the real DOM node.</p><p>At this point a DOM node is identical to our virtual node, and we call rendering function recursively for node children.</p><p>Finally, after all virtual nodes have been processed and mirrored in the real DOM, there might be some leftovers from the previous renders in the real DOM tree. So we remove all remaining DOM elements that come after the last rendered virtual node.</p><pre><code>const h = (el, props, ...children) =&gt; ({el, props, children});
 const render = (vnodes, dom) =&gt; {
   vnodes = [].concat(vnodes);
+  const forceUpdate = () =&gt; render(vnodes, dom);
   vnodes.forEach((v, i) =&gt; {
-    while (typeof v.e === 'function') {
-      v = v.e(v.p, v.c, () =&gt; render(vnodes, dom));
+    while (typeof v.el === 'function') {
+      v = v.el(v.props, v.children, forceUpdate);
     }
-    let $ = () =&gt; v.e ? document.createElement(v.e) : document.createTextNode(v);
-    let n = dom.childNodes[i];
-    if (!n || (n.e !== v.e &amp;&amp; n.data !== v)) {
-      n = dom.insertBefore($(), n);
+    const newNode = () =&gt; v.el ? document.createElement(v.el) : document.createTextNode(v);
+    let node = dom.childNodes[i];
+    if (!node || (node.el !== v.el &amp;&amp; node.data !== v)) {
+       node = dom.insertBefore(newNode(), node);
     }
-    if (v.e) {
-      n.e = v.e;
-      for (let k in v.p) {
-        if (n[k] !== v.p[k]) {
-          n[k] = v.p[k];
+    if (v.el) {
+      node.el = v.el;
+      for (let propName in v.props) {
+        if (node[propName] !== v.props[propName]) {
+          node[propName] = v.props[propName];
         }
       }
-      render(v.c, n);
+      render(v.children, node);
     } else {
-      n.data = v;
+      node.data = v;
     }
   });
   for (let c; (c = dom.childNodes[vnodes.length]); ) {
@@ -67,7 +68,7 @@ x`Hello, ${user}!`
 // strings: ['Hello ', '!'];
 // fields: [user]
 </code></pre><p>Now we make our hands dirty by writing a tiny parser for HTML-like language that would return a hyperscript hierarchy of nodes based on the given string literal.</p><p>I thought of a grammar I want to support. Regular tags, like <code>&lt;{tagName} attr={value} ...&gt;</code>, self-closing tags ending with <code>/&gt;</code>, closing tags starting with <code>&lt;/</code> and raw text between the tags. I decided the attribute values must be quoted, unless they are placeholders. That&rsquo;s it. No HTML comments, white-space optimizations etc.</p><p>Now if we think about the state machine we need, it would have only 3 states:</p><ul><li>&ldquo;text&rdquo;, when we are looking for <code>&lt;</code> or <code>&lt;/</code>.</li><li>&ldquo;open&rdquo;, when we are inside the open tag and are looking for attributes until the end of tag.</li><li>&ldquo;close&rdquo;, when we are inside the closing tag and are only looking for <code>&gt;</code>.</li></ul><p>Initial state is &ldquo;text&rdquo;. Possible positions for the placeholders would be tag name, attribute value or raw text. This means, that if our literal string is empty by that point - we use the placeholder field. Otherwise we continue reading the string literal as long as it fits.</p><p>Here&rsquo;s how the resulting parser might look like:</p><pre><code>export const x = (strings, ...fields) =&gt; {
-  const stack = [{c: []}];
+  const stack = [{children: []}];
   const find = (s, re, arg) =&gt; {
     if (!s) {
       return [s, arg];
@@ -92,17 +93,17 @@ x`Hello, ${user}!`
             } else {
               [s, val] = find(s.substring(1), /^([a-zA-Z]+)/, fields[i]);
               mode = MODE_OPEN;
-              stack.push({e: val, p: {}, c: []});
+              stack.push(h(val, {}, []));
             }
           } else {
             [s, val] = find(s, /^([^&lt;]+)/, '');
-            stack[stack.length - 1].c.push(val);
+            stack[stack.length - 1].children.push(val);
           }
           break;
         case MODE_OPEN:
           if (s[0] === '/' &amp;&amp; s[1] === '&gt;') {
             s = s.substring(2);
-            stack[stack.length - 2].c.push(stack.pop());
+            stack[stack.length - 2].children.push(stack.pop());
             mode = MODE_TEXT;
           } else if (s[0] === '&gt;') {
             s = s.substring(1);
@@ -111,24 +112,24 @@ x`Hello, ${user}!`
             let m = s.match(/^([a-zA-Z0-9]+)=/);
             console.assert(m);
             s = s.substring(m[0].length);
-            let k = m[1];
+            let propName = m[1];
             [s, val] = find(s, /^&quot;([^&quot;]*)&quot;/, fields[i]);
-            stack[stack.length - 1].p[k] = val;
+            stack[stack.length - 1].props[propName] = val;
           }
           break;
         case MODE_CLOSE:
           console.assert(s[0] === '&gt;');
-          stack[stack.length - 2].c.push(stack.pop());
+          stack[stack.length - 2].children.push(stack.pop());
           s = s.substring(1);
           mode = MODE_TEXT;
           break;
       }
     }
     if (mode === MODE_TEXT) {
-      stack[stack.length - 1].c.push(fields[i]);
+      stack[stack.length - 1].children.push(fields[i]);
     }
   });
-  return stack[0].c[0];
+  return stack[0].children[0];
 };
 </code></pre><p>It is most likely enormously slow and clumsy, but it seems to work:</p><pre><code>const Hello = ({onClick}, children) =&gt; x`
   &lt;div className=&quot;foo&quot; onclick=${onClick}&gt;
