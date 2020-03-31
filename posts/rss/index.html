@@ -1,0 +1,83 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>RSS is dead</title><meta name=description content="My last attempt to keep RSS as a part of my life."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/rss/><meta property=og:title content=title><meta property=og:type content=article><meta property=og:url content=url><meta property=og:image content=http://zserge.com/logo.png><meta property=og:description content=description><meta property=og:locale content=en_US><meta name=twitter:card content=summary><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>RSS is dead</h1><p>(The story of <a href=https://github.com/zserge/headline>https://github.com/zserge/headline</a>).</p><p>About seven years ago Google decided to shut down Google Reader, a world known and beloved RSS reader, and I think no other service has been so genuinely lamented since then. I remember the warm feeling when I opened Reader on a tiny HTC Wildfire that fit well in my palm and read stories from dozens of blogs of interesting and unusual people I was subscribed to.</p><p>Of course, I tried Feedly and Inoreader and many other alternatives, even installed Tiny Tiny RSS on my server, but nothing felt the same. After many years I found that I don&rsquo;t ready RSS anymore, but rather get my news from Twitter, HN or Reddit. Sad.</p><p><img src=/images/headline.png alt="headline screenshot"></p><p>So I though that maybe it&rsquo;s time to make an RSS reader of my own, the one that would fit my personal needs better than the others, and maybe this will bring back my good old habit of reading RSS. The picture above is the <a href=https://github.com/zserge/headline/>result</a>.</p><h2 id=past>Past</h2><p>So it all started several years ago. It was clear that web would become a dominating technology, so I took some jQuery, added some CSS and created a tiny HTML page that downloaded RSS content via AJAX, parsed it and printed on screen the titles. I was curious about minimalism back then and that page only displayed brief news headlines with nice clear typography. Even to add another blog I had to edit the HTML source itself. The good thing is that my RSS reader page never collected any personal information, did require any logins and was extremely easy to use.</p><p>The short function that did all the parsing for RSS and Atom feeds was something that still amazes me, how simple it was (converted to ES6):</p><pre><code>function parseFeed(text) {
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  const map = (c, f) =&gt; Array.prototype.slice.call(c, 0).map(f);
+  const tag = (item, name) =&gt;
+    (item.getElementsByTagName(name)[0] || {}).textContent;
+  switch (xml.documentElement.nodeName) {
+    case 'rss':
+      return map(xml.documentElement.getElementsByTagName('item'), item =&gt; ({
+        link: tag(item, 'link'),
+        title: tag(item, 'title'),
+        timestamp: new Date(tag(item, 'pubDate')),
+      }));
+    case 'feed':
+      return map(xml.documentElement.getElementsByTagName('entry'), item =&gt; ({
+        link: map(item.getElementsByTagName('link'), link =&gt; {
+          const rel = link.getAttribute('rel');
+          if (!rel || rel === 'alternate') {
+            return link.getAttribute('href');
+          }
+        })[0],
+        title: tag(item, 'title'),
+        timestamp: new Date(tag(item, 'updated')),
+      }));
+  }
+  return [];
+}
+</code></pre><p>Suddenly, more and more blogs become unreachable to my lovely reader. The reason was CORS, which made it impossible to fetch RSS/Atom XMLs from client-side javascript from another origin. So I edited my HTML news page to use some public CORS proxies.</p><p>As those started to die, I have written my own in Go, which was the language I was learning back then. Here&rsquo;s how it looks like:</p><pre><code>package main
+
+import (
+	&quot;flag&quot;
+	&quot;io&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+	&quot;net/url&quot;
+)
+
+func main() {
+	addr := flag.String(&quot;addr&quot;, &quot;:8080&quot;, &quot;Address to listen on&quot;)
+	flag.Parse()
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;)
+		w.Header().Add(&quot;Access-Control-Allow-Methods&quot;, &quot;GET, PUT, PATCH, POST, DELETE&quot;)
+		w.Header().Add(&quot;Access-Control-Allow-Headers&quot;, r.Header.Get(&quot;Access-Control-Request-Headers&quot;))
+		u := r.URL.Query().Get(&quot;u&quot;)
+		if _, err := url.ParseRequestURI(u); err != nil {
+			http.Error(w, &quot;bad URL&quot;, http.StatusBadRequest)
+			return
+		}
+		req, err := http.NewRequest(&quot;GET&quot;, u, nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		req = req.WithContext(r.Context())
+		req.Header.Set(&quot;User-Agent&quot;, r.Header.Get(&quot;User-Agent&quot;))
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer res.Body.Close()
+		for k, v := range res.Header {
+			for _, s := range v {
+				w.Header().Add(k, s)
+			}
+		}
+		w.WriteHeader(res.StatusCode)
+		io.Copy(w, res.Body)
+	})
+	log.Fatal(http.ListenAndServe(*addr, nil))
+}
+</code></pre><p>A combination of a personal CORS proxy and an HTML file for consuming the news worked pretty well, but somehow I stopped using it.</p><h2 id=present>Present</h2><p>Recently I thought that I still want to follow on the bloggers, that are not so known for Twitter to recommend them, but are still interesting to me. So I decided to revive the Headline.</p><p>Looking at the old-school jQuery felt weird these days, so I took my [tiny React clone] and quickly converted it into a single-page application. I decided that it should let users add/remove feeds without forcing them to edit HTML, also I added some animations and made news fetching an async operation so that user would never have to reload the page.</p><p>But after I started using it on my laptop and my phone - I thought that maybe a simpler and dumber approach was the right one.</p><p>Do I ditched my JSX and created initial layout straight in the HTML. I used <code>&lt;template&gt;</code> sections to define layout of dynamically added elements, like news headlines or items in the feed list. I left only one screen and reduced the animations. Basically I was thinking - how would this be implemented if I were to write it ten years ago, but with modern technologies. And you know what, ES6 is great even without frameworks. CSS is great even without preprocessors. Sometimes simpler tools give better results.</p><p>So the Headline was rewritten, it takes nearly 4KB of code and loads instantly even on my phone with slow network.</p><h2 id=future>Future</h2><p>As everyone is talking about progressive web applications, I decided to turn Headline into a PWA. I was not hard, with Lighthouse and tons of documentation. Now I can read my last cached news even when I&rsquo;m offline. The future is now.</p><p>However, Webkit and Apple would now erase all the local storage if the app has not been used for some time. Which means user will lose not only the cached news, but also the precious list of feeds. This was unacceptable, but I found a quick workaround - I serialize a list of feeds into the URL. So if you bookmark a Headline page - you keep all your associated feeds always with you. Moreover, you can create feeds on the desktop, convert the URL into a QR code, open it on the mobile and that&rsquo;s how you can sync two devices together without any need for a backend.</p><p>The other futuristic problem was how to reduce the number of posts in the headline feed, because the amount was sometimes overwhelming. I decided to try natural language processing approaches to filter news by user interests. The first problem here would be to figure out what user finds interesting. The links he clicked? But I often read the headlines and don&rsquo;t click, because the news is clear to me, still, I find it interesting.</p><p>But even if we get a list of the headlines interesting from the user&rsquo;s perspective, how do we find related news? I tried every approach I was aware of, from TD-IDF and &ldquo;Bag of Words&rdquo; to word2vec. I used common word2vec model and I trained my own one based on the HN and Reddit titles to make it domain-specific. But in every case the best I was getting was basically filtering by keywords. Synonyms were very close from reality. Imagine the related words for Apple, Swift, Go, Sketch - they all highly depend on the context and the context is almost impossible to extract from a headline of ten words. I still don&rsquo;t give up a hope to make it work some day, but for now I gave up.</p><p>Instead I implemented a literal keyword filtering. One can give a list of words and regexps to highlight - and Headline will highlight the matching titles for you. Simple, fast and predictable.</p><p>So I&rsquo;m back to using RSS daily. Is it a pleasant experience? Rather yes, than no. But to me RSS looks more undead, than dead. For those who remember RSS from its past glory it may seem alive forever. For those who don&rsquo;t - probably social networks and AI would feel more natural.</p><p>Would you like to give Headline a try? You may have a look at <a href=https://zserge.com/headline/>zserge.com/headline</a>. But if you found an issue or would like to customize it - the sources are on <a href=https://github.com/zserge/headline>Github</a>, pull requests are always welcome!</p><p>Technologies don&rsquo;t go extinct, and RSS is definitely not dead. Thanks for reading, and may you only get good news!</p><p class=date style=text-align:right><em>Mar 30, 2020</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=https%3a%2f%2fzserge.com%2fposts%2frss%2f&title=RSS%20is%20dead">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=RSS%20is%20dead+https%3a%2f%2fzserge.com%2fposts%2frss%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
