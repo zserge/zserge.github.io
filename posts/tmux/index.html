@@ -1,0 +1,88 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Tmux for mere mortals</title><meta name=description content="Tmux is great. Tmux defaults are not. How to make use of a brilliant tool without breaking your fingers?"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/tmux/><meta property=og:title content="Tmux for mere mortals"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/tmux/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Tmux is great. Tmux defaults are not. How to make use of a brilliant tool without breaking your fingers?"><meta property=og:locale content=en_US><meta name=twitter:card content="Tmux is great. Tmux defaults are not. How to make use of a brilliant tool without breaking your fingers?"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Tmux for mere mortals</h1><p>Tmux has liberated me from tiling window mangers. Not that I didn&rsquo;t like those, but I occasionally have to work with macOS or default GNOME setups. And over the years I realised that I only need a terminal multiplexor to do terminal tiling for me, the rest of the windows are just fine to be full-screen in separate workspaces.</p><p>So, I ended up doing 80% of my work in terminals with tmux. But, the prefix thing? Pardonnez-moi, but usability matters. Pressing a chorded prefix hotkey only to press another chorded hotkey to perform a single action is clear nonsense.</p><p>With this in mind, I decided to customize my tmux to use only simple chorded hotkeys without a prefix for most common actions, and to make them easy to remember. Additionally, my goal was not to override anything in the default tmux configuration to be able to use default tmux as well, if I have to (i.e. when ssh&rsquo;ed to some remote server). Finally, I wanted it to be similar in German/US keyboards, as well as work for MacBooks and regular laptops.</p><p>Here&rsquo;s what I came up with:</p><p><img src=/images/tmux-1.png alt=keys-without-shift></p><ul><li>Mod+1..9: switch windows from 1 to 9</li><li>Mod+, and Mod+.: switch to next/prev windows</li><li>Mod+HJKL or arrows: switch between panes</li><li>Mod+N: create new window</li><li>Mod+F: toggle full-screen</li><li>Mod+V: split vertically</li><li>Mod+B: split horizontally (&ldquo;bisect&rdquo;)</li><li>Mod+X: close pane</li><li>Mod+/: enter copy and scroll mode</li></ul><p>Intuitive? Now, same hotkeys with Shift key are used to <em>modify</em> things:</p><p><img src=/images/tmux-2.png alt=keys-with-shift></p><ul><li>Mod+&lt; and Mod+&gt;: move current window to the left/right</li><li>Mod+Shift+HJKL or arrows: move pane to the left/right/up/down</li><li>Mod+Shift+X: close window</li><li>Mod+Shift+R: rename window</li></ul><p>That&rsquo;s pretty much everything I ever needed from tmux. For other, less frequent actions I accept to use the default bindings, from time to time.</p><p>Additionally, I would like tmux to use my primary clipboard on all systems, so that I would only have to copy text with my mouse or keyboard selection. Resizing panes is also usable with a mouse.</p><p>As for the status bar, I&rsquo;m not a big fan of being overloaded with information, so I only show window names there, or in the case then window has only an open shell - current directory name.</p><p>Nothing else.</p><p>Here&rsquo;s the tmux.conf (or you may always have a look at my <a href=https://github.com/zserge/dotfiles>dotfiles</a> for a newer version:</p><pre><code>set-option -g default-terminal screen-256color
+set -g history-limit 10000
+set -g base-index 1
+set-option -g renumber-windows on
+set -s escape-time 0
+bind-key -n M-n new-window -c &quot;#{pane_current_path}&quot;
+bind-key -n M-1 select-window -t :1
+bind-key -n M-2 select-window -t :2
+bind-key -n M-3 select-window -t :3
+bind-key -n M-4 select-window -t :4
+bind-key -n M-5 select-window -t :5
+bind-key -n M-6 select-window -t :6
+bind-key -n M-7 select-window -t :7
+bind-key -n M-8 select-window -t :8
+bind-key -n M-9 select-window -t :9
+bind-key -n M-0 select-window -t :0
+bind-key -n M-. select-window -n
+bind-key -n M-, select-window -p
+bind-key -n M-&lt; swap-window -t -1
+bind-key -n M-&gt; swap-window -t +1
+bind-key -n M-X confirm-before &quot;kill-window&quot;
+bind-key -n M-v split-window -h -c &quot;#{pane_current_path}&quot;
+bind-key -n M-b split-window -v -c &quot;#{pane_current_path}&quot;
+bind-key -n M-R command-prompt -I &quot;&quot; &quot;rename-window '%%'&quot;
+bind-key -n M-f resize-pane -Z
+bind-key -n M-h select-pane -L
+bind-key -n M-l select-pane -R
+bind-key -n M-k select-pane -U
+bind-key -n M-j select-pane -D
+bind-key -n M-Left select-pane -L
+bind-key -n M-Right select-pane -R
+bind-key -n M-Up select-pane -U
+bind-key -n M-Down select-pane -D
+bind-key -n &quot;M-H&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -L; tmux swap-pane -t $old'
+bind-key -n &quot;M-J&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -D; tmux swap-pane -t $old'
+bind-key -n &quot;M-K&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -U; tmux swap-pane -t $old'
+bind-key -n &quot;M-L&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -R; tmux swap-pane -t $old'
+bind-key -n &quot;M-S-Left&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -L; tmux swap-pane -t $old'
+bind-key -n &quot;M-S-Down&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -D; tmux swap-pane -t $old'
+bind-key -n &quot;M-S-Up&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -U; tmux swap-pane -t $old'
+bind-key -n &quot;M-S-Right&quot; run-shell 'old=`tmux display -p &quot;#{pane_index}&quot;`; tmux select-pane -R; tmux swap-pane -t $old'
+bind-key -n M-x confirm-before &quot;kill-pane&quot;
+bind-key -n M-/ copy-mode
+
+# Linux system clipboard
+bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel &quot;xclip -in -selection clipboard&quot;
+bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel &quot;xclip -in -selection clipboard&quot;
+
+# macOS system clipboard
+#bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel &quot;pbcopy&quot;
+#bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel &quot;pbcopy&quot;
+
+set -g mouse on
+set-option -g status-keys vi
+set-option -g set-titles on
+set-option -g set-titles-string 'tmux - #W'
+set -g bell-action any
+set-option -g visual-bell off
+set-option -g set-clipboard off
+setw -g mode-keys vi
+setw -g monitor-activity on
+set -g visual-activity on
+set -g status-style fg=colour15
+set -g status-justify centre
+set -g status-left ''
+set -g status-right ''
+set -g status-interval 1
+set -g message-style fg=colour0,bg=colour3
+setw -g window-status-bell-style fg=colour1
+setw -g window-status-current-style fg=yellow,bold
+setw -g window-status-style fg=colour250
+setw -g window-status-current-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W} '
+setw -g window-status-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W} '
+# For older tmux:
+#setw -g window-status-format ' #W '
+#setw -g window-status-current-format ' #W '
+</code></pre><p>Now tmux feels like a regular desktop app and truly boosts the productivity in the terminal. What do you think?</p><p class=date style=text-align:right><em>Apr 25, 2020</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=https%3a%2f%2fzserge.com%2fposts%2ftmux%2f&title=Tmux%20for%20mere%20mortals">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=Tmux%20for%20mere%20mortals+https%3a%2f%2fzserge.com%2fposts%2ftmux%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
