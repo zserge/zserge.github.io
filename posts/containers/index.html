@@ -1,0 +1,125 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Linux containers in a few lines of code</title><meta name=description content="Trying to figure out how Linux containers work by implementing them from scratch in C."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/containers/><meta property=og:title content="Linux containers in a few lines of code"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/containers/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Trying to figure out how Linux containers work by implementing them from scratch in C."><meta property=og:locale content=en_US><meta name=twitter:card content="Trying to figure out how Linux containers work by implementing them from scratch in C."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
+<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Linux containers in a few lines of code</h1><p>This post is meant to be a counterpart to the previous <a href=/posts/kvm/>KVM</a> post, but about containers instead. The idea is to show how exactly containers work by running a busybox Docker image in our own small container runner.</p><p>Unlike a VM, container is very vague term. Normally, we call containers a self-contained bundle of code and its dependencies, that can be shipped together and run in an isolated environment inside some host operating system. If it still sounds similar to a VM, let&rsquo;s dive deeper and see how containers are implemented.</p><h2 id=busybox-docker>busybox docker</h2><p>Our end goal would be to run a common busybox Docker image, but without docker. Docker uses btrfs as a filesystem format for its images. Let&rsquo;s try pulling the image and unpack it into a directory:</p><pre><code>mkdir rootfs
+docker export $(docker create busybox) | tar -C rootfs -xvf -
+</code></pre><p>Now we got busybox image filesystem unpacked into the <code>rootfs</code> folder. Surely, we can run <code>./rootfs/bin/sh</code> and get a working shell, but if we look at the list of the processes there, or files, or network interfaces - we will see that we have access to our whole OS.</p><p>So, let&rsquo;s try to create an isolated environment somehow.</p><h2 id=clone>clone</h2><p>Since we want to control what a child process can see, we will be using clone(2) instead of fork(2). Clone does pretty much the same, but allows you to pass flags, defining which resources you would want to share.</p><p>The following flags are allowed:</p><ul><li><code>CLONE_NEWNET</code> – isolate network devices</li><li><code>CLONE_NEWUTS</code> – host and domain names (UNIX Timesharing System)</li><li><code>CLONE_NEWIPC</code> – IPC objects</li><li><code>CLONE_NEWPID</code> – PIDs</li><li><code>CLONE_NEWNS</code> – mount points (file systems)</li><li><code>CLONE_NEWUSER</code> – users and groups</li></ul><p>In our experiment we will try to isolate processes, IPC, network and file systems, so here we go:</p><pre><code class=language-c>static char child_stack[1024 * 1024];
+
+int child_main(void *arg) {
+  printf(&quot;Hello from child! PID=%d\n&quot;, getpid());
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  int flags =
+      CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWIPC | CLONE_NEWNET;
+  int pid = clone(child_main, child_stack + sizeof(child_stack),
+                  flags | SIGCHLD, argv + 1);
+  if (pid &lt; 0) {
+    fprintf(stderr, &quot;clone failed: %d\n&quot;, errno);
+    return 1;
+  }
+  waitpid(pid, NULL, 0);
+  return 0;
+}
+</code></pre><p>It has be run with superuser privileges, otherwise clone would fail.</p><p>This gives an already interesting result: child PID is 1. We all know that PID 1 is normally <code>init</code>, but in this case we see that child process got its own isolated list of processes, where it has become the first process.</p><h2 id=running-shell>running shell</h2><p>To easier play around the new environment, let&rsquo;s run a shell in the child process. Actually, let&rsquo;s run arbitrary commands, much like <code>docker run</code>:</p><pre><code class=language-c>int child_main(void *arg) {
+  char **argv = (char **)arg;
+  execvp(argv[0], argv);
+  return 0;
+}
+</code></pre><p>Now, running our app with &ldquo;/bin/sh&rdquo; argument opens a real shell, where we can type commands. This shows how wrong we were about the isolation:</p><pre><code># echo $$
+1
+# ps
+  PID TTY          TIME CMD
+ 5998 pts/31   00:00:00 sudo
+ 5999 pts/31   00:00:00 main
+ 6001 pts/31   00:00:00 sh
+ 6004 pts/31   00:00:00 ps
+</code></pre><p>As we see, the shell process itself has a PID of 1, but actually can see and access all the other processes from the host OS. The reason is that the list of processes is read from procfs, which is still inherited.</p><p>So, let&rsquo;s unmount procfs:</p><pre><code>umount2(&quot;/proc&quot;, MNT_DETACH);
+</code></pre><p>Now, running the shell breaks ps, mount, and other command, because no procfs is mounted. Still better than leaking the parent&rsquo;s procfs.</p><h2 id=chroot>chroot</h2><p>In the old days chroot was a &ldquo;good enough&rdquo; isolation for most use cases, but here let&rsquo;s use a <code>pivot_root</code> instead. This system call moves and existing rootfs into some subdirectory, and make a another directory a new root:</p><pre><code>int child_main(void *arg) {
+  /* Unmount procfs */
+  umount2(&quot;/proc&quot;, MNT_DETACH);
+  /* Pivot root */
+  mount(&quot;./rootfs&quot;, &quot;./rootfs&quot;, &quot;bind&quot;, MS_BIND | MS_REC, &quot;&quot;);
+  mkdir(&quot;./rootfs/oldrootfs&quot;, 0755);
+  syscall(SYS_pivot_root, &quot;./rootfs&quot;, &quot;./rootfs/oldrootfs&quot;);
+  chdir(&quot;/&quot;);
+  umount2(&quot;/oldrootfs&quot;, MNT_DETACH);
+  rmdir(&quot;/oldrootfs&quot;);
+  /* Re-mount procfs */
+  mount(&quot;proc&quot;, &quot;/proc&quot;, &quot;proc&quot;, 0, NULL);
+  /* Run the process */
+  char **argv = (char **)arg;
+  execvp(argv[0], argv);
+  return 0;
+}
+</code></pre><p>It would make sense to mount tmpfs into /tmp, sysfs into /sys and create a valid /dev filesystem, but to keep things short I&rsquo;ll skip it.</p><p>Anyway, now we only see the files from busybox image rootfs, as if we chrooted into it:</p><pre><code>/ # ls
+bin   dev   etc   home  proc  root  sys   tmp   usr   var
+
+/ # mount
+/dev/sda2 on / type ext4 (rw,relatime,data=ordered)
+proc on /proc type proc (rw,relatime)
+
+/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 /bin/sh
+    4 root      0:00 ps
+
+/ # ps ax
+PID   USER     TIME  COMMAND
+    1 root      0:00 /bin/sh
+    5 root      0:00 ps ax
+</code></pre><p>At this point it looks more or less isolated, perhaps, too isolated - we can not ping anything and the network does not seem to work at all.</p><h2 id=network>network</h2><p>Creating a new network namespace was only the start. We need to assign network interfaces to it and set them up to do proper packet forwarding.</p><p>If you don&rsquo;t have a br0 interface, let&rsquo;s create it manually (brctl is part of bridge-utils package on Ubuntu):</p><pre><code>brctl addbr br0
+ip addr add dev br0 172.16.0.100/24
+ip link set br0 up
+sudo iptables -A FORWARD -i wlp3s0  -o br0 -j ACCEPT
+sudo iptables -A FORWARD -o wlp3s0 -i br0 -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -s 172.16.0.0/16 -j MASQUERADE
+</code></pre><p>In my case, wlp3s0 was my primary WiFi network interface and 172.16.x.x was a network for the container.</p><p>What our container launcher should do is to create a pair of peer interfaces, veth0 and veth1, link them to the br0 and set up routing within the container.</p><p>In the main() function we will run these commands before clone:</p><pre><code>system(&quot;ip link add veth0 type veth peer name veth1&quot;);
+system(&quot;ip link set veth0 up&quot;);
+system(&quot;brctl addif br0 veth0&quot;);
+</code></pre><p>After clone() is complete, we will add veth1 to the new child namespace:</p><pre><code>char ip_link_set[4096];
+snprintf(ip_link_set, sizeof(ip_link_set) - 1, &quot;ip link set veth1 netns %d&quot;,
+         pid);
+system(ip_link_set);
+</code></pre><p>Now if we run &ldquo;ip link&rdquo; in the container shell we will see a loopback interface, and some veth1@xxxx interface. But the network still doesn&rsquo;t work. Let&rsquo;s set a unique hostname in the container and configure the routes:</p><pre><code>int child_main(void *arg) {
+
+  ....
+
+  sethostname(&quot;example&quot;, 7);
+  system(&quot;ip link set veth1 up&quot;);
+
+  char ip_addr_add[4096];
+  snprintf(ip_addr_add, sizeof(ip_addr_add),
+           &quot;ip addr add 172.16.0.101/24 dev veth1&quot;);
+  system(ip_addr_add);
+  system(&quot;route add default gw 172.16.0.100 veth1&quot;);
+
+  char **argv = (char **)arg;
+  execvp(argv[0], argv);
+  return 0;
+}
+</code></pre><p>Let&rsquo;s see how it looks like:</p><pre><code>/ # ip link
+1: lo: &lt;LOOPBACK&gt; mtu 65536 qdisc noop qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+47: veth1@if48: &lt;BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN&gt; mtu 1500 qdisc noqueue qlen 1000
+    link/ether 72:0a:f0:91:d5:11 brd ff:ff:ff:ff:ff:ff
+
+/ # hostname
+example
+
+/ # ping 1.1.1.1
+PING 1.1.1.1 (1.1.1.1): 56 data bytes
+64 bytes from 1.1.1.1: seq=0 ttl=57 time=27.161 ms
+64 bytes from 1.1.1.1: seq=1 ttl=57 time=26.048 ms
+64 bytes from 1.1.1.1: seq=2 ttl=57 time=26.980 ms
+...
+</code></pre><p>It works!</p><h2 id=summary>summary</h2><p>The full source code is available at <a href=https://gist.github.com/zserge/4ce3c1ca837b96d58cc5bdcf8befb80e>https://gist.github.com/zserge/4ce3c1ca837b96d58cc5bdcf8befb80e</a>. If you found a mistake or got a suggestion - please leave a comment there!</p><p>Obviously, Docker does much more than this. But it&rsquo;s amazing how many convenient APIs Linux kernel has and easy it is to use them to achieve OS-level virtualization.</p><p class=date style=text-align:right><em>May 10, 2020</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=https%3a%2f%2fzserge.com%2fposts%2fcontainers%2f&title=Linux%20containers%20in%20a%20few%20lines%20of%20code">like</a>
+&nbsp;
+<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=Linux%20containers%20in%20a%20few%20lines%20of%20code+https%3a%2f%2fzserge.com%2fposts%2fcontainers%2f via @zsergo">tweet</a>
+&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
+&nbsp;
+<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
+&nbsp;
+<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
