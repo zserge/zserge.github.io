@@ -1,7 +1,7 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Ode to J</title><meta name=description content="From a confusing page of old C code to APL/J praise."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/j/><meta property=og:title content="Ode to J"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/j/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="From a confusing page of old C code to APL/J praise."><meta property=og:locale content=en_US><meta name=twitter:card content="From a confusing page of old C code to APL/J praise."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Ode to J</title><meta name=description content="From a confusing page of old C code to APL/J praise."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/j/><meta property=og:title content="Ode to J"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/j/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="From a confusing page of old C code to APL/J praise."><meta property=og:locale content=en_US><meta name=twitter:card content="From a confusing page of old C code to APL/J praise."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link href=https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/themes/prism.min.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
 <a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Ode to J</h1><p>While self-isolating orchestras and amateur musicians are playing &lsquo;Ode to Joy&rsquo;
-from their open windows, I would like to give it a try with my ode to <a href=https://en.wikipedia.org/wiki/J_(programming_language>J</a>.</p><p>If you read the Hacker News or other programming resources, you probably have read <a href=https://code.jsoftware.com/wiki/Essays/Incunabulum>the following passage</a>:</p><p>&ldquo;One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm and produced—on one page and in one afternoon—an interpreter fragment on the AT&amp;T 3B1 computer. I studied this interpreter for about a week for its organization and programming style; and on Sunday, August 27, 1989, at about four o&rsquo;clock in the afternoon, wrote the first line of code that became the implementation described in this document.&rdquo; (An Implementation of J, Appendix A: Incunabulum).</p><p>It was the beginning of the story of the J language, a weird-looking array programming language. This family of languages is notable for their terse notation, where a clever one-liner can represent what would have taken a page of Java code.</p><p>For example a common for loop <code>for (int i = 0; i &lt; n; i++) a[i] += b[i];</code> in J would simple become <code>a=:a+b</code>.</p><p>It&rsquo;s no wonder that the snippet of code that inspired the creation of the J language is also very concise:</p><pre><code>typedef char C;typedef long long I;
+from their open windows, I would like to give it a try with my ode to <a href=https://en.wikipedia.org/wiki/J_(programming_language>J</a>.</p><p>If you read the Hacker News or other programming resources, you probably have read <a href=https://code.jsoftware.com/wiki/Essays/Incunabulum>the following passage</a>:</p><p>&ldquo;One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm and produced—on one page and in one afternoon—an interpreter fragment on the AT&amp;T 3B1 computer. I studied this interpreter for about a week for its organization and programming style; and on Sunday, August 27, 1989, at about four o&rsquo;clock in the afternoon, wrote the first line of code that became the implementation described in this document.&rdquo; (An Implementation of J, Appendix A: Incunabulum).</p><p>It was the beginning of the story of the J language, a weird-looking array programming language. This family of languages is notable for their terse notation, where a clever one-liner can represent what would have taken a page of Java code.</p><p>For example a common for loop <code class="language-c">for (int i = 0; i &lt; n; i++) a[i] += b[i];</code> in J would simple become <code class="language-j">a=:a+b</code>.</p><p>It&rsquo;s no wonder that the snippet of code that inspired the creation of the J language is also very concise:</p><pre><code class="language-c">typedef char C;typedef long long I;
 typedef struct a{I t,r,d[3],p[2];}*A;
 #define P printf
 #define R return
@@ -43,7 +43,7 @@ I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
  DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
 
 main(){C s[99];while(gets(s))pr(ex(wd(s)));}
-</code></pre><p>I dared to update the code a little bit, originally it was using <code>long</code> data type, and was casting it to pointers, which are 64-bit these days. So I replaced it with <code>long long</code> to be able to run this code.</p><p>Yes, it looks weird to modern eyes. Even if we prettify the code with clang-format - we will still find that it uses old-school K&amp;R coding style and it&rsquo;s a miracle that this code is 30 years old and still works.</p><p>What does it do? Well, it&rsquo;s an interpreter. Yes, it&rsquo;s a tiny array programming language, like APL or K. It has certain limitations that we will discover later, but for now I invite you to the journey of deciphering this code.</p><h2 id=data-types>Data types</h2><p>As we are dealing with an array programming language, the only data type it supports is an array. Arrays may contain numbers, or other nested arrays, which is known as &ldquo;boxing&rdquo;.</p><pre><code>typedef struct a{I t,r,d[3],p[2];}*A;
+</code></pre><p>I dared to update the code a little bit, originally it was using <code class="language-c">long</code> data type, and was casting it to pointers, which are 64-bit these days. So I replaced it with <code class="language-c">long long</code> to be able to run this code.</p><p>Yes, it looks weird to modern eyes. Even if we prettify the code with clang-format - we will still find that it uses old-school K&amp;R coding style and it&rsquo;s a miracle that this code is 30 years old and still works.</p><p>What does it do? Well, it&rsquo;s an interpreter. Yes, it&rsquo;s a tiny array programming language, like APL or K. It has certain limitations that we will discover later, but for now I invite you to the journey of deciphering this code.</p><h2 id=data-types>Data types</h2><p>As we are dealing with an array programming language, the only data type it supports is an array. Arrays may contain numbers, or other nested arrays, which is known as &ldquo;boxing&rdquo;.</p><pre><code class="language-c">typedef struct a{I t,r,d[3],p[2];}*A;
 // or
 typedef struct {
   I t; // t=0: normal array, t=1: &quot;boxed&quot;
@@ -51,20 +51,20 @@ typedef struct {
   I d[3]; // depth: size in each dimension (up to 3)
   I p[2]; // array data - numbers mixed with pointers
 } *A;
-</code></pre><p>As you can see, arrays are limited to only integer elements, may contain other arrays and may have up to 3 dimensions (linear vectors, rectangular matrices and 3-dimensional arrays.</p><p>The fixed size of 2 for data array was probably chosen to avoid dynamic memory allocation for single numbers (arrays of zero rank with one element). But I suspect it has not been used correctly (I might be wrong, though).</p><p>For allocating integer arrays there is a helper function &ldquo;ma&rdquo;, which only wraps malloc to allocate <code>n</code> integers:</p><pre><code>I *ma(n){R(I*)malloc(n*8);}
+</code></pre><p>As you can see, arrays are limited to only integer elements, may contain other arrays and may have up to 3 dimensions (linear vectors, rectangular matrices and 3-dimensional arrays.</p><p>The fixed size of 2 for data array was probably chosen to avoid dynamic memory allocation for single numbers (arrays of zero rank with one element). But I suspect it has not been used correctly (I might be wrong, though).</p><p>For allocating integer arrays there is a helper function &ldquo;ma&rdquo;, which only wraps malloc to allocate <code class="language-c">n</code> integers:</p><pre><code class="language-c">I *ma(n){R(I*)malloc(n*8);}
 // or
 typedef long long I;
 I *ma(int n) {
   return (I *) malloc(n * sizeof(I));
 }
-</code></pre><p>For copying array elements there is a hand-written memmove:</p><pre><code>mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
+</code></pre><p>For copying array elements there is a hand-written memmove:</p><pre><code class="language-c">mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
 // or
 void mv(I *d, I *s, int n) {
   for (int i = 0; i &lt; n; i++) {
     d[i] = s[i];
   }
 }
-</code></pre><p>As you see, <code>DO(n, op)</code> is a macro to avoid numerous for-loops, that are untypical in the array programming nature.</p><p>Then goes a function to multiply dimensions in each rank (to get the total number of elements in all dimensions):</p><pre><code>tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
+</code></pre><p>As you see, <code class="language-c">DO(n, op)</code> is a macro to avoid numerous for-loops, that are untypical in the array programming nature.</p><p>Then goes a function to multiply dimensions in each rank (to get the total number of elements in all dimensions):</p><pre><code class="language-c">tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
 // or
 I tr(I r, I *d) {
   I z = 1;
@@ -73,7 +73,7 @@ I tr(I r, I *d) {
   }
   return z;
 }
-</code></pre><p>It is commonly used before calling DO() to apply some operation to all elements in all dimensions of an array.</p><p>Finally, there is a constructor for the array type:</p><pre><code>A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z-&gt;t=t,z-&gt;r=r,mv(z-&gt;d,d,r);R z;}
+</code></pre><p>It is commonly used before calling DO() to apply some operation to all elements in all dimensions of an array.</p><p>Finally, there is a constructor for the array type:</p><pre><code class="language-c">A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z-&gt;t=t,z-&gt;r=r,mv(z-&gt;d,d,r);R z;}
 // or
 A ga(I t, I r, I *d) {
   A z = (A) ma(5 + tr(r, d)); // tr() returns number of elements here
@@ -82,7 +82,7 @@ A ga(I t, I r, I *d) {
   mv(z-&gt;d, d, r);
   return z;
 }
-</code></pre><h2 id=parser>parser</h2><p>Now I suggest to skip the part with many V1 and V2 functions, and jump to the end of the program, the main function:</p><pre><code>main(){C s[99];while(gets(s))pr(ex(wd(s)));}
+</code></pre><h2 id=parser>parser</h2><p>Now I suggest to skip the part with many V1 and V2 functions, and jump to the end of the program, the main function:</p><pre><code class="language-c">main(){C s[99];while(gets(s))pr(ex(wd(s)));}
 // or
 int main() {
   char s[99];             // maximum input line length
@@ -92,7 +92,7 @@ int main() {
     pr(result);           // print result
   }
 }
-</code></pre><p>Yes, it&rsquo;s a simple REPL (read-eval-print) loop, that we commonly see in every interpreter.</p><p>Let&rsquo;s have a look at the parser (which is only a tokenizer in fact):</p><pre><code>C vt[]=&quot;+{~&lt;#,&quot;;
+</code></pre><p>Yes, it&rsquo;s a simple REPL (read-eval-print) loop, that we commonly see in every interpreter.</p><p>Let&rsquo;s have a look at the parser (which is only a tokenizer in fact):</p><pre><code class="language-c">C vt[]=&quot;+{~&lt;#,&quot;;
 noun(c){A z;if(c&lt;'0'||c&gt;'9')R 0;z=ga(0,0,0);*z-&gt;p=c-'0';R z;}
 verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
 I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
@@ -137,7 +137,7 @@ I *wd(const char *s) {
   e[n] = 0; // null-terminate and return tokens
   return e;
 }
-</code></pre><p>So the parser converts each and every character in the input line to either a noun (numeric literal from 0 to 9), a verb (a one-symbol function) or a variable (&lsquo;a&rsquo;..&lsquo;z&rsquo;). It&rsquo;s very fragile so you should be really careful with the input.</p><p>Now as we have an input string converted into an array of tokens - we can evaluate them.</p><h2 id=eval>eval</h2><p>Evaluator is recursive-decent, with right-side recursion (when right part of the expression is evaluated before the left one):</p><pre><code>A(*vd[])()={0,plus,from,find,0,rsh,cat},
+</code></pre><p>So the parser converts each and every character in the input line to either a noun (numeric literal from 0 to 9), a verb (a one-symbol function) or a variable (&lsquo;a&rsquo;..&lsquo;z&rsquo;). It&rsquo;s very fragile so you should be really careful with the input.</p><p>Now as we have an input string converted into an array of tokens - we can evaluate them.</p><h2 id=eval>eval</h2><p>Evaluator is recursive-decent, with right-side recursion (when right part of the expression is evaluated before the left one):</p><pre><code class="language-c">A(*vd[])()={0,plus,from,find,0,rsh,cat},
  (*vm[])()={0,id,size,iota,box,sha,0};
 I st[26]; qp(a){R  a&gt;='a'&amp;&amp;a&lt;='z';}qv(a){R a&lt;'a';}
 A ex(e)I *e;{I a=*e;
@@ -174,7 +174,7 @@ A ex(I *e) {
     return a;          // else, return noun `a` as is.
   }
 }
-</code></pre><p>Again, evaluator is completely intolerant to errors and expect only correct input. You see that right-hand side of the expression is always recursively evaluated first. That&rsquo;s because in APL-like languages operators are always applied right-to-left.</p><p>If you are confused about &ldquo;monadic&rdquo; and &ldquo;dyadic&rdquo; verbs - these are merely functions with one (monadic) or two (dyadic) arguments.</p><p>So, once it is clear how evaluation works - let&rsquo;s have a look at the actual verbs, that manipulate our arrays.</p><h2 id=verbs>verbs</h2><p>All verbs take an array or two and return another array, which is a result.</p><p>First, monadic verbs, there&rsquo;s only five of them:</p><pre><code>V1(id){R w;}
+</code></pre><p>Again, evaluator is completely intolerant to errors and expect only correct input. You see that right-hand side of the expression is always recursively evaluated first. That&rsquo;s because in APL-like languages operators are always applied right-to-left.</p><p>If you are confused about &ldquo;monadic&rdquo; and &ldquo;dyadic&rdquo; verbs - these are merely functions with one (monadic) or two (dyadic) arguments.</p><p>So, once it is clear how evaluation works - let&rsquo;s have a look at the actual verbs, that manipulate our arrays.</p><h2 id=verbs>verbs</h2><p>All verbs take an array or two and return another array, which is a result.</p><p>First, monadic verbs, there&rsquo;s only five of them:</p><pre><code class="language-c">V1(id){R w;}
 V1(size){A z=ga(0,0,0);*z-&gt;p=w-&gt;r?*w-&gt;d:1;R z;}
 V1(iota){I n=*w-&gt;p;A z=ga(0,1,&amp;n);DO(n,z-&gt;p[i]=i);R z;}
 V1(box){A z=ga(1,0,0);*z-&gt;p=(I)w;R z;}
@@ -221,7 +221,7 @@ A sha(A w) {
   mv(z-&gt;p, w-&gt;d, w-&gt;r);   // copy dimensions of w into result z
   return z;
 }
-</code></pre><p>Obviously, in Arthur Whitney&rsquo;s notation these verbs are compact and maybe even easy to read once you know what they are supposed to do.</p><p>Now, the dyadic verbs that operate on two arguments:</p><pre><code>V2(plus){I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);A z=ga(0,r,d);
+</code></pre><p>Obviously, in Arthur Whitney&rsquo;s notation these verbs are compact and maybe even easy to read once you know what they are supposed to do.</p><p>Now, the dyadic verbs that operate on two arguments:</p><pre><code class="language-c">V2(plus){I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);A z=ga(0,r,d);
  DO(n,z-&gt;p[i]=a-&gt;p[i]+w-&gt;p[i]);R z;}
 
 // Example: [1,2,3] + [4,5,6] -&gt; [5,7,9]
@@ -282,12 +282,12 @@ A rsh(A a, A w) {
   }
   return z;
 }
-</code></pre><h2 id=print>print</h2><p>Finally, printing arrays. I will leave this without any comments, but instead will show the usage of the interpreter:</p><pre><code>// pi(i) print an interger
+</code></pre><h2 id=print>print</h2><p>Finally, printing arrays. I will leave this without any comments, but instead will show the usage of the interpreter:</p><pre><code class="language-c">// pi(i) print an interger
 pi(i){P(&quot;%d &quot;,i);}nl(){P(&quot;\n&quot;);}
 // pr(w) prints an array, first shape then data, &quot;&lt;&quot; indicates boxing
 pr(w)A w;{I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);DO(r,pi(d[i]));nl();
  if(w-&gt;t)DO(n,P(&quot;&lt; &quot;);pr(w-&gt;p[i]))else DO(n,pi(w-&gt;p[i]));nl();}
-</code></pre><p>And here&rsquo;s the usage of the whole program:</p><pre><code>$ gcc odetoj.c -o j
+</code></pre><p>And here&rsquo;s the usage of the whole program:</p><pre><code class="language-shell-session">$ gcc odetoj.c -o j
 $ ./j
     2      // numbers
 2
@@ -326,4 +326,4 @@ $ ./j
 &nbsp;
 <a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
 <a href=https://zserge.com>Serge Zaitsev</a> &middot;
-<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
+<a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/components/prism-core.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/plugins/autoloader/prism-autoloader.min.js></script><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
