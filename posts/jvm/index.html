@@ -1,11 +1,11 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>How to write a (toy) JVM</title><meta name=description content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/jvm/><meta property=og:title content="How to write a (toy) JVM"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/jvm/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta property=og:locale content=en_US><meta name=twitter:card content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>How to write a (toy) JVM</title><meta name=description content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/jvm/><meta property="og:title" content="How to write a (toy) JVM"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/jvm/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM."><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>How to write a (toy) JVM</h1><p>Whether we like it or not, but Java is one of the most widely used programming languages. However, since most of the applications in Java are either too boring or too complex - not every Java developer has enough curiosity to look under the hood and see how JVM works.</p><p>In this post I will try to write a toy (and incomplete) JVM to show the core principles behind it and hopefully sparkle some interest in you to learn it further.</p><h2 id=our-humble-goal>Our humble goal</h2><p>Let&rsquo;s start with something really simple:</p><pre><code class=language-java>public class Add {
-  public static int add(int a, int b) {
-    return a + b;
-  }
-}
-</code></pre><p>We compile our class with <code>javac Add.java</code> and it results in <code>Add.class</code>. This class file is the actual binary file that JVM can execute. All that is left to do is to implement such a JVM that would execute it correctly.</p><p>If we look inside the <code>Add.class</code> with a hexdump - we probably won&rsquo;t get too impressed:</p><pre><code>00000000  ca fe ba be 00 00 00 34  00 0f 0a 00 03 00 0c 07  |.......4........|
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>How to write a (toy) JVM</h1><p>Whether we like it or not, but Java is one of the most widely used programming languages. However, since most of the applications in Java are either too boring or too complex - not every Java developer has enough curiosity to look under the hood and see how JVM works.</p><p>In this post I will try to write a toy (and incomplete) JVM to show the core principles behind it and hopefully sparkle some interest in you to learn it further.</p><h2 id=our-humble-goal>Our humble goal</h2><p>Let&rsquo;s start with something really simple:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>class</span> <span class=nc>Add</span> <span class=o>{</span>
+  <span class=kd>public</span> <span class=kd>static</span> <span class=kt>int</span> <span class=nf>add</span><span class=o>(</span><span class=kt>int</span> <span class=n>a</span><span class=o>,</span> <span class=kt>int</span> <span class=n>b</span><span class=o>)</span> <span class=o>{</span>
+    <span class=k>return</span> <span class=n>a</span> <span class=o>+</span> <span class=n>b</span><span class=o>;</span>
+  <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><p>We compile our class with <code>javac Add.java</code> and it results in <code>Add.class</code>. This class file is the actual binary file that JVM can execute. All that is left to do is to implement such a JVM that would execute it correctly.</p><p>If we look inside the <code>Add.class</code> with a hexdump - we probably won&rsquo;t get too impressed:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>00000000  ca fe ba be 00 00 00 34  00 0f 0a 00 03 00 0c 07  |.......4........|
 00000010  00 0d 07 00 0e 01 00 06  3c 69 6e 69 74 3e 01 00  |........&lt;init&gt;..|
 00000020  03 28 29 56 01 00 04 43  6f 64 65 01 00 0f 4c 69  |.()V...Code...Li|
 00000030  6e 65 4e 75 6d 62 65 72  54 61 62 6c 65 01 00 03  |neNumberTable...|
@@ -20,13 +20,13 @@
 000000c0  00 06 00 00 00 1c 00 02  00 02 00 00 00 04 1a 1b  |................|
 000000d0  60 ac 00 00 00 01 00 07  00 00 00 06 00 01 00 00  |`...............|
 000000e0  00 03 00 01 00 0a 00 00  00 02 00 0b              |............|
-</code></pre><p>Although we don&rsquo;t see a clear structure here yet - we need to find a way how to parse it: what are these <code>()V</code> and <code>(II)I</code>, what is <code>&lt;init&gt;</code>, and why does it start with &ldquo;cafe babe&rdquo;?</p><p>You probably have seen another way to dump class files, which is often more useful:</p><pre><code>$ javap -c Add
-Compiled from &quot;Add.java&quot;
+</code></pre></div><p>Although we don&rsquo;t see a clear structure here yet - we need to find a way how to parse it: what are these <code>()V</code> and <code>(II)I</code>, what is <code>&lt;init></code>, and why does it start with &ldquo;cafe babe&rdquo;?</p><p>You probably have seen another way to dump class files, which is often more useful:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ javap -c Add
+Compiled from &#34;Add.java&#34;
 public class Add {
   public Add();
     Code:
        0: aload_0
-       1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V
+       1: invokespecial #1                  // Method java/lang/Object.&#34;&lt;init&gt;&#34;:()V
        4: return
 
   public static int add(int, int);
@@ -36,221 +36,221 @@ public class Add {
        2: iadd
        3: ireturn
 }
-</code></pre><p>Now we see our class, its constructor, and a method. Both constructor and method contain a few instructions and it now becomes more or less clear what our add() method does: it loads two arguments (<code>iload_0</code> and <code>iload_1</code>), adds them, and returns the result. JVM is a stack machine, so there are no registers, all arguments to the instructions are stored on the internal stack and the results are pushed on the stack as well.</p><h2 id=class-loader>Class loader</h2><p>Now, how can we achieve what javap did here, how do we parse the class file?</p><p>If we look into the <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/index.html>JVM specification</a>, we learn about <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/jvms-4.html>classfile</a> structure. It always starts with 4 bytes signature (CAFEBABE), then 2+2 bytes for version, sounds simple.</p><p>Since we would have to read bytes, shorts, ints, and byte sequences from the binary file, we can start implementing our loader like this:</p><pre><code class=language-go>type loader struct {
-	r   io.Reader
-	err error
-}
+</code></pre></div><p>Now we see our class, its constructor, and a method. Both constructor and method contain a few instructions and it now becomes more or less clear what our add() method does: it loads two arguments (<code>iload_0</code> and <code>iload_1</code>), adds them, and returns the result. JVM is a stack machine, so there are no registers, all arguments to the instructions are stored on the internal stack and the results are pushed on the stack as well.</p><h2 id=class-loader>Class loader</h2><p>Now, how can we achieve what javap did here, how do we parse the class file?</p><p>If we look into the <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/index.html>JVM specification</a>, we learn about <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/jvms-4.html>classfile</a> structure. It always starts with 4 bytes signature (CAFEBABE), then 2+2 bytes for version, sounds simple.</p><p>Since we would have to read bytes, shorts, ints, and byte sequences from the binary file, we can start implementing our loader like this:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>loader</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>r</span>   <span class=nx>io</span><span class=p>.</span><span class=nx>Reader</span>
+	<span class=nx>err</span> <span class=kt>error</span>
+<span class=p>}</span>
 
-func (l *loader) bytes(n int) []byte {
-	b := make([]byte, n, n)
-	// we don't want to handle errors in each step,
-	// so simply store the first found error till the end
-	// and do nothing if we entered an erroneous state
-	if l.err == nil {
-		_, l.err = io.ReadFull(l.r, b)
-	}
-	return b
-}
-func (l *loader) u1() uint8  { return l.bytes(1)[0] }
-func (l *loader) u2() uint16 { return binary.BigEndian.Uint16(l.bytes(2)) }
-func (l *loader) u4() uint32 { return binary.BigEndian.Uint32(l.bytes(4)) }
-func (l *loader) u8() uint64 { return binary.BigEndian.Uint64(l.bytes(8)) }
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>bytes</span><span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=p>[]</span><span class=kt>byte</span> <span class=p>{</span>
+	<span class=nx>b</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>byte</span><span class=p>,</span> <span class=nx>n</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span>
+	<span class=c1>// we don&#39;t want to handle errors in each step,
+</span><span class=c1></span>	<span class=c1>// so simply store the first found error till the end
+</span><span class=c1></span>	<span class=c1>// and do nothing if we entered an erroneous state
+</span><span class=c1></span>	<span class=k>if</span> <span class=nx>l</span><span class=p>.</span><span class=nx>err</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nx>_</span><span class=p>,</span> <span class=nx>l</span><span class=p>.</span><span class=nx>err</span> <span class=p>=</span> <span class=nx>io</span><span class=p>.</span><span class=nf>ReadFull</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nx>r</span><span class=p>,</span> <span class=nx>b</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>b</span>
+<span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>u1</span><span class=p>()</span> <span class=kt>uint8</span>  <span class=p>{</span> <span class=k>return</span> <span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=mi>1</span><span class=p>)[</span><span class=mi>0</span><span class=p>]</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>u2</span><span class=p>()</span> <span class=kt>uint16</span> <span class=p>{</span> <span class=k>return</span> <span class=nx>binary</span><span class=p>.</span><span class=nx>BigEndian</span><span class=p>.</span><span class=nf>Uint16</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=mi>2</span><span class=p>))</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>u4</span><span class=p>()</span> <span class=kt>uint32</span> <span class=p>{</span> <span class=k>return</span> <span class=nx>binary</span><span class=p>.</span><span class=nx>BigEndian</span><span class=p>.</span><span class=nf>Uint32</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=mi>4</span><span class=p>))</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>u8</span><span class=p>()</span> <span class=kt>uint64</span> <span class=p>{</span> <span class=k>return</span> <span class=nx>binary</span><span class=p>.</span><span class=nx>BigEndian</span><span class=p>.</span><span class=nf>Uint64</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=mi>8</span><span class=p>))</span> <span class=p>}</span>
 
-// Usage:
-f, _ := os.Open(&quot;Add.class&quot;)
-loader := &amp;loader{r: f}
-cafebabe := loader.u4()
-major := loader.u2()
-minor := loader.u2()
-</code></pre><p>And then the spec tells us that we need to parse the constant pool. What is it? It is a special part of the class file, that contains constants needed to run the class. All the strings, numerical constants, and references are stored there and each has a unique uint16 index (thus, a class may have up to 64K constants).</p><p>There are several types of constants in the pool, each containing a different set of values. We would be interested in:</p><ul><li>UTF8: a plain string literal</li><li>Class: an index of a class name string (indirect reference)</li><li>Name and type: an index of a type name and descriptor, used for fields and methods</li><li>Field and method references: indices referring to classes and name-and-type constants</li></ul><p>As you see, constants in the pool are referring to each other a lot. Since we are implementing a JVM in Go and there are no union types, let&rsquo;s make a Const type that would contain various possible constant fields in it:</p><pre><code class=language-go>type Const struct {
-	Tag              byte
-	NameIndex        uint16
-	ClassIndex       uint16
-	NameAndTypeIndex uint16
-	StringIndex      uint16
-	DescIndex        uint16
-	String           string
-}
-type ConstPool []Const
-</code></pre><p>Then, following the JVM spec we could parse the constant pool data like this:</p><pre><code class=language-go>func (l *loader) cpinfo() (constPool ConstPool) {
-	constPoolCount := l.u2()
-	// Valid constant pool indices start from 1
-	for i := uint16(1); i &lt; constPoolCount; i++ {
-		c := Const{Tag: l.u1()}
-		switch c.Tag {
-		case 0x01: // UTF8 string literal, 2 bytes length + data
-			c.String = string(l.bytes(int(l.u2())))
-		case 0x07: // Class index
-			c.NameIndex = l.u2()
-		case 0x08: // String reference index
-			c.StringIndex = l.u2()
-		case 0x09, 0x0a: // Field and method: class index + NaT index
-			c.ClassIndex = l.u2()
-			c.NameAndTypeIndex = l.u2()
-		case 0x0c: // Name-and-type
-			c.NameIndex, c.DescIndex = l.u2(), l.u2()
-		default:
-			l.err = fmt.Errorf(&quot;unsupported tag: %d&quot;, c.Tag)
-		}
-		constPool = append(constPool, c)
-	}
-	return constPool
-}
-</code></pre><p>We keep things simple here, but in real JVM we would have to treat long and double constant types uniquely, by inserting an additional unused const item, as JVM spec tells us (since const items are considered to be 32-bit).</p><p>To easier get string literals by indices, we would implement a <code>Resolve(index uint16) string</code> method:</p><pre><code class=language-go>func (cp ConstPool) Resolve(index uint16) string {
-	if cp[index-1].Tag == 0x01 {
-		return cp[index-1].String
-	}
-	return &quot;&quot;
-}
-</code></pre><p>Now we have to add similar helpers to parse a list of class interfaces, fields and methods, and their attributes:</p><pre><code class=language-go>func (l *loader) interfaces(cp ConstPool) (interfaces []string) {
-	interfaceCount := l.u2()
-	for i := uint16(0); i &lt; interfaceCount; i++ {
-		interfaces = append(interfaces, cp.Resolve(l.u2()))
-	}
-	return interfaces
-}
+<span class=c1>// Usage:
+</span><span class=c1></span><span class=nx>f</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>os</span><span class=p>.</span><span class=nf>Open</span><span class=p>(</span><span class=s>&#34;Add.class&#34;</span><span class=p>)</span>
+<span class=nx>loader</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>loader</span><span class=p>{</span><span class=nx>r</span><span class=p>:</span> <span class=nx>f</span><span class=p>}</span>
+<span class=nx>cafebabe</span> <span class=o>:=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>u4</span><span class=p>()</span>
+<span class=nx>major</span> <span class=o>:=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+<span class=nx>minor</span> <span class=o>:=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+</code></pre></div><p>And then the spec tells us that we need to parse the constant pool. What is it? It is a special part of the class file, that contains constants needed to run the class. All the strings, numerical constants, and references are stored there and each has a unique uint16 index (thus, a class may have up to 64K constants).</p><p>There are several types of constants in the pool, each containing a different set of values. We would be interested in:</p><ul><li>UTF8: a plain string literal</li><li>Class: an index of a class name string (indirect reference)</li><li>Name and type: an index of a type name and descriptor, used for fields and methods</li><li>Field and method references: indices referring to classes and name-and-type constants</li></ul><p>As you see, constants in the pool are referring to each other a lot. Since we are implementing a JVM in Go and there are no union types, let&rsquo;s make a Const type that would contain various possible constant fields in it:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Const</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>Tag</span>              <span class=kt>byte</span>
+	<span class=nx>NameIndex</span>        <span class=kt>uint16</span>
+	<span class=nx>ClassIndex</span>       <span class=kt>uint16</span>
+	<span class=nx>NameAndTypeIndex</span> <span class=kt>uint16</span>
+	<span class=nx>StringIndex</span>      <span class=kt>uint16</span>
+	<span class=nx>DescIndex</span>        <span class=kt>uint16</span>
+	<span class=nx>String</span>           <span class=kt>string</span>
+<span class=p>}</span>
+<span class=kd>type</span> <span class=nx>ConstPool</span> <span class=p>[]</span><span class=nx>Const</span>
+</code></pre></div><p>Then, following the JVM spec we could parse the constant pool data like this:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>cpinfo</span><span class=p>()</span> <span class=p>(</span><span class=nx>constPool</span> <span class=nx>ConstPool</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>constPoolCount</span> <span class=o>:=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+	<span class=c1>// Valid constant pool indices start from 1
+</span><span class=c1></span>	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uint16</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>constPoolCount</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>c</span> <span class=o>:=</span> <span class=nx>Const</span><span class=p>{</span><span class=nx>Tag</span><span class=p>:</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u1</span><span class=p>()}</span>
+		<span class=k>switch</span> <span class=nx>c</span><span class=p>.</span><span class=nx>Tag</span> <span class=p>{</span>
+		<span class=k>case</span> <span class=mh>0x01</span><span class=p>:</span> <span class=c1>// UTF8 string literal, 2 bytes length + data
+</span><span class=c1></span>			<span class=nx>c</span><span class=p>.</span><span class=nx>String</span> <span class=p>=</span> <span class=nb>string</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=nb>int</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>())))</span>
+		<span class=k>case</span> <span class=mh>0x07</span><span class=p>:</span> <span class=c1>// Class index
+</span><span class=c1></span>			<span class=nx>c</span><span class=p>.</span><span class=nx>NameIndex</span> <span class=p>=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+		<span class=k>case</span> <span class=mh>0x08</span><span class=p>:</span> <span class=c1>// String reference index
+</span><span class=c1></span>			<span class=nx>c</span><span class=p>.</span><span class=nx>StringIndex</span> <span class=p>=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+		<span class=k>case</span> <span class=mh>0x09</span><span class=p>,</span> <span class=mh>0x0a</span><span class=p>:</span> <span class=c1>// Field and method: class index + NaT index
+</span><span class=c1></span>			<span class=nx>c</span><span class=p>.</span><span class=nx>ClassIndex</span> <span class=p>=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+			<span class=nx>c</span><span class=p>.</span><span class=nx>NameAndTypeIndex</span> <span class=p>=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+		<span class=k>case</span> <span class=mh>0x0c</span><span class=p>:</span> <span class=c1>// Name-and-type
+</span><span class=c1></span>			<span class=nx>c</span><span class=p>.</span><span class=nx>NameIndex</span><span class=p>,</span> <span class=nx>c</span><span class=p>.</span><span class=nx>DescIndex</span> <span class=p>=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>(),</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+		<span class=k>default</span><span class=p>:</span>
+			<span class=nx>l</span><span class=p>.</span><span class=nx>err</span> <span class=p>=</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=s>&#34;unsupported tag: %d&#34;</span><span class=p>,</span> <span class=nx>c</span><span class=p>.</span><span class=nx>Tag</span><span class=p>)</span>
+		<span class=p>}</span>
+		<span class=nx>constPool</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>constPool</span><span class=p>,</span> <span class=nx>c</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>constPool</span>
+<span class=p>}</span>
+</code></pre></div><p>We keep things simple here, but in real JVM we would have to treat long and double constant types uniquely, by inserting an additional unused const item, as JVM spec tells us (since const items are considered to be 32-bit).</p><p>To easier get string literals by indices, we would implement a <code>Resolve(index uint16) string</code> method:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>cp</span> <span class=nx>ConstPool</span><span class=p>)</span> <span class=nf>Resolve</span><span class=p>(</span><span class=nx>index</span> <span class=kt>uint16</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+	<span class=k>if</span> <span class=nx>cp</span><span class=p>[</span><span class=nx>index</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>Tag</span> <span class=o>==</span> <span class=mh>0x01</span> <span class=p>{</span>
+		<span class=k>return</span> <span class=nx>cp</span><span class=p>[</span><span class=nx>index</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>String</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=s>&#34;&#34;</span>
+<span class=p>}</span>
+</code></pre></div><p>Now we have to add similar helpers to parse a list of class interfaces, fields and methods, and their attributes:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>interfaces</span><span class=p>(</span><span class=nx>cp</span> <span class=nx>ConstPool</span><span class=p>)</span> <span class=p>(</span><span class=nx>interfaces</span> <span class=p>[]</span><span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>interfaceCount</span> <span class=o>:=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uint16</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>interfaceCount</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>interfaces</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>interfaces</span><span class=p>,</span> <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()))</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>interfaces</span>
+<span class=p>}</span>
 
-// Field type is used for both, fields and methods
-type Field struct {
-	Flags      uint16
-	Name       string
-	Descriptor string 
-	Attributes []Attribute 
-}
+<span class=c1>// Field type is used for both, fields and methods
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>Field</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>Flags</span>      <span class=kt>uint16</span>
+	<span class=nx>Name</span>       <span class=kt>string</span>
+	<span class=nx>Descriptor</span> <span class=kt>string</span> 
+	<span class=nx>Attributes</span> <span class=p>[]</span><span class=nx>Attribute</span> 
+<span class=p>}</span>
 
-// Attributes contain addition information about fields and classes
-// The most useful is &quot;Code&quot; attribute, which contains actual byte code
-type Attribute struct {
-	Name string
-	Data []byte
-}
+<span class=c1>// Attributes contain addition information about fields and classes
+</span><span class=c1>// The most useful is &#34;Code&#34; attribute, which contains actual byte code
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>Attribute</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>Name</span> <span class=kt>string</span>
+	<span class=nx>Data</span> <span class=p>[]</span><span class=kt>byte</span>
+<span class=p>}</span>
 
-func (l *loader) fields(cp ConstPool) (fields []Field) {
-	fieldsCount := l.u2()
-	for i := uint16(0); i &lt; fieldsCount; i++ {
-		fields = append(fields, Field{
-			Flags:      l.u2(),
-			Name:       cp.Resolve(l.u2()),
-			Descriptor: cp.Resolve(l.u2()),
-			Attributes: l.attrs(cp),
-		})
-	}
-	return fields
-}
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>fields</span><span class=p>(</span><span class=nx>cp</span> <span class=nx>ConstPool</span><span class=p>)</span> <span class=p>(</span><span class=nx>fields</span> <span class=p>[]</span><span class=nx>Field</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>fieldsCount</span> <span class=o>:=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uint16</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>fieldsCount</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>fields</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>fields</span><span class=p>,</span> <span class=nx>Field</span><span class=p>{</span>
+			<span class=nx>Flags</span><span class=p>:</span>      <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>(),</span>
+			<span class=nx>Name</span><span class=p>:</span>       <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()),</span>
+			<span class=nx>Descriptor</span><span class=p>:</span> <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()),</span>
+			<span class=nx>Attributes</span><span class=p>:</span> <span class=nx>l</span><span class=p>.</span><span class=nf>attrs</span><span class=p>(</span><span class=nx>cp</span><span class=p>),</span>
+		<span class=p>})</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>fields</span>
+<span class=p>}</span>
 
-func (l *loader) attrs(cp ConstPool) (attrs []Attribute) {
-	attributesCount := l.u2()
-	for i := uint16(0); i &lt; attributesCount; i++ {
-		attrs = append(attrs, Attribute{
-			Name: cp.Resolve(l.u2()),
-			Data: l.bytes(int(l.u4())),
-		})
-	}
-	return attrs
-}
-</code></pre><p>Both, fields and methods are represented as Fields, which is very fortunate and saves us some time. Finally, we can assemble it all together and parse our complete class:</p><pre><code class=language-go>type Class struct {
-	ConstPool  ConstPool
-	Name       string
-	Super      string
-	Flags      uint16
-	Interfaces []string
-	Fields     []Field
-	Methods    []Field
-	Attributes []Attribute
-}
+<span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=o>*</span><span class=nx>loader</span><span class=p>)</span> <span class=nf>attrs</span><span class=p>(</span><span class=nx>cp</span> <span class=nx>ConstPool</span><span class=p>)</span> <span class=p>(</span><span class=nx>attrs</span> <span class=p>[]</span><span class=nx>Attribute</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>attributesCount</span> <span class=o>:=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uint16</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>attributesCount</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>attrs</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>attrs</span><span class=p>,</span> <span class=nx>Attribute</span><span class=p>{</span>
+			<span class=nx>Name</span><span class=p>:</span> <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u2</span><span class=p>()),</span>
+			<span class=nx>Data</span><span class=p>:</span> <span class=nx>l</span><span class=p>.</span><span class=nf>bytes</span><span class=p>(</span><span class=nb>int</span><span class=p>(</span><span class=nx>l</span><span class=p>.</span><span class=nf>u4</span><span class=p>())),</span>
+		<span class=p>})</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>attrs</span>
+<span class=p>}</span>
+</code></pre></div><p>Both, fields and methods are represented as Fields, which is very fortunate and saves us some time. Finally, we can assemble it all together and parse our complete class:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Class</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>ConstPool</span>  <span class=nx>ConstPool</span>
+	<span class=nx>Name</span>       <span class=kt>string</span>
+	<span class=nx>Super</span>      <span class=kt>string</span>
+	<span class=nx>Flags</span>      <span class=kt>uint16</span>
+	<span class=nx>Interfaces</span> <span class=p>[]</span><span class=kt>string</span>
+	<span class=nx>Fields</span>     <span class=p>[]</span><span class=nx>Field</span>
+	<span class=nx>Methods</span>    <span class=p>[]</span><span class=nx>Field</span>
+	<span class=nx>Attributes</span> <span class=p>[]</span><span class=nx>Attribute</span>
+<span class=p>}</span>
 
-func Load(r io.Reader) (Class, error) {
-	loader := &amp;loader{r: r}
-	c := Class{}
-	loader.u8()           // magic (u32), minor (u16), major (u16)
-	cp := loader.cpinfo() // const pool info
-	c.ConstPool = cp
-	c.Flags = loader.u2()             // access flags
-	c.Name = cp.Resolve(loader.u2())  // this class
-	c.Super = cp.Resolve(loader.u2()) // super class
-	c.Interfaces = loader.interfaces(cp)
-	c.Fields = loader.fields(cp)    // fields
-	c.Methods = loader.fields(cp)   // methods
-	c.Attributes = loader.attrs(cp) // methods
-	return c, loader.err
-}
-</code></pre><p>Now if we look into the resulting class info we will see that it has zero fields and two methods - <code>&lt;init&gt;:()V</code> and <code>add:(II)I</code>. What are these things that look like roman numbers with parens? Those are descriptors, they define what types of arguments a method takes and what it returns. In this case <code>&lt;init&gt;</code> (a synthetic method, used to initialize objects when they are constructed) takes no arguments and returns nothing (V=void), while the &ldquo;add&rdquo; method takes two ints (I=int32) and returns an integer.</p><h2 id=bytecode>Bytecode</h2><p>If we look closer, we&rsquo;ll see that each method in our parsed class has one attribute, named &ldquo;Code&rdquo;. This attribute has a slice of bytes as a payload.
-The bytes are the following:</p><pre><code>&lt;init&gt;:
+<span class=kd>func</span> <span class=nf>Load</span><span class=p>(</span><span class=nx>r</span> <span class=nx>io</span><span class=p>.</span><span class=nx>Reader</span><span class=p>)</span> <span class=p>(</span><span class=nx>Class</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>loader</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>loader</span><span class=p>{</span><span class=nx>r</span><span class=p>:</span> <span class=nx>r</span><span class=p>}</span>
+	<span class=nx>c</span> <span class=o>:=</span> <span class=nx>Class</span><span class=p>{}</span>
+	<span class=nx>loader</span><span class=p>.</span><span class=nf>u8</span><span class=p>()</span>           <span class=c1>// magic (u32), minor (u16), major (u16)
+</span><span class=c1></span>	<span class=nx>cp</span> <span class=o>:=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>cpinfo</span><span class=p>()</span> <span class=c1>// const pool info
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>ConstPool</span> <span class=p>=</span> <span class=nx>cp</span>
+	<span class=nx>c</span><span class=p>.</span><span class=nx>Flags</span> <span class=p>=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>u2</span><span class=p>()</span>             <span class=c1>// access flags
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>Name</span> <span class=p>=</span> <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>loader</span><span class=p>.</span><span class=nf>u2</span><span class=p>())</span>  <span class=c1>// this class
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>Super</span> <span class=p>=</span> <span class=nx>cp</span><span class=p>.</span><span class=nf>Resolve</span><span class=p>(</span><span class=nx>loader</span><span class=p>.</span><span class=nf>u2</span><span class=p>())</span> <span class=c1>// super class
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>Interfaces</span> <span class=p>=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>interfaces</span><span class=p>(</span><span class=nx>cp</span><span class=p>)</span>
+	<span class=nx>c</span><span class=p>.</span><span class=nx>Fields</span> <span class=p>=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>fields</span><span class=p>(</span><span class=nx>cp</span><span class=p>)</span>    <span class=c1>// fields
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>Methods</span> <span class=p>=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>fields</span><span class=p>(</span><span class=nx>cp</span><span class=p>)</span>   <span class=c1>// methods
+</span><span class=c1></span>	<span class=nx>c</span><span class=p>.</span><span class=nx>Attributes</span> <span class=p>=</span> <span class=nx>loader</span><span class=p>.</span><span class=nf>attrs</span><span class=p>(</span><span class=nx>cp</span><span class=p>)</span> <span class=c1>// methods
+</span><span class=c1></span>	<span class=k>return</span> <span class=nx>c</span><span class=p>,</span> <span class=nx>loader</span><span class=p>.</span><span class=nx>err</span>
+<span class=p>}</span>
+</code></pre></div><p>Now if we look into the resulting class info we will see that it has zero fields and two methods - <code>&lt;init>:()V</code> and <code>add:(II)I</code>. What are these things that look like roman numbers with parens? Those are descriptors, they define what types of arguments a method takes and what it returns. In this case <code>&lt;init></code> (a synthetic method, used to initialize objects when they are constructed) takes no arguments and returns nothing (V=void), while the &ldquo;add&rdquo; method takes two ints (I=int32) and returns an integer.</p><h2 id=bytecode>Bytecode</h2><p>If we look closer, we&rsquo;ll see that each method in our parsed class has one attribute, named &ldquo;Code&rdquo;. This attribute has a slice of bytes as a payload.
+The bytes are the following:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>&lt;init&gt;:
 [0 1 0 1 0 0 0 5 42 183 0 1 177 0 0 0 1 0 7 0 0 0 6 0 1 0 0 0 1]
 add:
 [0 2 0 2 0 0 0 4 26 27 96 172 0 0 0 1 0 7 0 0 0 6 0 1 0 0 0 3]
-</code></pre><p>If we look at the spec, this time in the <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/jvms-6.html>bytecode</a> section, we will see that &ldquo;Code&rdquo; attribute starts with maxstack value (2 bytes), then maxlocals (2 bytes), then code length (4 bytes), and then actual code. So our attributes can be read like this:</p><pre><code>&lt;init&gt;: maxstack: 1, maxlocals: 1, code: [42 183 0 1 177]
+</code></pre></div><p>If we look at the spec, this time in the <a href=https://docs.oracle.com/javase/specs/jvms/se14/html/jvms-6.html>bytecode</a> section, we will see that &ldquo;Code&rdquo; attribute starts with maxstack value (2 bytes), then maxlocals (2 bytes), then code length (4 bytes), and then actual code. So our attributes can be read like this:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>&lt;init&gt;: maxstack: 1, maxlocals: 1, code: [42 183 0 1 177]
 add: maxstack: 2, maxlocals: 2, code: [26 27 96 172]
-</code></pre><p>Yes, we only have 4 and 5 bytes of code in each method. What do those bytes mean?</p><p>Like I said, JVM is a stack machine. Each instruction is encoded as a single byte, which might be followed by some additional arguments. If we look at the spec, we will see that the &ldquo;add&rdquo; method has the following instructions:</p><pre><code> 26 = iload_0
+</code></pre></div><p>Yes, we only have 4 and 5 bytes of code in each method. What do those bytes mean?</p><p>Like I said, JVM is a stack machine. Each instruction is encoded as a single byte, which might be followed by some additional arguments. If we look at the spec, we will see that the &ldquo;add&rdquo; method has the following instructions:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback> 26 = iload_0
  27 = iload_1
  96 = iadd
 172 = ireturn
-</code></pre><p>Exactly like we saw in javap output at the beginning! But how shall we execute it?</p><h2 id=jvm-frames>JVM frames</h2><p>When a method is executed inside the JVM, it has its own stack for temporary operands, its own local variables, and its own chunk of code to execute. All these parameters are stored in a single execution frame. Additionally, frames contain the current instruction pointer (how far we have advanced while executing the bytecode) and a pointer to the class, which contained the method. The latter is needed to get access to the const pool of the class, as well as other details.</p><p>Let&rsquo;s make a method that constructs a frame for the given method to be called with the given arguments. I will be using <code>interface{}</code> type here as the Value type, although proper union types would of course be a safer choice.</p><pre><code class=language-go>type Frame struct {
-	Class  Class
-	IP     uint32
-	Code   []byte
-	Locals []interface{}
-	Stack  []interface{}
-}
+</code></pre></div><p>Exactly like we saw in javap output at the beginning! But how shall we execute it?</p><h2 id=jvm-frames>JVM frames</h2><p>When a method is executed inside the JVM, it has its own stack for temporary operands, its own local variables, and its own chunk of code to execute. All these parameters are stored in a single execution frame. Additionally, frames contain the current instruction pointer (how far we have advanced while executing the bytecode) and a pointer to the class, which contained the method. The latter is needed to get access to the const pool of the class, as well as other details.</p><p>Let&rsquo;s make a method that constructs a frame for the given method to be called with the given arguments. I will be using <code>interface{}</code> type here as the Value type, although proper union types would of course be a safer choice.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Frame</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>Class</span>  <span class=nx>Class</span>
+	<span class=nx>IP</span>     <span class=kt>uint32</span>
+	<span class=nx>Code</span>   <span class=p>[]</span><span class=kt>byte</span>
+	<span class=nx>Locals</span> <span class=p>[]</span><span class=kd>interface</span><span class=p>{}</span>
+	<span class=nx>Stack</span>  <span class=p>[]</span><span class=kd>interface</span><span class=p>{}</span>
+<span class=p>}</span>
 
-func (c Class) Frame(method string, args ...interface{}) Frame {
-	for _, m := range c.Methods {
-		if m.Name == method {
-			for _, a := range m.Attributes {
-				if a.Name == &quot;Code&quot; &amp;&amp; len(a.Data) &gt; 8 {
-					maxLocals := binary.BigEndian.Uint16(a.Data[2:4])
-					frame := Frame{
-						Class:  c,
-						Code:   a.Data[8:],
-						Locals: make([]interface{}, maxLocals, maxLocals),
-					}
-					for i := 0; i &lt; len(args); i++ {
-						frame.Locals[i] = args[i]
-					}
-					return frame
-				}
-			}
-		}
-	}
-	panic(&quot;method not found&quot;)
-}
-</code></pre><p>So, we got the Frame, with initialized locals, empty stack, and preloaded bytecode. Now it&rsquo;s time to execute the bytecode:</p><pre><code class=language-go>func Exec(f Frame) interface{} {
-	for {
-		op := f.Code[f.IP]
-		log.Printf(&quot;OP:%02x STACK:%v&quot;, op, f.Stack)
-		n := len(f.Stack)
-		switch op {
-		case 26: // iload_0
-			f.Stack = append(f.Stack, f.Locals[0])
-		case 27: // iload_1
-			f.Stack = append(f.Stack, f.Locals[1])
-		case 96:
-			a := f.Stack[n-1].(int32)
-			b := f.Stack[n-2].(int32)
-			f.Stack[n-2] = a + b
-			f.Stack = f.Stack[:n-1]
-		case 172: // ireturn
-			v := f.Stack[n-1]
-			f.Stack = f.Stack[:n-1]
-			return v
-		}
-		f.IP++
-	}
-}
-</code></pre><p>Finally, we can put it all together and run by calling our add() method:</p><pre><code class=language-go>f, _ := os.Open(&quot;Add.class&quot;)
-class, _ := Load(f)
-frame := class.Frame(&quot;add&quot;, int32(2), int32(3))
-result := Exec(frame)
-log.Println(result)
+<span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=nx>Class</span><span class=p>)</span> <span class=nf>Frame</span><span class=p>(</span><span class=nx>method</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>args</span> <span class=o>...</span><span class=kd>interface</span><span class=p>{})</span> <span class=nx>Frame</span> <span class=p>{</span>
+	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>m</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>c</span><span class=p>.</span><span class=nx>Methods</span> <span class=p>{</span>
+		<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Name</span> <span class=o>==</span> <span class=nx>method</span> <span class=p>{</span>
+			<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>a</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Attributes</span> <span class=p>{</span>
+				<span class=k>if</span> <span class=nx>a</span><span class=p>.</span><span class=nx>Name</span> <span class=o>==</span> <span class=s>&#34;Code&#34;</span> <span class=o>&amp;&amp;</span> <span class=nb>len</span><span class=p>(</span><span class=nx>a</span><span class=p>.</span><span class=nx>Data</span><span class=p>)</span> <span class=p>&gt;</span> <span class=mi>8</span> <span class=p>{</span>
+					<span class=nx>maxLocals</span> <span class=o>:=</span> <span class=nx>binary</span><span class=p>.</span><span class=nx>BigEndian</span><span class=p>.</span><span class=nf>Uint16</span><span class=p>(</span><span class=nx>a</span><span class=p>.</span><span class=nx>Data</span><span class=p>[</span><span class=mi>2</span><span class=p>:</span><span class=mi>4</span><span class=p>])</span>
+					<span class=nx>frame</span> <span class=o>:=</span> <span class=nx>Frame</span><span class=p>{</span>
+						<span class=nx>Class</span><span class=p>:</span>  <span class=nx>c</span><span class=p>,</span>
+						<span class=nx>Code</span><span class=p>:</span>   <span class=nx>a</span><span class=p>.</span><span class=nx>Data</span><span class=p>[</span><span class=mi>8</span><span class=p>:],</span>
+						<span class=nx>Locals</span><span class=p>:</span> <span class=nb>make</span><span class=p>([]</span><span class=kd>interface</span><span class=p>{},</span> <span class=nx>maxLocals</span><span class=p>,</span> <span class=nx>maxLocals</span><span class=p>),</span>
+					<span class=p>}</span>
+					<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nb>len</span><span class=p>(</span><span class=nx>args</span><span class=p>);</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+						<span class=nx>frame</span><span class=p>.</span><span class=nx>Locals</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>=</span> <span class=nx>args</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+					<span class=p>}</span>
+					<span class=k>return</span> <span class=nx>frame</span>
+				<span class=p>}</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+	<span class=nb>panic</span><span class=p>(</span><span class=s>&#34;method not found&#34;</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div><p>So, we got the Frame, with initialized locals, empty stack, and preloaded bytecode. Now it&rsquo;s time to execute the bytecode:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>Exec</span><span class=p>(</span><span class=nx>f</span> <span class=nx>Frame</span><span class=p>)</span> <span class=kd>interface</span><span class=p>{}</span> <span class=p>{</span>
+	<span class=k>for</span> <span class=p>{</span>
+		<span class=nx>op</span> <span class=o>:=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Code</span><span class=p>[</span><span class=nx>f</span><span class=p>.</span><span class=nx>IP</span><span class=p>]</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;OP:%02x STACK:%v&#34;</span><span class=p>,</span> <span class=nx>op</span><span class=p>,</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>)</span>
+		<span class=nx>n</span> <span class=o>:=</span> <span class=nb>len</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>)</span>
+		<span class=k>switch</span> <span class=nx>op</span> <span class=p>{</span>
+		<span class=k>case</span> <span class=mi>26</span><span class=p>:</span> <span class=c1>// iload_0
+</span><span class=c1></span>			<span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>,</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Locals</span><span class=p>[</span><span class=mi>0</span><span class=p>])</span>
+		<span class=k>case</span> <span class=mi>27</span><span class=p>:</span> <span class=c1>// iload_1
+</span><span class=c1></span>			<span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>,</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Locals</span><span class=p>[</span><span class=mi>1</span><span class=p>])</span>
+		<span class=k>case</span> <span class=mi>96</span><span class=p>:</span>
+			<span class=nx>a</span> <span class=o>:=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>].(</span><span class=kt>int32</span><span class=p>)</span>
+			<span class=nx>b</span> <span class=o>:=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[</span><span class=nx>n</span><span class=o>-</span><span class=mi>2</span><span class=p>].(</span><span class=kt>int32</span><span class=p>)</span>
+			<span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[</span><span class=nx>n</span><span class=o>-</span><span class=mi>2</span><span class=p>]</span> <span class=p>=</span> <span class=nx>a</span> <span class=o>+</span> <span class=nx>b</span>
+			<span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span> <span class=p>=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[:</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+		<span class=k>case</span> <span class=mi>172</span><span class=p>:</span> <span class=c1>// ireturn
+</span><span class=c1></span>			<span class=nx>v</span> <span class=o>:=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+			<span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span> <span class=p>=</span> <span class=nx>f</span><span class=p>.</span><span class=nx>Stack</span><span class=p>[:</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+			<span class=k>return</span> <span class=nx>v</span>
+		<span class=p>}</span>
+		<span class=nx>f</span><span class=p>.</span><span class=nx>IP</span><span class=o>++</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>Finally, we can put it all together and run by calling our add() method:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=nx>f</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>os</span><span class=p>.</span><span class=nf>Open</span><span class=p>(</span><span class=s>&#34;Add.class&#34;</span><span class=p>)</span>
+<span class=nx>class</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nf>Load</span><span class=p>(</span><span class=nx>f</span><span class=p>)</span>
+<span class=nx>frame</span> <span class=o>:=</span> <span class=nx>class</span><span class=p>.</span><span class=nf>Frame</span><span class=p>(</span><span class=s>&#34;add&#34;</span><span class=p>,</span> <span class=nb>int32</span><span class=p>(</span><span class=mi>2</span><span class=p>),</span> <span class=nb>int32</span><span class=p>(</span><span class=mi>3</span><span class=p>))</span>
+<span class=nx>result</span> <span class=o>:=</span> <span class=nf>Exec</span><span class=p>(</span><span class=nx>frame</span><span class=p>)</span>
+<span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>result</span><span class=p>)</span>
 
-// OUTPUT:
-OP:1a STACK:[]
-OP:1b STACK:[2]
-OP:60 STACK:[2 3]
-OP:ac STACK:[5]
-5
-</code></pre><p>So, it works. Yes, it&rsquo;s a very lousy and pitiful JVM, but still, it does what JVM does - loads bytecode and interprets it (but of course, the real JVM does way more than that).</p><h2 id=what-s-missing>what&rsquo;s missing</h2><p>The other two hundred instructions, the runtime, OOP type system, and a few other things.</p><p>There are 11 groups of instructions and most of them are trivial:</p><ul><li>Constants (put a null or a small number or values from const pool on the stack).</li><li>Loads (put locals on the stack). There are 32 instructions like that.</li><li>Stores (pop from the stack into locals). Another 32 boring instructions.</li><li>Stack (pop/dup/swap), like in every stack machine.</li><li>Math (add/sub/div/mul/rem/shift/logic). For different value types, 36 instructions in total.</li><li>Conversions (int to short, int to float, &hellip;).</li><li>Comparisons (eq/ne/le/&hellip;). Useful for making conditionals, like if/else.</li><li>Control (goto/return). Useful for loops and subroutines.</li><li>References. The most interesting part, fields and methods, exceptions, and object monitors.</li><li>Extended. Something that would look like an ugly workaround at a first glance. And it probably won&rsquo;t change over time.</li><li>Reserved. Breakpoint instruction 0xca goes here.</li></ul><p>Most instructions are trivial to implement - they take one or two arguments from the stack, perform some operation on them, and push the result. The only thing to keep in mind here is that long and double instructions expect that each value takes two slots on the stack, so you may require additional push() and pop(), which makes it harder to group the instructions.</p><p>Implementing References requires to think about the object model - how you would like to store Objects and their Classes, how to represent inheritance, where to store instance fields and class fields. Also, this is where you would have to be careful about method dispatching - there are multiple &ldquo;invoke&rdquo; instructions and they behave in a slighly different manner:</p><ul><li>invokestatic: invoke a static method on a class, no surprises.</li><li>invokespecial: invoke an instance method directly, mostly used for synthetic methods, like <code>&lt;init&gt;</code>, or private methods.</li><li>invokevirtual: invoke an instance method based on the class hierachy.</li><li>invokeinterface: invoke an interface method, similar to invokevirtual, but does different checks and optimizations.</li><li>invokedynamic: invoke a dynamically-computed call site, new in Java 7, useful for dynamic methods and MethodHandles.</li></ul><p>If you implement a JVM in a language without garbage collection - this is also where you should think about how to perform the garbage collection: reference counting, mark-and-sweep, etc. Handling exceptions by implementing <code>athrow</code>, propagating them through the frames and handling them with exception tables is another interesting topic.</p><p>Finally, your JVM remains useless if there no runtime classes. Without <code>java/lang/Object</code> you are unlikely to even see how <code>new</code> instruction works by constructing new objects. Your runtime may provide some common JRE classes from java.lang, java.io, and java.util packages, or it may be something more domain-specific. Most likely some methods in the classes would have to be implemented natively and not in Java. This will raise the question of how to find and execute such methods and it becomes another edge case for your JVM.</p><p>In other words, implementing a proper JVM is not so trivial, however, understanding how it is implemented is not so complex either.</p><p>I only had one summer weekend to spare, and my JVM still has a long way to go, but the structure looks more or less clear: <a href=https://github.com/zserge/tojvm>https://github.com/zserge/tojvm</a> (PRs are always welcome!)</p><p>The actual code snippets from this blog post are even smaller and available as a <a href=https://gist.github.com/zserge/b75162f6cc3bf53c501cc6831e0e0884>gist</a>.</p><p>If you would like to explore the topic deeper - you may consider looking at small JVMs:</p><ul><li>Mika: <a href=https://github.com/kifferltd/open-mika>https://github.com/kifferltd/open-mika</a></li><li>Avian: <a href=https://github.com/ReadyTalk/avian>https://github.com/ReadyTalk/avian</a></li><li>NanoVM: <a href=https://github.com/harbaum/NanoVM>https://github.com/harbaum/NanoVM</a></li><li>Luje: <a href=https://github.com/davidgiven/luje>https://github.com/davidgiven/luje</a> (a brilliant JVM for LuaJIT)</li></ul><p>I hope this article did not turn you away from Java. Virtual machines are fun, and JVM truly deserves its place.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jun 01, 2020</em></p><p>See also:
+<span class=c1>// OUTPUT:
+</span><span class=c1></span><span class=nx>OP</span><span class=p>:</span><span class=mi>1</span><span class=nx>a</span> <span class=nx>STACK</span><span class=p>:[]</span>
+<span class=nx>OP</span><span class=p>:</span><span class=mi>1</span><span class=nx>b</span> <span class=nx>STACK</span><span class=p>:[</span><span class=mi>2</span><span class=p>]</span>
+<span class=nx>OP</span><span class=p>:</span><span class=mi>60</span> <span class=nx>STACK</span><span class=p>:[</span><span class=mi>2</span> <span class=mi>3</span><span class=p>]</span>
+<span class=nx>OP</span><span class=p>:</span><span class=nx>ac</span> <span class=nx>STACK</span><span class=p>:[</span><span class=mi>5</span><span class=p>]</span>
+<span class=mi>5</span>
+</code></pre></div><p>So, it works. Yes, it&rsquo;s a very lousy and pitiful JVM, but still, it does what JVM does - loads bytecode and interprets it (but of course, the real JVM does way more than that).</p><h2 id=whats-missing>what&rsquo;s missing</h2><p>The other two hundred instructions, the runtime, OOP type system, and a few other things.</p><p>There are 11 groups of instructions and most of them are trivial:</p><ul><li>Constants (put a null or a small number or values from const pool on the stack).</li><li>Loads (put locals on the stack). There are 32 instructions like that.</li><li>Stores (pop from the stack into locals). Another 32 boring instructions.</li><li>Stack (pop/dup/swap), like in every stack machine.</li><li>Math (add/sub/div/mul/rem/shift/logic). For different value types, 36 instructions in total.</li><li>Conversions (int to short, int to float, &mldr;).</li><li>Comparisons (eq/ne/le/&mldr;). Useful for making conditionals, like if/else.</li><li>Control (goto/return). Useful for loops and subroutines.</li><li>References. The most interesting part, fields and methods, exceptions, and object monitors.</li><li>Extended. Something that would look like an ugly workaround at a first glance. And it probably won&rsquo;t change over time.</li><li>Reserved. Breakpoint instruction 0xca goes here.</li></ul><p>Most instructions are trivial to implement - they take one or two arguments from the stack, perform some operation on them, and push the result. The only thing to keep in mind here is that long and double instructions expect that each value takes two slots on the stack, so you may require additional push() and pop(), which makes it harder to group the instructions.</p><p>Implementing References requires to think about the object model - how you would like to store Objects and their Classes, how to represent inheritance, where to store instance fields and class fields. Also, this is where you would have to be careful about method dispatching - there are multiple &ldquo;invoke&rdquo; instructions and they behave in a slighly different manner:</p><ul><li>invokestatic: invoke a static method on a class, no surprises.</li><li>invokespecial: invoke an instance method directly, mostly used for synthetic methods, like <code>&lt;init></code>, or private methods.</li><li>invokevirtual: invoke an instance method based on the class hierachy.</li><li>invokeinterface: invoke an interface method, similar to invokevirtual, but does different checks and optimizations.</li><li>invokedynamic: invoke a dynamically-computed call site, new in Java 7, useful for dynamic methods and MethodHandles.</li></ul><p>If you implement a JVM in a language without garbage collection - this is also where you should think about how to perform the garbage collection: reference counting, mark-and-sweep, etc. Handling exceptions by implementing <code>athrow</code>, propagating them through the frames and handling them with exception tables is another interesting topic.</p><p>Finally, your JVM remains useless if there no runtime classes. Without <code>java/lang/Object</code> you are unlikely to even see how <code>new</code> instruction works by constructing new objects. Your runtime may provide some common JRE classes from java.lang, java.io, and java.util packages, or it may be something more domain-specific. Most likely some methods in the classes would have to be implemented natively and not in Java. This will raise the question of how to find and execute such methods and it becomes another edge case for your JVM.</p><p>In other words, implementing a proper JVM is not so trivial, however, understanding how it is implemented is not so complex either.</p><p>I only had one summer weekend to spare, and my JVM still has a long way to go, but the structure looks more or less clear: <a href=https://github.com/zserge/tojvm>https://github.com/zserge/tojvm</a> (PRs are always welcome!)</p><p>The actual code snippets from this blog post are even smaller and available as a <a href=https://gist.github.com/zserge/b75162f6cc3bf53c501cc6831e0e0884>gist</a>.</p><p>If you would like to explore the topic deeper - you may consider looking at small JVMs:</p><ul><li>Mika: <a href=https://github.com/kifferltd/open-mika>https://github.com/kifferltd/open-mika</a></li><li>Avian: <a href=https://github.com/ReadyTalk/avian>https://github.com/ReadyTalk/avian</a></li><li>NanoVM: <a href=https://github.com/harbaum/NanoVM>https://github.com/harbaum/NanoVM</a></li><li>Luje: <a href=https://github.com/davidgiven/luje>https://github.com/davidgiven/luje</a> (a brilliant JVM for LuaJIT)</li></ul><p>I hope this article did not turn you away from Java. Virtual machines are fun, and JVM truly deserves its place.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jun 01, 2020</em></p><p>See also:
 <a href=/posts/kotlin/>kotlin - a new hope</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>moved to new static site generator</title><meta name=description content="self done is well done"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/new-site-generator/><meta property=og:title content="moved to new static site generator"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/new-site-generator/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="self done is well done"><meta property=og:locale content=en_US><meta name=twitter:card content="self done is well done"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>moved to new static site generator</title><meta name=description content="self done is well done"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/new-site-generator/><meta property="og:title" content="moved to new static site generator"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/new-site-generator/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="self done is well done"><meta property="og:locale" content="en_US"><meta name=twitter:card content="self done is well done"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>moved to new static site generator</h1><p>This website has been powered by <a href=https://bitbucket.org/obensonne/poole>poole</a> for a long time.
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>moved to new static site generator</h1><p>This website has been powered by <a href=https://bitbucket.org/obensonne/poole>poole</a> for a long time.
 I don&rsquo;t think I have any real reasons to migrate from poole.</p><p>Do you know there are static site generators written in UNIX Shell?
 I think it&rsquo;s a good choice for old-school programmers, who
 feel uncomfortable with Ruby, Python and even Node.js.</p><p>All that shell madness started with <a href=http://werc.cat-v.org/>werc</a>, a nice tool used by
@@ -13,7 +13,7 @@ created:</p><pre><code>.
     |-- index.md
     `-- layouts
         `-- default.html
-</code></pre><p>Here <code>default.html</code> is a layout template. You can use <code>&lt;% .. %&gt;</code> tags to specify
+</code></pre><p>Here <code>default.html</code> is a layout template. You can use <code>&lt;% .. %></code> tags to specify
 where to render page title, description, keywords, content:</p><pre><code>&lt;!doctype html&gt;
 &lt;html&gt;
 &lt;head&gt;
@@ -25,7 +25,7 @@ where to render page title, description, keywords, content:</p><pre><code>&lt;!d
 &lt;/html&gt;
 </code></pre><p>Content pages are mostly written in Markdown and consist of two parts: header
 and body. Header defines a list of page variables, like title, description
-etc. Body is a markdown text that can include <code>&lt;% ... %&gt;</code> tags to define custom
+etc. Body is a markdown text that can include <code>&lt;% ... %></code> tags to define custom
 logic. Tag can be either a page variable (like in layout templates) or a shell
 function/command:</p><pre><code>title: Test page
 description: My test page geneated with Stash
@@ -49,7 +49,7 @@ Generated with [Sta.sh](http://bitbucket.org/zserge/stash) site generator.
 &lt;/body&gt;
 &lt;/html&gt;
 </code></pre><h2 id=customization>customization</h2><p>Stash loads custom.sh script on start and allows you to easily extend it.
-Every function defined in custom.sh can be called from within <code>&lt;% ... %&gt;</code> tags.</p><p>Also, there are special &ldquo;hook&rdquo; functions: <code>ongen</code> and <code>onexit</code>. The first one
+Every function defined in custom.sh can be called from within <code>&lt;% ... %></code> tags.</p><p>Also, there are special &ldquo;hook&rdquo; functions: <code>ongen</code> and <code>onexit</code>. The first one
 is called for every page generated, and the second one is called after the
 whole site is processed allowing you to cleanup everything.</p><p>I used &ldquo;hooks&rdquo; to build a list of blog pages with <code>ongen</code> and then render that
 list into a single blog index page in <code>onexit</code>.</p><h2 id=how-it-works>how it works</h2><p>Inside it&rsquo;s ugly. Yet simple. Pages are parsed with AWK. AWK produces shell
@@ -57,7 +57,7 @@ script that generates markdown when executed. During parsing every page
 variable is converted into <code>export</code> statement:</p><pre><code>title: Hello world   =&gt;   export page_title='Hello world'
 date:  18 Jul 2013   =&gt;   export page_date='18 Jul 2013'
 </code></pre><p>Next, when parsing body the idea is to generate <code>printf</code> and <code>echo</code> statements
-for every piece of text and raw shell commands for every <code>&lt;% .. %&gt;</code> tag:</p><pre><code># Title              =&gt;   printf '# Title'
+for every piece of text and raw shell commands for every <code>&lt;% .. %></code> tag:</p><pre><code># Title              =&gt;   printf '# Title'
 Hello world. Today is &lt;% date %&gt;.
                      =&gt;   printf 'Hello world. Today is '; date
 </code></pre><p>Statements are now separated with semicolons, which brings some not obvious limitations:</p><pre><code>This won't work (semicolons after &quot;do&quot; are not allowed):
@@ -78,6 +78,6 @@ No need to say that NEVER EVER generate such sites:</p><pre><code>Hello &lt;% su
 </code></pre><p>So, to sum up the whole beauty of this approach here is a long way a page goes
 during generation:</p><pre><code>Page -&gt; Shell -&gt; AWK -&gt; Shell -&gt; eval -&gt; Markdown -&gt; HTML
 </code></pre><h2 id=summary>summary</h2><p>So, now there is one more static site generator in Shell. Less than 100 LOC,
-pure UNIX Shell, extensible, MIT-licensed. Enjoy!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jul 18, 2013</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+pure UNIX Shell, extensible, MIT-licensed. Enjoy!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jul 18, 2013</em></p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

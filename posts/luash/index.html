@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>lua-sh: calling shell commands as functions</title><meta name=description content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/luash/><meta property=og:title content="lua-sh: calling shell commands as functions"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/luash/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta property=og:locale content=en_US><meta name=twitter:card content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>lua-sh: calling shell commands as functions</title><meta name=description content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/luash/><meta property="og:title" content="lua-sh: calling shell commands as functions"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/luash/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta property="og:locale" content="en_US"><meta name=twitter:card content="Subprocess interface for Lua, inspired by Python 'sh' module"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>lua-sh: calling shell commands as functions</h1><p><a href=http://www.lua.org/>Lua</a> is one of my favourite languages. It&rsquo;s tiny, it&rsquo;s fast, it has simple
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>lua-sh: calling shell commands as functions</h1><p><a href=http://www.lua.org/>Lua</a> is one of my favourite languages. It&rsquo;s tiny, it&rsquo;s fast, it has simple
 grammar and is very easy to learn.</p><p>I also often write shell scripts - from simple one-liners, to bigger ones
 containing business logic and binding together smaller app components. In fact,
 this blog is powered by a few shell scripts to generate list of posts, rss xml
@@ -10,30 +10,30 @@ more readable. However, we had to wrap shell command invocations into
 hand-written functions to make them look nice.</p><p>So I made a <a href=https://github.com/zserge/luash>library</a> that brings the joy of shell scripting into Lua.</p><h2 id=luash>luash</h2><p>Inspired by <a href=https://amoffat.github.io/sh/>Python&rsquo;s sh module</a>, I took the same idea.</p><p>Every shell command can be invoked as a Lua function. For example, calling <code>echo hello world</code> in Lua would be <code>echo('Hello', 'world')</code>.</p><p>To achieve this I added a handler function for the missing table items in the
 globals table. So if the script called a non-existent command (which is likely
 to be a shell command wrapper) - my handler function started looking for the
-requested shell command and returned an appropriate wrapper function.</p><pre><code class=language-lua>-- get global metatable
-local mt = getmetatable(_G)
-if mt == nil then
-  mt = {}
-  setmetatable(_G, mt)
-end
+requested shell command and returned an appropriate wrapper function.</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=c1>-- get global metatable</span>
+<span class=kd>local</span> <span class=n>mt</span> <span class=o>=</span> <span class=n>getmetatable</span><span class=p>(</span><span class=n>_G</span><span class=p>)</span>
+<span class=kr>if</span> <span class=n>mt</span> <span class=o>==</span> <span class=kc>nil</span> <span class=kr>then</span>
+  <span class=n>mt</span> <span class=o>=</span> <span class=p>{}</span>
+  <span class=n>setmetatable</span><span class=p>(</span><span class=n>_G</span><span class=p>,</span> <span class=n>mt</span><span class=p>)</span>
+<span class=kr>end</span>
 
--- set hook for undefined variables
-mt.__index = function(t, cmd)
-	return command(cmd)
-end
-</code></pre><p>Then I had to implement the function <code>command(cmd)</code> to return a function, which
-being invoked would run the actual command with all the arguments.</p><pre><code class=language-lua>local function command(cmd)
-	return function(...)
-		-- it could be like this, if we didn't care about intercepting I/O
-		os.execute(cmd, ...)
-	end
-end
+<span class=c1>-- set hook for undefined variables</span>
+<span class=n>mt.__index</span> <span class=o>=</span> <span class=kr>function</span><span class=p>(</span><span class=n>t</span><span class=p>,</span> <span class=n>cmd</span><span class=p>)</span>
+	<span class=kr>return</span> <span class=n>command</span><span class=p>(</span><span class=n>cmd</span><span class=p>)</span>
+<span class=kr>end</span>
+</code></pre></div><p>Then I had to implement the function <code>command(cmd)</code> to return a function, which
+being invoked would run the actual command with all the arguments.</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=kd>local</span> <span class=kr>function</span> <span class=nf>command</span><span class=p>(</span><span class=n>cmd</span><span class=p>)</span>
+	<span class=kr>return</span> <span class=kr>function</span><span class=p>(...)</span>
+		<span class=c1>-- it could be like this, if we didn&#39;t care about intercepting I/O</span>
+		<span class=n>os.execute</span><span class=p>(</span><span class=n>cmd</span><span class=p>,</span> <span class=p>...)</span>
+	<span class=kr>end</span>
+<span class=kr>end</span>
 
-...
+<span class=p>...</span>
 
-local date = command('date')
-date('--date=2015-09-03', '+%s')
-</code></pre><p>At this point, we shall think about the commands chains (pipelines). Lua by
+<span class=kd>local</span> <span class=n>date</span> <span class=o>=</span> <span class=n>command</span><span class=p>(</span><span class=s1>&#39;date&#39;</span><span class=p>)</span>
+<span class=n>date</span><span class=p>(</span><span class=s1>&#39;--date=2015-09-03&#39;</span><span class=p>,</span> <span class=s1>&#39;+%s&#39;</span><span class=p>)</span>
+</code></pre></div><p>At this point, we shall think about the commands chains (pipelines). Lua by
 nature is single-threaded and has blocking I/O. Which means you can either read
 or write at a time, and you can not do both simultaneously.</p><p>So to implement a pipeline the output of the previous command should be
 buffered somewhere, and input should be sent using <code>io.write</code> function. Or the
@@ -44,50 +44,50 @@ this table should be accepted by the outer <code>command()</code> function (the 
 in a pipeline). I decided to pass only command output, exit code and signal
 inside this &ldquo;command result&rdquo; table.</p><p>And that&rsquo;s all we have underneath the Lua sh module. You can see the <a href=https://github.com/zserge/luash/blob/master/sh.lua>full
 implementation of this module</a> to learn more. It&rsquo;s really tiny, less than 100
-lines of sparse code.</p><h2 id=usage>usage</h2><p>First, require the Lua sh module:</p><pre><code class=language-lua>local sh = require('sh')
-</code></pre><p>At this point global table hook is already set up, you can start running your
-shell commands:</p><pre><code class=language-lua>print('User:', whoami())
-print('Current directory:', pwd())
-</code></pre><p>Here&rsquo;s how chaining looks like:</p><pre><code class=language-lua>--
--- Bash equivalents:
---
--- $ ls /bin | wc -l
--- $ ls /usr/bin | wc -l
--- $ (ls /bin; ls /usr/bin) | wc -l
---
-print('Files in /bin:', wc(ls('/bin'), '-l'))
-print('Files in /usr/bin:', wc(ls('/usr/bin'), '-l'))
-print('files in both /usr/bin and /bin:', wc(ls('/usr/bin'), ls('/bin'), '-l'))
-</code></pre><p>Also, since command output is buffered, you can store it and reuse as many
-times as needed. I personally find Lua syntax even more readable in this case:</p><pre><code class=language-lua>--
--- Bash equivalents:
---
--- $ s1=$(echo hello world | sed 's/world/Lua/g')
--- $ s2=$(echo &quot;$s1&quot; | tr '[[:lower:]]' '[[:upper:]]')
---
-local s1 = sed(echo('hello', 'world'), 's/world/Lua/g')
-local s2 = tr(s1, '[[:lower:]]', '[[:upper:]]')
-print('sed:',    s1)
-print('sed+tr:', s2)
-</code></pre><p>You can provide stdin to the commands as a string passing a table with
-<code>__input</code> key:</p><pre><code class=language-lua>s = 'Hello World'
-tr({__input=s}, '[[:lower:]]', '[[:upper:]]')
-</code></pre><p>Finally, commands that don&rsquo;t fit the Lua syntax (like <code>google-chrome</code> or <code>somecommand.bin</code>). Since we already have a function <code>command(cmd)</code> that returns a command wrapper - we can use it, since it&rsquo;s exported by the module:</p><pre><code class=language-lua>local sh = require('sh')
-local chrome = sh.command('google-chrome')
-chrome()
-</code></pre><p>As a bonus, you can pre-define some command line arguments as well:</p><pre><code class=language-lua>local sh = require('sh')
-local dockerbusybox = sh.command('docker', 'run', 'busybox')
-dockerbusybox('echo', 'hello')
-</code></pre><p>This is helpful for multi-command binaries, like <code>git</code>, <code>docker</code>, <code>ip</code> or
-<code>busybox</code>.</p><p>Another syntax sugar is named options. You may pass a table instead of variadic arguments, then table keys will be interpreted as option names. Single-letter keys will be used as short options (<code>o</code> becomes <code>-o</code>), longer keys will be used a long options (<code>output</code> becomes <code>--output</code>).</p><pre><code class=language-lua>-- $(seq --separator=&quot;,&quot; -w 0 10)
-seq({
-	separator = ',',
-	w = true,
-}, 0, 10)
-</code></pre><h2 id=summary>summary</h2><p>The library is super tiny, much more lightweight comparing to Python&rsquo;s sh. And
+lines of sparse code.</p><h2 id=usage>usage</h2><p>First, require the Lua sh module:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=kd>local</span> <span class=n>sh</span> <span class=o>=</span> <span class=n>require</span><span class=p>(</span><span class=s1>&#39;sh&#39;</span><span class=p>)</span>
+</code></pre></div><p>At this point global table hook is already set up, you can start running your
+shell commands:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=n>print</span><span class=p>(</span><span class=s1>&#39;User:&#39;</span><span class=p>,</span> <span class=n>whoami</span><span class=p>())</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;Current directory:&#39;</span><span class=p>,</span> <span class=n>pwd</span><span class=p>())</span>
+</code></pre></div><p>Here&rsquo;s how chaining looks like:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=c1>--</span>
+<span class=c1>-- Bash equivalents:</span>
+<span class=c1>--</span>
+<span class=c1>-- $ ls /bin | wc -l</span>
+<span class=c1>-- $ ls /usr/bin | wc -l</span>
+<span class=c1>-- $ (ls /bin; ls /usr/bin) | wc -l</span>
+<span class=c1>--</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;Files in /bin:&#39;</span><span class=p>,</span> <span class=n>wc</span><span class=p>(</span><span class=n>ls</span><span class=p>(</span><span class=s1>&#39;/bin&#39;</span><span class=p>),</span> <span class=s1>&#39;-l&#39;</span><span class=p>))</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;Files in /usr/bin:&#39;</span><span class=p>,</span> <span class=n>wc</span><span class=p>(</span><span class=n>ls</span><span class=p>(</span><span class=s1>&#39;/usr/bin&#39;</span><span class=p>),</span> <span class=s1>&#39;-l&#39;</span><span class=p>))</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;files in both /usr/bin and /bin:&#39;</span><span class=p>,</span> <span class=n>wc</span><span class=p>(</span><span class=n>ls</span><span class=p>(</span><span class=s1>&#39;/usr/bin&#39;</span><span class=p>),</span> <span class=n>ls</span><span class=p>(</span><span class=s1>&#39;/bin&#39;</span><span class=p>),</span> <span class=s1>&#39;-l&#39;</span><span class=p>))</span>
+</code></pre></div><p>Also, since command output is buffered, you can store it and reuse as many
+times as needed. I personally find Lua syntax even more readable in this case:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=c1>--</span>
+<span class=c1>-- Bash equivalents:</span>
+<span class=c1>--</span>
+<span class=c1>-- $ s1=$(echo hello world | sed &#39;s/world/Lua/g&#39;)</span>
+<span class=c1>-- $ s2=$(echo &#34;$s1&#34; | tr &#39;[[:lower:]]&#39; &#39;[[:upper:]]&#39;)</span>
+<span class=c1>--</span>
+<span class=kd>local</span> <span class=n>s1</span> <span class=o>=</span> <span class=n>sed</span><span class=p>(</span><span class=n>echo</span><span class=p>(</span><span class=s1>&#39;hello&#39;</span><span class=p>,</span> <span class=s1>&#39;world&#39;</span><span class=p>),</span> <span class=s1>&#39;s/world/Lua/g&#39;</span><span class=p>)</span>
+<span class=kd>local</span> <span class=n>s2</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>s1</span><span class=p>,</span> <span class=s1>&#39;[[:lower:]]&#39;</span><span class=p>,</span> <span class=s1>&#39;[[:upper:]]&#39;</span><span class=p>)</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;sed:&#39;</span><span class=p>,</span>    <span class=n>s1</span><span class=p>)</span>
+<span class=n>print</span><span class=p>(</span><span class=s1>&#39;sed+tr:&#39;</span><span class=p>,</span> <span class=n>s2</span><span class=p>)</span>
+</code></pre></div><p>You can provide stdin to the commands as a string passing a table with
+<code>__input</code> key:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=n>s</span> <span class=o>=</span> <span class=s1>&#39;Hello World&#39;</span>
+<span class=n>tr</span><span class=p>({</span><span class=n>__input</span><span class=o>=</span><span class=n>s</span><span class=p>},</span> <span class=s1>&#39;[[:lower:]]&#39;</span><span class=p>,</span> <span class=s1>&#39;[[:upper:]]&#39;</span><span class=p>)</span>
+</code></pre></div><p>Finally, commands that don&rsquo;t fit the Lua syntax (like <code>google-chrome</code> or <code>somecommand.bin</code>). Since we already have a function <code>command(cmd)</code> that returns a command wrapper - we can use it, since it&rsquo;s exported by the module:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=kd>local</span> <span class=n>sh</span> <span class=o>=</span> <span class=n>require</span><span class=p>(</span><span class=s1>&#39;sh&#39;</span><span class=p>)</span>
+<span class=kd>local</span> <span class=n>chrome</span> <span class=o>=</span> <span class=n>sh.command</span><span class=p>(</span><span class=s1>&#39;google-chrome&#39;</span><span class=p>)</span>
+<span class=n>chrome</span><span class=p>()</span>
+</code></pre></div><p>As a bonus, you can pre-define some command line arguments as well:</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=kd>local</span> <span class=n>sh</span> <span class=o>=</span> <span class=n>require</span><span class=p>(</span><span class=s1>&#39;sh&#39;</span><span class=p>)</span>
+<span class=kd>local</span> <span class=n>dockerbusybox</span> <span class=o>=</span> <span class=n>sh.command</span><span class=p>(</span><span class=s1>&#39;docker&#39;</span><span class=p>,</span> <span class=s1>&#39;run&#39;</span><span class=p>,</span> <span class=s1>&#39;busybox&#39;</span><span class=p>)</span>
+<span class=n>dockerbusybox</span><span class=p>(</span><span class=s1>&#39;echo&#39;</span><span class=p>,</span> <span class=s1>&#39;hello&#39;</span><span class=p>)</span>
+</code></pre></div><p>This is helpful for multi-command binaries, like <code>git</code>, <code>docker</code>, <code>ip</code> or
+<code>busybox</code>.</p><p>Another syntax sugar is named options. You may pass a table instead of variadic arguments, then table keys will be interpreted as option names. Single-letter keys will be used as short options (<code>o</code> becomes <code>-o</code>), longer keys will be used a long options (<code>output</code> becomes <code>--output</code>).</p><div class=highlight><pre class=chroma><code class=language-lua data-lang=lua><span class=c1>-- $(seq --separator=&#34;,&#34; -w 0 10)</span>
+<span class=n>seq</span><span class=p>({</span>
+	<span class=n>separator</span> <span class=o>=</span> <span class=s1>&#39;,&#39;</span><span class=p>,</span>
+	<span class=n>w</span> <span class=o>=</span> <span class=kc>true</span><span class=p>,</span>
+<span class=p>},</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>10</span><span class=p>)</span>
+</code></pre></div><h2 id=summary>summary</h2><p>The library is super tiny, much more lightweight comparing to Python&rsquo;s sh. And
 of course it lacks lots of functionality that Python&rsquo;s sh has:</p><ul><li>Stderr redirection (now stderr messages are printed to lua stderr). This can
 be done via another file I think, but I don&rsquo;t want to mess with shell a lot.
-I hope <code>&lt;</code> operator works in most shells, while <code>&gt;&amp;2 x &gt; y</code> might not.</li><li>Subcommands as attributes (like <code>git.branch()</code>). I don&rsquo;t think this feature
+I hope <code>&lt;</code> operator works in most shells, while <code>>&2 x > y</code> might not.</li><li>Subcommands as attributes (like <code>git.branch()</code>). I don&rsquo;t think this feature
 is needed at all. One can define it easily with sh.command().</li><li>Glob expansion. Again, I don&rsquo;t see how this can be helpful, assuming that Lua
 passes commands via shell anyway, which does glob expansion already. E.g.
 <code>ls(/tmp/*')</code> already works.</li><li>No special API for &ldquo;baking&rdquo;, all is done via the same single <code>command()</code> API
@@ -97,6 +97,6 @@ processes after it&rsquo;s fully read.</li><li>No interactive callbacks (like ex
 is because I/O is not suitable for interactive usage in Lua.</li><li>No way to control buffer sizes (again, because we read full output at once).</li><li>No way to set environment variable. Because Lua has no API for that.</li><li>No way to attach tty. Because Lua has no API for that.</li></ul><p>This means the library can still be improved. I haven&rsquo;t tried it on Windows,
 but I think it should work with minor modifications. Special mode for loops
 might be added. Stderr redirection might be added after I ensure that it works
-in all modern shells (bash, zsh, busybox, ash, mksh, windows cmd.exe etc).</p><p>But the library can already be used for most of the scripting needs. I hope it would help someone, and I&rsquo;m glad to share it under MIT license.</p><p>Please, report any <a href=https://github.com/zserge/luash/issues>issues on github</a> and <a href=https://github.com/zserge/luash/pulls>pull requests are welcome</a>!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 03, 2015</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+in all modern shells (bash, zsh, busybox, ash, mksh, windows cmd.exe etc).</p><p>But the library can already be used for most of the scripting needs. I hope it would help someone, and I&rsquo;m glad to share it under MIT license.</p><p>Please, report any <a href=https://github.com/zserge/luash/issues>issues on github</a> and <a href=https://github.com/zserge/luash/pulls>pull requests are welcome</a>!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 03, 2015</em></p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

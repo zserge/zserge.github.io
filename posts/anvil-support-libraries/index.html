@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil 0.4.0 &#43; support libraries</title><meta name=description content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-support-libraries/><meta property=og:title content="Anvil 0.4.0 &#43; support libraries"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/anvil-support-libraries/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta property=og:locale content=en_US><meta name=twitter:card content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil 0.4.0 + support libraries</title><meta name=description content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-support-libraries/><meta property="og:title" content="Anvil 0.4.0 + support libraries"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-support-libraries/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta property="og:locale" content="en_US"><meta name=twitter:card content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Anvil 0.4.0 &#43; support libraries</h1><p>Previously on <a href=https://github.com/zserge/anvil>Anvil</a>: version 0.1 was the
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Anvil 0.4.0 + support libraries</h1><p>Previously on <a href=https://github.com/zserge/anvil>Anvil</a>: version 0.1 was the
 first one to use incremental rendering approach instead of virtual tree
 diff&rsquo;ing. Version 0.2 added support for XML layouts and binding data to
 existing views. Version 0.3 was about two-way data bindings - most views got
@@ -10,48 +10,48 @@ a lot). But the urgency of bringing them to Anvil has been clear.</p><p>Thanks t
 generator, it finally got the ability to produce DSL from the support classes
 as well.</p><p>Here are the new build artifacts that should be added if you are going to use
 support libraries with Anvil (you may only add the ones you actually need, they
-are all independent):</p><pre><code>compile 'co.trikita:anvil-support-v4:0.4.0'
-compile 'co.trikita:anvil-recyclerview-v7:0.4.0'
-compile 'co.trikita:anvil-cardview-v7:0.4.0'
-compile 'co.trikita:anvil-appcompat-v7:0.4.0'
-compile 'co.trikita:anvil-design:0.4.0'
-</code></pre><p>Each one has its own DSL class, so let&rsquo;s quickly jump though all of them.</p><h2 id=support-v4>Support v4</h2><p>Here the most notable view functions are <code>drawerLayout</code>, <code>viewPager</code>,
-<code>pagerTabStrip</code> and <code>swipeRefreshLayout</code>. Most of them can be used like normal Anvil views.</p><p>Here&rsquo;s an example of using drawer layout with Anvil:</p><pre><code class=language-java>drawerLayout(() -&gt; {
-  init(() -&gt; {
-    // The following is needed if you want actionbar to toggle the drawer, too
-    drawer = Anvil.currentView();
-    drawerToggle = new ActionBarDrawerToggle(activity, drawer, R.string.drawer_open, R.string.drawer_close);
-    drawer.addDrawerListener(drawerToggle);
-    activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    activity.getSupportActionBar().setHomeButtonEnabled(true);
-    drawerToggle.syncState();
-  });
+are all independent):</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>compile &#39;co.trikita:anvil-support-v4:0.4.0&#39;
+compile &#39;co.trikita:anvil-recyclerview-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-cardview-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-appcompat-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-design:0.4.0&#39;
+</code></pre></div><p>Each one has its own DSL class, so let&rsquo;s quickly jump though all of them.</p><h2 id=support-v4>Support v4</h2><p>Here the most notable view functions are <code>drawerLayout</code>, <code>viewPager</code>,
+<code>pagerTabStrip</code> and <code>swipeRefreshLayout</code>. Most of them can be used like normal Anvil views.</p><p>Here&rsquo;s an example of using drawer layout with Anvil:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>drawerLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>init</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=c1>// The following is needed if you want actionbar to toggle the drawer, too
+</span><span class=c1></span>    <span class=n>drawer</span> <span class=o>=</span> <span class=n>Anvil</span><span class=o>.</span><span class=na>currentView</span><span class=o>();</span>
+    <span class=n>drawerToggle</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ActionBarDrawerToggle</span><span class=o>(</span><span class=n>activity</span><span class=o>,</span> <span class=n>drawer</span><span class=o>,</span> <span class=n>R</span><span class=o>.</span><span class=na>string</span><span class=o>.</span><span class=na>drawer_open</span><span class=o>,</span> <span class=n>R</span><span class=o>.</span><span class=na>string</span><span class=o>.</span><span class=na>drawer_close</span><span class=o>);</span>
+    <span class=n>drawer</span><span class=o>.</span><span class=na>addDrawerListener</span><span class=o>(</span><span class=n>drawerToggle</span><span class=o>);</span>
+    <span class=n>activity</span><span class=o>.</span><span class=na>getSupportActionBar</span><span class=o>().</span><span class=na>setDisplayHomeAsUpEnabled</span><span class=o>(</span><span class=kc>true</span><span class=o>);</span>
+    <span class=n>activity</span><span class=o>.</span><span class=na>getSupportActionBar</span><span class=o>().</span><span class=na>setHomeButtonEnabled</span><span class=o>(</span><span class=kc>true</span><span class=o>);</span>
+    <span class=n>drawerToggle</span><span class=o>.</span><span class=na>syncState</span><span class=o>();</span>
+  <span class=o>});</span>
 
-  size(FILL, FILL);
+  <span class=n>size</span><span class=o>(</span><span class=n>FILL</span><span class=o>,</span> <span class=n>FILL</span><span class=o>);</span>
 
-  // Main content, often is a custom renderable
-  // You may use if/else or switch/case to toggle between different content views
-  v(SomeContentView.class, () -&gt; {
-    size(FILL, FILL);
-  });
+  <span class=c1>// Main content, often is a custom renderable
+</span><span class=c1></span>  <span class=c1>// You may use if/else or switch/case to toggle between different content views
+</span><span class=c1></span>  <span class=n>v</span><span class=o>(</span><span class=n>SomeContentView</span><span class=o>.</span><span class=na>class</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>size</span><span class=o>(</span><span class=n>FILL</span><span class=o>,</span> <span class=n>FILL</span><span class=o>);</span>
+  <span class=o>});</span>
 
-  // Drawer menu
-  listView(() -&gt; {
-    size(dip(240), FILL);
-    layoutGravity(START);
-    adapter(drawerAdapter);
-    onItemClick((av, v, pos, id) -&gt; {
-      drawer.closeDrawer(av);
-      // handle navigation here
-    });
-  });
-});
-</code></pre><h2 id=recyclerview-and-cardview>RecyclerView and CardView</h2><p>Prior to Anvil 0.4 we made a separate library that handled RecyclerView. Now
-once RecyclerView is part of Anvil libraries you may use it out-of-the-box like:</p><pre><code>// Simple adapters are created like for ListView
+  <span class=c1>// Drawer menu
+</span><span class=c1></span>  <span class=n>listView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>size</span><span class=o>(</span><span class=n>dip</span><span class=o>(</span><span class=n>240</span><span class=o>),</span> <span class=n>FILL</span><span class=o>);</span>
+    <span class=n>layoutGravity</span><span class=o>(</span><span class=n>START</span><span class=o>);</span>
+    <span class=n>adapter</span><span class=o>(</span><span class=n>drawerAdapter</span><span class=o>);</span>
+    <span class=n>onItemClick</span><span class=o>((</span><span class=n>av</span><span class=o>,</span> <span class=n>v</span><span class=o>,</span> <span class=n>pos</span><span class=o>,</span> <span class=n>id</span><span class=o>)</span> <span class=o>-&gt;</span> <span class=o>{</span>
+      <span class=n>drawer</span><span class=o>.</span><span class=na>closeDrawer</span><span class=o>(</span><span class=n>av</span><span class=o>);</span>
+      <span class=c1>// handle navigation here
+</span><span class=c1></span>    <span class=o>});</span>
+  <span class=o>});</span>
+<span class=o>});</span>
+</code></pre></div><h2 id=recyclerview-and-cardview>RecyclerView and CardView</h2><p>Prior to Anvil 0.4 we made a separate library that handled RecyclerView. Now
+once RecyclerView is part of Anvil libraries you may use it out-of-the-box like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>// Simple adapters are created like for ListView
 // But one may extend RenderableRecyclerViewAdapter to get more control
 someAdapter = RenderableRecyclerViewAdapter.withItems(items, (i, item) -&gt; {
   textView(() -&gt; {
-    text(item.text + &quot; at position &quot; + i);
+    text(item.text + &#34; at position &#34; + i);
   });
 });
 
@@ -61,45 +61,44 @@ recyclerView(() -&gt; {
   // gridLayoutManager(spanCount)
   adapter(someAdapter);
 });
-</code></pre><p>Unlike RecyclerView, CardView is a pretty boring library, all you can do is
-create a card view and control its corner radius, elevation etc:</p><pre><code>cardView(() -&gt; {
+</code></pre></div><p>Unlike RecyclerView, CardView is a pretty boring library, all you can do is
+create a card view and control its corner radius, elevation etc:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>cardView(() -&gt; {
   cardElevation(1);
   radius(dip(4));
 });
-</code></pre><p>One potential caveat is using animated views (like switches) inside the
+</code></pre></div><p>One potential caveat is using animated views (like switches) inside the
 recycler view. You can&rsquo;t modify such views during the layout phase, so if you
 are calling <code>notifyDataSetChanged</code> on your recycler adapter from inside the
 <code>view()</code> method - better delay the adapter change with <code>post()</code>. It would fix a
 potential crash.</p><h2 id=appcompat>AppCompat</h2><p>Due to the programming language semantics, Anvil is unable to replace regular
 views with appCompat versions on-the-fly like XML inflater does. Probably it&rsquo;s
-for the best - explicit is often better than implicit:</p><pre><code>appCompatButton(() -&gt; ...);
+for the best - explicit is often better than implicit:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>appCompatButton(() -&gt; ...);
 appCompatCheckBox(() -&gt; ...);
-</code></pre><h2 id=design>Design</h2><p>Design library is often being used to get the floating action buttons, so
-here&rsquo;s an example:</p><pre><code>floatingActionButton(() -&gt; {
+</code></pre></div><h2 id=design>Design</h2><p>Design library is often being used to get the floating action buttons, so
+here&rsquo;s an example:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>floatingActionButton(() -&gt; {
   compatElevation(dip(4));
   layoutGravity(BOTTOM | END);
   onClick(v -&gt; ...);
 });
-</code></pre><p>Of course all these libraries are not limited to the examples above, all view
+</code></pre></div><p>Of course all these libraries are not limited to the examples above, all view
 classes and view attributes have been wrapped into DSL. If some of them are
 still missing - please report an
 <a href=https://github.com/zserge/anvil/issues>issue</a>.</p><h2 id=caveats>Caveats</h2><p>Since Java has no mixins - there now may be some name collisions if you import
 all DSLs statically with a wildcard.</p><p>There is no simple fix for that, not at least in Java, so whenever you get a
-name conflict - specify DSL class explicitly, e.g. <code>CardViewv7DSL.cardView(()
--&gt; ...)</code> instead of <code>cardView(() -&gt; ...)</code>.</p><p>Some support DSLs modify attributes of the support views which are not
+name conflict - specify DSL class explicitly, e.g. <code>CardViewv7DSL.cardView(() -> ...)</code> instead of <code>cardView(() -> ...)</code>.</p><p>Some support DSLs modify attributes of the support views which are not
 inherited from the common SDK views yet have the same setter names. Likewise,
 specify DSL name explicitly in such a case.</p><p>Another potential problem could be LayoutParams. If you put your view inside a
 support layout - you must set the specific support layout params class. As a
-workaround, you may do it explicitly:</p><pre><code>someSupportLayout(() -&gt; {
+workaround, you may do it explicitly:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>someSupportLayout(() -&gt; {
   yourView(() -&gt; {
     layoutParams(someSupportLayoutParams);
   });
 });
-</code></pre><p>For layout params such as <code>weight</code> and <code>gravity</code> you may use normal Anvil
+</code></pre></div><p>For layout params such as <code>weight</code> and <code>gravity</code> you may use normal Anvil
 attribute setters, otherwise either use support DSL setters, or pass the
 LayoutParams object manually.</p><p>Hope this doesn&rsquo;t stop you from using Anvil, moreover, I hope the adoption of
 the support libraries will encourage you to try Anvil in your next project!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>May 11, 2016</em></p><p>See also:
 <a href=/posts/anvil-app-architecture/>How to architect Anvil apps</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

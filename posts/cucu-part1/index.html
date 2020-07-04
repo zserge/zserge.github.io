@@ -1,26 +1,26 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>cucu: a compiler you can understand (1/3)</title><meta name=description content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/cucu-part1/><meta property=og:title content="cucu: a compiler you can understand (1/3)"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/cucu-part1/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta property=og:locale content=en_US><meta name=twitter:card content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>cucu: a compiler you can understand (1/3)</title><meta name=description content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/cucu-part1/><meta property="og:title" content="cucu: a compiler you can understand (1/3)"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/cucu-part1/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Compilers is fun. Want to write your own one? Part 1 - lexer."><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>cucu: a compiler you can understand (1/3)</h1><p>Let talk about the compilers. Have you ever thought of writing your own one?</p><p>I will try to show you how simple it is. The first part will be pretty much
-theoretical, so keep patience.</p><h2 id=what-we-re-going-to-achieve>what we&rsquo;re going to achieve?</h2><p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>cucu: a compiler you can understand (1/3)</h1><p>Let talk about the compilers. Have you ever thought of writing your own one?</p><p>I will try to show you how simple it is. The first part will be pretty much
+theoretical, so keep patience.</p><h2 id=what-were-going-to-achieve>what we&rsquo;re going to achieve?</h2><p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C
 as possible, so that every valid CUCU program could be compiled with a C
 compiler without any errors. Of course, the support of the whole ANSI C
-standard is very difficult, so I picked a very small C language subset.</p><p>For example, here&rsquo;s a valid CUCU code snippet:</p><pre><code class=language-c>int cucu_strlen(char *s) {
-	int i = 0;
-	while (s[i]) {
-		i = i + 1;
-	}
-	return i;
-}
-</code></pre><h2 id=grammar>grammar</h2><p>We&rsquo;re about to define a grammar for our language. It&rsquo;s an important step,
+standard is very difficult, so I picked a very small C language subset.</p><p>For example, here&rsquo;s a valid CUCU code snippet:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>cucu_strlen</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>)</span> <span class=p>{</span>
+	<span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+	<span class=k>while</span> <span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>])</span> <span class=p>{</span>
+		<span class=n>i</span> <span class=o>=</span> <span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=n>i</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=grammar>grammar</h2><p>We&rsquo;re about to define a grammar for our language. It&rsquo;s an important step,
 because everything in our compiler design depends on it.</p><p>So, let&rsquo;s go from top to bottom. Our source file contains a <strong>program</strong>.
 What is a program? We know it&rsquo;s a list of <strong>variable declarations</strong>, <strong>function
-declarations</strong> and <strong>function definitions</strong>, e.g:</p><pre><code class=language-c>int func(char *s, int len); /* function declaration */
-int i;                      /* variable declaration */
+declarations</strong> and <strong>function definitions</strong>, e.g:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>func</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=kt>int</span> <span class=n>len</span><span class=p>);</span> <span class=cm>/* function declaration */</span>
+<span class=kt>int</span> <span class=n>i</span><span class=p>;</span>                      <span class=cm>/* variable declaration */</span>
 
-int func(char *s, int len) { /* function definition */
-	...
-}
-</code></pre><p>Let&rsquo;s try to write it down in <a href=http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form>EBNF</a> form (it&rsquo;s absolutely ok, if you don&rsquo;t
+<span class=kt>int</span> <span class=nf>func</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=kt>int</span> <span class=n>len</span><span class=p>)</span> <span class=p>{</span> <span class=cm>/* function definition */</span>
+	<span class=p>...</span>
+<span class=p>}</span>
+</code></pre></div><p>Let&rsquo;s try to write it down in <a href=http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form>EBNF</a> form (it&rsquo;s absolutely ok, if you don&rsquo;t
 know what EBNF is, it&rsquo;s really intuitive):</p><pre><code>&lt;program&gt; ::= { &lt;var-decl&gt; | &lt;func-decl&gt; | &lt;func-def&gt; } ;
 </code></pre><p>This notation says: &ldquo;a program is a repeating sequence of variable declarations,
 function declarations and function definitions. But what is all those
@@ -30,27 +30,27 @@ declarations and definitions? Ok, let&rsquo;s go deeper:</p><pre><code>&lt;var-d
 &lt;func-args&gt; ::= { &lt;type&gt; &lt;ident&gt; &quot;,&quot; }
 &lt;type&gt; ::= &quot;int&quot; | &quot;char *&quot;
 </code></pre><p>So, variable declaration is simple: it&rsquo;s a type name followed by the identifier,
-and followed by a semicolon, like we usually do in C, e.g.:</p><pre><code class=language-c>int i;
-char *s;
-</code></pre><p>Function declaration is a bit more complicated. It&rsquo;s a &ldquo;type + identifier&rdquo;,
-and an optional list of function arguments <code>&lt;func-args&gt;</code> inside the braces.</p><p>Function arguments list, in it&rsquo;s turn, is a sequence of comma-separated
-&ldquo;type + identifier&rdquo;, like:</p><pre><code class=language-c>char *s, int from, int to
-</code></pre><p><em>Actually, trailing comma in CUCU is still allowed, but not required. It will
+and followed by a semicolon, like we usually do in C, e.g.:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+<span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>;</span>
+</code></pre></div><p>Function declaration is a bit more complicated. It&rsquo;s a &ldquo;type + identifier&rdquo;,
+and an optional list of function arguments <code>&lt;func-args></code> inside the braces.</p><p>Function arguments list, in it&rsquo;s turn, is a sequence of comma-separated
+&ldquo;type + identifier&rdquo;, like:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=kt>int</span> <span class=n>from</span><span class=p>,</span> <span class=kt>int</span> <span class=n>to</span>
+</code></pre></div><p><em>Actually, trailing comma in CUCU is still allowed, but not required. It will
 just simplify our parser code.</em></p><p>The supported data types are only <code>int</code> and <code>char *</code>. Identifier is a sequence
-of letters, digits and an underscore symbol.</p><p>The only thing left is <code>&lt;func-body&gt;</code>. But let&rsquo;s talk about <strong>statements</strong> and
+of letters, digits and an underscore symbol.</p><p>The only thing left is <code>&lt;func-body></code>. But let&rsquo;s talk about <strong>statements</strong> and
 <strong>expressions</strong> first.</p><p><em>Statement</em> is a smallest standalone element of the language. Here are valid
-statements in out language:</p><pre><code class=language-c>/* These are simple statements */
-i = 2 + 3; /* assignment statement */
-my_func(i); /* function call statement */
-return i; /* return statement */
+statements in out language:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cm>/* These are simple statements */</span>
+<span class=n>i</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>+</span> <span class=mi>3</span><span class=p>;</span> <span class=cm>/* assignment statement */</span>
+<span class=n>my_func</span><span class=p>(</span><span class=n>i</span><span class=p>);</span> <span class=cm>/* function call statement */</span>
+<span class=k>return</span> <span class=n>i</span><span class=p>;</span> <span class=cm>/* return statement */</span>
 
-/* These are compound statements */
-if (x &gt; 0) { .. } else { .. }
-while (x &gt; 0) { .. }
-</code></pre><p><em>Expression</em> is a smaller part of the statement. As opposed to statements,
+<span class=cm>/* These are compound statements */</span>
+<span class=k>if</span> <span class=p>(</span><span class=n>x</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span> <span class=p>..</span> <span class=p>}</span> <span class=k>else</span> <span class=p>{</span> <span class=p>..</span> <span class=p>}</span>
+<span class=k>while</span> <span class=p>(</span><span class=n>x</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span> <span class=p>..</span> <span class=p>}</span>
+</code></pre></div><p><em>Expression</em> is a smaller part of the statement. As opposed to statements,
 expressions always return a value. Usually, it&rsquo;s just the arithmetic. For
 example in the statement <code>func(x[2], i + j)</code> the expressions are <code>x[2]</code> and
-<code>i+j</code>.</p><p>So, looking back at <code>&lt;func-body&gt;</code>. It&rsquo;s just a valid statement (which is
+<code>i+j</code>.</p><p>So, looking back at <code>&lt;func-body></code>. It&rsquo;s just a valid statement (which is
 usually a block statement).</p><p>Here&rsquo;s what we have:</p><pre><code>&lt;func-body&gt; ::= &lt;statement&gt;
 &lt;statement&gt; ::= &quot;{&quot; { &lt;statement&gt; } &quot;}&quot;                /* block statement */
                 | [&lt;type&gt;] &lt;ident&gt; [ &quot;=&quot; &lt;expr&gt; ] &quot;;&quot;  /* assignment */
@@ -80,9 +80,9 @@ usually a block statement).</p><p>Here&rsquo;s what we have:</p><pre><code>&lt;f
 &lt;prim-expr&gt; := &lt;number&gt; | &lt;ident&gt; | &lt;string&gt; | &quot;(&quot; &lt;expr&gt; &quot;)&quot;
 </code></pre><p>That&rsquo;s it. Did you notice the recursion in the expression notation? Basically,
 the notation above shows us the precedence of the operators from bottom to top:
-parens and square brackets are evaluated first, and assignment goes the last.</p><p>For example, according to this grammar an expression <code>8&gt;&gt;1+1</code>
-will be evaluated to 2 (like in <code>8&gt;&gt;(1+1)</code>), not to 5 (like in <code>(8&gt;&gt;1)+1</code>),
-because <code>&gt;&gt;</code> has lower precedence than <code>+</code>.</p><h2 id=lexer>lexer</h2><p>Now we are done with grammar, and are ready to start. The first thing to do is
+parens and square brackets are evaluated first, and assignment goes the last.</p><p>For example, according to this grammar an expression <code>8>>1+1</code>
+will be evaluated to 2 (like in <code>8>>(1+1)</code>), not to 5 (like in <code>(8>>1)+1</code>),
+because <code>>></code> has lower precedence than <code>+</code>.</p><h2 id=lexer>lexer</h2><p>Now we are done with grammar, and are ready to start. The first thing to do is
 a lexer. Our compiler takes a stream of bytes as an input, and lexer allows to
 split that stream into smaller tokens, that can be processed later. It gives us
 some level of abstraction and simplifies out parser.</p><p>For example, a sequence of bytes &ldquo;int i = 2+31;&rdquo; will be split into tokens:</p><pre><code>int
@@ -93,8 +93,7 @@ i
 31
 ;
 </code></pre><p><em>In normal grown-up lexers every lexeme (token) has a type and a value, so
-instead of the list above we will get a list of pairs: <code>&lt;TYPE:int&gt;,&lt;ID:i&gt;,
-&lt;ASSIGN:=&gt;,&lt;NUM:2&gt;,&lt;PLUS:+&gt;,&lt;NUM:31&gt;,&lt;SEMI:;&gt;</code>. We are going to detect lexeme
+instead of the list above we will get a list of pairs: <code>&lt;TYPE:int>,&lt;ID:i>, &lt;ASSIGN:=>,&lt;NUM:2>,&lt;PLUS:+>,&lt;NUM:31>,&lt;SEMI:;></code>. We are going to detect lexeme
 type by its value, which is not academical at all!</em></p><p>The major problem with the lexer is that once a byte is read from the stream -
 it can not be &ldquo;un-read&rdquo;. And what if we&rsquo;ve read a byte that can not be added to
 the current token? Where should we store it until the current token is
@@ -103,84 +102,84 @@ need to have is a single byte buffer - <code>nextc</code>. It stores a byte, tha
 from the stream, but has not yet been pushed to the token string.</p><p>Also, I need to warn you - I use global variables a lot in CUCU code. I know
 it&rsquo;s a bad style, but if I pass all values as function arguments the compiler
 would loose it&rsquo;s simplicity.</p><p>The whole lexer is just a single function <code>readtok()</code>. The algorithm is simple:</p><ul><li>skip leading spaces</li><li>try to read an identifier (a sequence of letters, digits and <code>_</code>)</li><li>if it&rsquo;s not an identifier - try to read a sequence of special operators, like
-<code>&amp;, |, &lt;, &gt;, =, !</code>.</li><li>if it&rsquo;s not an operator - try to read a string literal &ldquo;&hellip;.&rdquo; or &lsquo;&hellip;.&rsquo;</li><li>if failed - maybe it&rsquo;s a comment, like <code>/* ... */</code>?</li><li>if failed again - just read a single byte. It might be another single-byte
-token, like &ldquo;(&rdquo; or &ldquo;[&ldquo;.</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><pre><code class=language-c>#include &lt;stdio.h&gt; /* for vpritnf */
-#include &lt;stdarg.h&gt; /* for va_list */
-#include &lt;stdlib.h&gt; /* for exit() */
-#include &lt;ctype.h&gt; /* for isspace, isalpha... */
+<code>&, |, &lt;, >, =, !</code>.</li><li>if it&rsquo;s not an operator - try to read a string literal &ldquo;&mldr;.&rdquo; or &lsquo;&mldr;.&rsquo;</li><li>if failed - maybe it&rsquo;s a comment, like <code>/* ... */</code>?</li><li>if failed again - just read a single byte. It might be another single-byte
+token, like &ldquo;(&rdquo; or &ldquo;[".</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt; /* for vpritnf */</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;stdarg.h&gt; /* for va_list */</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt; /* for exit() */</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;ctype.h&gt; /* for isspace, isalpha... */</span><span class=cp>
+</span><span class=cp></span>
+<span class=cp>#define MAXTOKSZ 256
+</span><span class=cp></span><span class=k>static</span> <span class=n>FILE</span> <span class=o>*</span><span class=n>f</span><span class=p>;</span> <span class=cm>/* input file */</span>
+<span class=k>static</span> <span class=kt>char</span> <span class=n>tok</span><span class=p>[</span><span class=n>MAXTOKSZ</span><span class=p>];</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=n>tokpos</span><span class=p>;</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=n>nextc</span><span class=p>;</span>
 
-#define MAXTOKSZ 256
-static FILE *f; /* input file */
-static char tok[MAXTOKSZ];
-static int tokpos;
-static int nextc;
+<span class=kt>void</span> <span class=nf>readchr</span><span class=p>()</span> <span class=p>{</span>
+	<span class=k>if</span> <span class=p>(</span><span class=n>tokpos</span> <span class=o>==</span> <span class=n>MAXTOKSZ</span> <span class=o>-</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+		<span class=n>tok</span><span class=p>[</span><span class=n>tokpos</span><span class=p>]</span> <span class=o>=</span> <span class=sc>&#39;\0&#39;</span><span class=p>;</span>
+		<span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span> <span class=s>&#34;token too long: %s</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>tok</span><span class=p>);</span>
+		<span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+	<span class=p>}</span>
+	<span class=n>tok</span><span class=p>[</span><span class=n>tokpos</span><span class=o>++</span><span class=p>]</span> <span class=o>=</span> <span class=n>nextc</span><span class=p>;</span>
+	<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+<span class=p>}</span>
 
-void readchr() {
-	if (tokpos == MAXTOKSZ - 1) {
-		tok[tokpos] = '\0';
-		fprintf(stderr, &quot;token too long: %s\n&quot;, tok);
-		exit(EXIT_FAILURE);
-	}
-	tok[tokpos++] = nextc;
-	nextc = fgetc(f);
-}
+<span class=kt>void</span> <span class=nf>readtok</span><span class=p>()</span> <span class=p>{</span>
+	<span class=k>for</span> <span class=p>(;;)</span> <span class=p>{</span>
+		<span class=k>while</span> <span class=p>(</span><span class=n>isspace</span><span class=p>(</span><span class=n>nextc</span><span class=p>))</span> <span class=p>{</span>
+			<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+		<span class=p>}</span>
+		<span class=n>tokpos</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+		<span class=k>while</span><span class=p>(</span><span class=n>isalnum</span><span class=p>(</span><span class=n>nextc</span><span class=p>)</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;_&#39;</span><span class=p>)</span> <span class=p>{</span>
+			<span class=n>readchr</span><span class=p>();</span>
+		<span class=p>}</span>
+		<span class=k>if</span> <span class=p>(</span><span class=n>tokpos</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+			<span class=k>while</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;&lt;&#39;</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;=&#39;</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;&gt;&#39;</span>
+					<span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;!&#39;</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;&amp;&#39;</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;|&#39;</span><span class=p>)</span> <span class=p>{</span>
+				<span class=n>readchr</span><span class=p>();</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+		<span class=k>if</span> <span class=p>(</span><span class=n>tokpos</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+			<span class=k>if</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;\&#39;&#39;</span> <span class=o>||</span> <span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;&#34;&#39;</span><span class=p>)</span> <span class=p>{</span>
+				<span class=kt>char</span> <span class=n>c</span> <span class=o>=</span> <span class=n>nextc</span><span class=p>;</span>
+				<span class=n>readchr</span><span class=p>();</span>
+				<span class=k>while</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>!=</span> <span class=n>c</span><span class=p>)</span> <span class=p>{</span>
+					<span class=n>readchr</span><span class=p>();</span>
+				<span class=p>}</span>
+				<span class=n>readchr</span><span class=p>();</span>
+			<span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;/&#39;</span><span class=p>)</span> <span class=p>{</span>
+				<span class=n>readchr</span><span class=p>();</span>
+				<span class=k>if</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>==</span> <span class=sc>&#39;*&#39;</span><span class=p>)</span> <span class=p>{</span>
+					<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+					<span class=k>while</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>!=</span> <span class=sc>&#39;/&#39;</span><span class=p>)</span> <span class=p>{</span>
+						<span class=k>while</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>!=</span> <span class=sc>&#39;*&#39;</span><span class=p>)</span> <span class=p>{</span>
+							<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+						<span class=p>}</span>
+						<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+					<span class=p>}</span>
+					<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
+				<span class=p>}</span>
+			<span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>nextc</span> <span class=o>!=</span> <span class=n>EOF</span><span class=p>)</span> <span class=p>{</span>
+				<span class=n>readchr</span><span class=p>();</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+		<span class=k>break</span><span class=p>;</span>
+	<span class=p>}</span>
+	<span class=n>tok</span><span class=p>[</span><span class=n>tokpos</span><span class=p>]</span> <span class=o>=</span> <span class=sc>&#39;\0&#39;</span><span class=p>;</span>
+<span class=p>}</span>
 
-void readtok() {
-	for (;;) {
-		while (isspace(nextc)) {
-			nextc = fgetc(f);
-		}
-		tokpos = 0;
-		while(isalnum(nextc) || nextc == '_') {
-			readchr();
-		}
-		if (tokpos == 0) {
-			while (nextc == '&lt;' || nextc == '=' || nextc == '&gt;'
-					|| nextc == '!' || nextc == '&amp;' || nextc == '|') {
-				readchr();
-			}
-		}
-		if (tokpos == 0) {
-			if (nextc == '\'' || nextc == '&quot;') {
-				char c = nextc;
-				readchr();
-				while (nextc != c) {
-					readchr();
-				}
-				readchr();
-			} else if (nextc == '/') {
-				readchr();
-				if (nextc == '*') {
-					nextc = fgetc(f);
-					while (nextc != '/') {
-						while (nextc != '*') {
-							nextc = fgetc(f);
-						}
-						nextc = fgetc(f);
-					}
-					nextc = fgetc(f);
-				}
-			} else if (nextc != EOF) {
-				readchr();
-			}
-		}
-		break;
-	}
-	tok[tokpos] = '\0';
-}
+<span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=n>f</span> <span class=o>=</span> <span class=n>stdin</span><span class=p>;</span>
+	<span class=n>nextc</span> <span class=o>=</span> <span class=n>fgetc</span><span class=p>(</span><span class=n>f</span><span class=p>);</span>
 
-int main() {
-	f = stdin;
-	nextc = fgetc(f);
-
-	for (;;) {
-		readtok();
-		printf(&quot;TOKEN: %s\n&quot;, tok);
-		if (tok[0] == '\0') break;
-	}
-	return 0;
-}
-</code></pre><p>If we put a C file as the compiler input - it will print us a list of tokens,
-one per line.</p><p>Ok, have a cup of coffee, and let&rsquo;s <a href=/posts/cucu-part2/>go further &rarr;</a></p><p><em>You can check <a href=/posts/cucu-part3/>part3</a> to know how the story ended.</em></p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 23, 2012</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+	<span class=k>for</span> <span class=p>(;;)</span> <span class=p>{</span>
+		<span class=n>readtok</span><span class=p>();</span>
+		<span class=n>printf</span><span class=p>(</span><span class=s>&#34;TOKEN: %s</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>tok</span><span class=p>);</span>
+		<span class=k>if</span> <span class=p>(</span><span class=n>tok</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;\0&#39;</span><span class=p>)</span> <span class=k>break</span><span class=p>;</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>If we put a C file as the compiler input - it will print us a list of tokens,
+one per line.</p><p>Ok, have a cup of coffee, and let&rsquo;s <a href=/posts/cucu-part2/>go further →</a></p><p><em>You can check <a href=/posts/cucu-part3/>part3</a> to know how the story ended.</em></p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 23, 2012</em></p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

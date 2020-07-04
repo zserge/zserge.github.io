@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Cross-platform web UI for C and Go</title><meta name=description content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/webview/><meta property=og:title content="Cross-platform web UI for C and Go"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/webview/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta property=og:locale content=en_US><meta name=twitter:card content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Cross-platform web UI for C and Go</title><meta name=description content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/webview/><meta property="og:title" content="Cross-platform web UI for C and Go"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/webview/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta property="og:locale" content="en_US"><meta name=twitter:card content="Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Cross-platform web UI for C and Go</h1><p>Cross-platform GUI has always been a painful part of software development.</p><p>Today the biggest horror for an old-school C developer is to look at the <a href=https://electron.atom.io/apps/>list
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Cross-platform web UI for C and Go</h1><p>Cross-platform GUI has always been a painful part of software development.</p><p>Today the biggest horror for an old-school C developer is to look at the <a href=https://electron.atom.io/apps/>list
 of Electron apps</a> on their website. Simple, often trivial
 utilities, each taking over a hundred of megabytes of disk space and consuming
 hundreds of RAM once launched.</p><p>I&rsquo;m not going to start a rant here, people of HackerNews have said enough on
@@ -23,13 +23,13 @@ satisfactory results.</p><p>On Windows 8 user will end up with IE10, which is st
 supports most of the CSS3/HTML5. On Windows 10 it will be IE11, which is even
 better. But poor Windows 7 users will be enjoying IE7 in all its glory and
 there is not much we can do about it. And I don&rsquo;t want to even start talking
-about Windows XP&hellip;</p><h2 id=api>API</h2><p>Of course it would be nice to have an advanced API with a flexible event loop and
+about Windows XP&mldr;</p><h2 id=api>API</h2><p>Of course it would be nice to have an advanced API with a flexible event loop and
 functions to control every aspect of a web view and the hosting window, but
-that&rsquo;s beyond the time limits of a Sunday morning.</p><p>The library is available at <a href=https://github.com/zserge/webview>https://github.com/zserge/webview</a></p><p>So I simplified the API down to one function call:</p><pre><code class=language-c>int webview(const char *title, const char *url,
-	int width, int height, int resizable);
-</code></pre><p>It is supposed to open a window with the given title, width and height
+that&rsquo;s beyond the time limits of a Sunday morning.</p><p>The library is available at <a href=https://github.com/zserge/webview>https://github.com/zserge/webview</a></p><p>So I simplified the API down to one function call:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>webview</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>title</span><span class=p>,</span> <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>url</span><span class=p>,</span>
+	<span class=kt>int</span> <span class=n>width</span><span class=p>,</span> <span class=kt>int</span> <span class=n>height</span><span class=p>,</span> <span class=kt>int</span> <span class=n>resizable</span><span class=p>);</span>
+</code></pre></div><p>It is supposed to open a window with the given title, width and height
 (optinally - resizable) and render a full size web page with the given URL.</p><p>There is no way to provide actual HTML contents, but on Mac and Linux you can
-pass <code>data:text/html,&lt;html&gt;....&lt;/html&gt;</code> instead of a URL.</p><h2 id=usage>Usage</h2><p>The whole library is just a single header file of ~700 LOC and is available on
+pass <code>data:text/html,&lt;html>....&lt;/html></code> instead of a URL.</p><h2 id=usage>Usage</h2><p>The whole library is just a single header file of ~700 LOC and is available on
 <a href=https://github.com/zserge/webview>github</a>. It&rsquo;s written in C99, so it should play nicely with other
 languages if you want to make bindings. I expect it to be used only for web UI
 rendering. I don&rsquo;t force you to use any specific JS frameworks or communication
@@ -38,74 +38,74 @@ the app. If you can afford sharing you code under a GPL license - you can use
 <a href=https://github.com/cesanta/mongoose>Mongoose</a> web framework, it supports WebSockets.</p><p>But in 2017 I would also consider using Go.</p><h2 id=from-c-to-go>From C to Go</h2><p>Of course, there is little fun in writing web apps in C. So I made a tiny cgo
 wrapper that allows opening a webview from Go.</p><p>A self-contained native app with webUI can look like this. It shows a greeting
 with the current user name and exits if you click the button. You can check the
-<a href=https://github.com/zserge/webview>screenshots</a> on the project github page.</p><pre><code class=language-go>package main
+<a href=https://github.com/zserge/webview>screenshots</a> on the project github page.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
 
-import (
-	&quot;html/template&quot;
-	&quot;log&quot;
-	&quot;net&quot;
-	&quot;net/http&quot;
-	&quot;os&quot;
-	&quot;os/user&quot;
+<span class=kn>import</span> <span class=p>(</span>
+	<span class=s>&#34;html/template&#34;</span>
+	<span class=s>&#34;log&#34;</span>
+	<span class=s>&#34;net&#34;</span>
+	<span class=s>&#34;net/http&#34;</span>
+	<span class=s>&#34;os&#34;</span>
+	<span class=s>&#34;os/user&#34;</span>
 
-	&quot;github.com/zserge/webview&quot;
-)
+	<span class=s>&#34;github.com/zserge/webview&#34;</span>
+<span class=p>)</span>
 
-var tmpl = template.Must(template.New(&quot;&quot;).Parse(`
-&lt;html&gt;
-	&lt;head&gt;
-		&lt;style&gt;
-		* { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
-		body { color: #ffffff; background-color: #03a9f4; text-decoration: uppercase; font-size: 24px; }
-		h1 { text-align: center; font-weight: normal}
-		form { margin-left: auto; margin-right: auto; margin-top: 50px; width: 300px; }
-		input[type=&quot;submit&quot;] {
-				border: 0 none;
-				cursor: pointer;
-				margin-top: 1em;
-				background-color: #ffffff;
-				color: #03a9f4;
-				width: 100%;
-				height: 2em;
-				font-size: 24px;
-				text-transform: uppercase;
-		}
-		&lt;/style&gt;
-	&lt;/head&gt;
-	&lt;body&gt;
-	  &lt;form action=&quot;/exit&quot;&gt;
-			&lt;h1&gt;Hello, {{ markdownhack }}!&lt;/h1&gt;
-			&lt;input type=&quot;submit&quot; value=&quot;Exit&quot; /&gt;
-		&lt;/form&gt;
-	&lt;/body&gt;
-&lt;/html&gt;
-`))
+<span class=kd>var</span> <span class=nx>tmpl</span> <span class=p>=</span> <span class=nx>template</span><span class=p>.</span><span class=nf>Must</span><span class=p>(</span><span class=nx>template</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=s>&#34;&#34;</span><span class=p>).</span><span class=nf>Parse</span><span class=p>(</span><span class=s>`
+</span><span class=s>&lt;html&gt;
+</span><span class=s>	&lt;head&gt;
+</span><span class=s>		&lt;style&gt;
+</span><span class=s>		* { margin: 0; padding: 0; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; }
+</span><span class=s>		body { color: #ffffff; background-color: #03a9f4; text-decoration: uppercase; font-size: 24px; }
+</span><span class=s>		h1 { text-align: center; font-weight: normal}
+</span><span class=s>		form { margin-left: auto; margin-right: auto; margin-top: 50px; width: 300px; }
+</span><span class=s>		input[type=&#34;submit&#34;] {
+</span><span class=s>				border: 0 none;
+</span><span class=s>				cursor: pointer;
+</span><span class=s>				margin-top: 1em;
+</span><span class=s>				background-color: #ffffff;
+</span><span class=s>				color: #03a9f4;
+</span><span class=s>				width: 100%;
+</span><span class=s>				height: 2em;
+</span><span class=s>				font-size: 24px;
+</span><span class=s>				text-transform: uppercase;
+</span><span class=s>		}
+</span><span class=s>		&lt;/style&gt;
+</span><span class=s>	&lt;/head&gt;
+</span><span class=s>	&lt;body&gt;
+</span><span class=s>	  &lt;form action=&#34;/exit&#34;&gt;
+</span><span class=s>			&lt;h1&gt;Hello, </span><span class=cp>{{</span><span class=w> </span><span class=nx>markdownhack</span><span class=w> </span><span class=cp>}}</span><span class=s>!&lt;/h1&gt;
+</span><span class=s>			&lt;input type=&#34;submit&#34; value=&#34;Exit&#34; /&gt;
+</span><span class=s>		&lt;/form&gt;
+</span><span class=s>	&lt;/body&gt;
+</span><span class=s>&lt;/html&gt;
+</span><span class=s>`</span><span class=p>))</span>
 
-func main() {
-	ln, err := net.Listen(&quot;tcp&quot;, &quot;127.0.0.1:0&quot;)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ln.Close()
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>ln</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>net</span><span class=p>.</span><span class=nf>Listen</span><span class=p>(</span><span class=s>&#34;tcp&#34;</span><span class=p>,</span> <span class=s>&#34;127.0.0.1:0&#34;</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>defer</span> <span class=nx>ln</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
 
-	go func() {
-		http.HandleFunc(&quot;/exit&quot;, func(w http.ResponseWriter, r *http.Request) {
-			os.Exit(0)
-		})
-		http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
-			u, _ := user.Current()
-			tmpl.Execute(w, u)
-		})
-		log.Fatal(http.Serve(ln, nil))
-	}()
+	<span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+		<span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/exit&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+			<span class=nx>os</span><span class=p>.</span><span class=nf>Exit</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+		<span class=p>})</span>
+		<span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+			<span class=nx>u</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>user</span><span class=p>.</span><span class=nf>Current</span><span class=p>()</span>
+			<span class=nx>tmpl</span><span class=p>.</span><span class=nf>Execute</span><span class=p>(</span><span class=nx>w</span><span class=p>,</span> <span class=nx>u</span><span class=p>)</span>
+		<span class=p>})</span>
+		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nf>Serve</span><span class=p>(</span><span class=nx>ln</span><span class=p>,</span> <span class=kc>nil</span><span class=p>))</span>
+	<span class=p>}()</span>
 
-	webview.Open(&quot;Hello&quot;, &quot;http://&quot;+ln.Addr().String(), 400, 300, false)
-}
-</code></pre><p>The good thing is that unlike many Electron apps, this demo consumes only ~6MB
+	<span class=nx>webview</span><span class=p>.</span><span class=nf>Open</span><span class=p>(</span><span class=s>&#34;Hello&#34;</span><span class=p>,</span> <span class=s>&#34;http://&#34;</span><span class=o>+</span><span class=nx>ln</span><span class=p>.</span><span class=nf>Addr</span><span class=p>().</span><span class=nf>String</span><span class=p>(),</span> <span class=mi>400</span><span class=p>,</span> <span class=mi>300</span><span class=p>,</span> <span class=kc>false</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div><p>The good thing is that unlike many Electron apps, this demo consumes only ~6MB
 of RAM and the binary size is about 7MB unstripped (I&rsquo;ve only measured it on
 Linux).</p><p>Of course, it&rsquo;s a very early proof-of-concept and I haven&rsquo;t used it in any
 serious apps yet. But the whole idea of running a native web UI on top of a
 memory safe modern language is very appealing to me. So if you share my views,
-or found a bug, or have a suggestion to make - feel free to contribute!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Aug 20, 2017</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+or found a bug, or have a suggestion to make - feel free to contribute!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Aug 20, 2017</em></p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

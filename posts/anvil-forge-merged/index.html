@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil: time for a change</title><meta name=description content="I merged anvil-forge branch back to master and published a new version."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-forge-merged/><meta property=og:title content="Anvil: time for a change"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/anvil-forge-merged/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="I merged anvil-forge branch back to master and published a new version."><meta property=og:locale content=en_US><meta name=twitter:card content="I merged anvil-forge branch back to master and published a new version."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil: time for a change</title><meta name=description content="I merged anvil-forge branch back to master and published a new version."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-forge-merged/><meta property="og:title" content="Anvil: time for a change"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-forge-merged/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="I merged anvil-forge branch back to master and published a new version."><meta property="og:locale" content="en_US"><meta name=twitter:card content="I merged anvil-forge branch back to master and published a new version."><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Anvil: time for a change</h1><p>Those of you who regularly check my blog may remember that I was going to
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Anvil: time for a change</h1><p>Those of you who regularly check my blog may remember that I was going to
 <a href=/posts/anvil-breaking-changes/>redesign Anvil from scratch</a>. Unfortunately, it was an unavoidable step. We
 had performance issues and it turned out that blindly copying modern web
 metaphors to Android doesn&rsquo;t work well.</p><p>I am sorry, I had to change a lot of Anvil APIs since then. Those of you who
@@ -18,7 +18,7 @@ noticeable GC delays, even if you update your UI while scrolling the views or
 animating them.</p><p>Let me show you some numbers. If you render a layout of 100 views, about 10
 attributes each - <strong>you still can do about 4000 render cycles per second</strong>! And
 it grows linearly, so simple layouts of 10 views would be rendered 10 times
-faster.</p><h2 id=diff-ing-in-the-pipeline>Diff&rsquo;ing in the pipeline</h2><p>The key concept of Anvil is a virtual layout. Anvil keeps lightweight
+faster.</p><h2 id=diffing-in-the-pipeline>Diff&rsquo;ing in the pipeline</h2><p>The key concept of Anvil is a virtual layout. Anvil keeps lightweight
 representations of your views and their attributes and compares them before
 applying the changes to the actual views.</p><p>For the old Anvil is was absolutely true. Now it keeps only one virtual layout
 tree and traverses it during the next rendering cycle, &ldquo;patching&rdquo; it in-place.</p><p>This gives dramatic speed improvement for the most typical uses cases (when the
@@ -46,60 +46,60 @@ function returns, because the main job is already done when it&rsquo;s been call
 functional data processing techniques - you can use <code>for</code> loops instead of
 (missing) function map method on collection. You can use normal
 <code>if/else/switch</code> conditionals instead of ternary operations. You can append
-views in a loop and style your views easily.</p><p>Here&rsquo;s an example of the new syntax in Kotlin:</p><pre><code class=language-kotlin>public override fun view {
-	linearLayout {
-		orientation(LinearLayout.VERTICAL)
+views in a loop and style your views easily.</p><p>Here&rsquo;s an example of the new syntax in Kotlin:</p><div class=highlight><pre class=chroma><code class=language-kotlin data-lang=kotlin><span class=k>public</span> <span class=k>override</span> <span class=k>fun</span> <span class=nf>view</span> <span class=p>{</span>
+	<span class=n>linearLayout</span> <span class=p>{</span>
+		<span class=n>orientation</span><span class=p>(</span><span class=n>LinearLayout</span><span class=p>.</span><span class=n>VERTICAL</span><span class=p>)</span>
 
-		// If certain group of views is in every activity -
-		// you may move it to a separate &quot;utility&quot; class
-		AppStyle.headerView()
+		<span class=c1>// If certain group of views is in every activity -
+</span><span class=c1></span>		<span class=c1>// you may move it to a separate &#34;utility&#34; class
+</span><span class=c1></span>		<span class=n>AppStyle</span><span class=p>.</span><span class=n>headerView</span><span class=p>()</span>
 
-		inputField(Icon.USER, login)
-		inputField(Icon.PASSWORD, passwd)
+		<span class=n>inputField</span><span class=p>(</span><span class=n>Icon</span><span class=p>.</span><span class=n>USER</span><span class=p>,</span> <span class=n>login</span><span class=p>)</span>
+		<span class=n>inputField</span><span class=p>(</span><span class=n>Icon</span><span class=p>.</span><span class=n>PASSWORD</span><span class=p>,</span> <span class=n>passwd</span><span class=p>)</span>
 
-		button {
-			size(FILL, WRAP)
-			text(R.string.login)
-			enabled(login.toString().length() &gt; 0 &amp;&amp;
-				passwd.toString().length() &gt; 0)
-			onClick { v -&gt;
-				performLogin(login.toString(), passwd.toString())
-			}
-		}
-	}
-}
-// If a certain group of views is repeated in the layout - 
-// move it to a separate method
-fun inputField(iconText, input) {
-	linearLayout {
-		orientation(LinearLayout.HORIZONTAL)
+		<span class=n>button</span> <span class=p>{</span>
+			<span class=n>size</span><span class=p>(</span><span class=n>FILL</span><span class=p>,</span> <span class=n>WRAP</span><span class=p>)</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>R</span><span class=p>.</span><span class=n>string</span><span class=p>.</span><span class=n>login</span><span class=p>)</span>
+			<span class=n>enabled</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span> <span class=p>&amp;&amp;</span>
+				<span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span><span class=p>)</span>
+			<span class=n>onClick</span> <span class=p>{</span> <span class=n>v</span> <span class=p>-&gt;</span>
+				<span class=n>performLogin</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>(),</span> <span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>())</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+<span class=c1>// If a certain group of views is repeated in the layout - 
+</span><span class=c1>// move it to a separate method
+</span><span class=c1></span><span class=k>fun</span> <span class=nf>inputField</span><span class=p>(</span><span class=n>iconText</span><span class=p>,</span> <span class=n>input</span><span class=p>)</span> <span class=p>{</span>
+	<span class=n>linearLayout</span> <span class=p>{</span>
+		<span class=n>orientation</span><span class=p>(</span><span class=n>LinearLayout</span><span class=p>.</span><span class=n>HORIZONTAL</span><span class=p>)</span>
 
-		textView {
-			fontAwesomeIconStyle()
-			text(iconText)
-		}
-		editText {
-			size(0, FILL)
-			text(input)
-		}
-	}
-}
+		<span class=n>textView</span> <span class=p>{</span>
+			<span class=n>fontAwesomeIconStyle</span><span class=p>()</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>iconText</span><span class=p>)</span>
+		<span class=p>}</span>
+		<span class=n>editText</span> <span class=p>{</span>
+			<span class=n>size</span><span class=p>(</span><span class=m>0</span><span class=p>,</span> <span class=n>FILL</span><span class=p>)</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>input</span><span class=p>)</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
 
-// If the same style is applied many times - move it to a separate method
-fun fontAwesomeIconStyle() {
-	// Here you can define properties common for all FontAwesome icons
-	size(dip(48), dip(48))
-	gravity(CENTER)
-	typeface(&quot;fontawesome.ttf&quot;)
-	// You may use different styles depending on the app theme, orientation,
-	// screen size or user preferences
-	if nightMode() {
-		...
-	} else {
-		...
-	}
-}
-</code></pre><p>As you can see the rules of refactoring (like &ldquo;don&rsquo;t repeat yourself&rdquo;) still
+<span class=c1>// If the same style is applied many times - move it to a separate method
+</span><span class=c1></span><span class=k>fun</span> <span class=nf>fontAwesomeIconStyle</span><span class=p>()</span> <span class=p>{</span>
+	<span class=c1>// Here you can define properties common for all FontAwesome icons
+</span><span class=c1></span>	<span class=n>size</span><span class=p>(</span><span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>),</span> <span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>))</span>
+	<span class=n>gravity</span><span class=p>(</span><span class=n>CENTER</span><span class=p>)</span>
+	<span class=n>typeface</span><span class=p>(</span><span class=s>&#34;fontawesome.ttf&#34;</span><span class=p>)</span>
+	<span class=c1>// You may use different styles depending on the app theme, orientation,
+</span><span class=c1></span>	<span class=c1>// screen size or user preferences
+</span><span class=c1></span>	<span class=k>if</span> <span class=n>nightMode</span><span class=p>()</span> <span class=p>{</span>
+		<span class=p>...</span>
+	<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+		<span class=p>...</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>As you can see the rules of refactoring (like &ldquo;don&rsquo;t repeat yourself&rdquo;) still
 apply here. You already know them, so you&rsquo;re ready to write maintainable code
 with Anvil. Use the full power of your programming language.</p><h2 id=separation-of-api-levels>Separation of API levels</h2><p>As any other library, Anvil has certain impact on your APK size. Previously we
 included generated bindings for the two API levels - Android 2.3.3 and Android
@@ -126,6 +126,6 @@ That&rsquo;s because I&rsquo;m thinking about making it its own library (but mor
 powerful).</p><p>Finally, the State + Animations is something that mostly remained unchanged,
 but there are a few misconception in those modules. I&rsquo;m afraid the animations
 API is likely to be changed again soon.</p><p>Please let me know what you think of this update, and don&rsquo;t hesitate to spread
-the word about Anvil if you like it!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 01, 2015</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+the word about Anvil if you like it!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 01, 2015</em></p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

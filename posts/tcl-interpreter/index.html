@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Partcl - a tiny command language</title><meta name=description content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/tcl-interpreter/><meta property=og:title content="Partcl - a tiny command language"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/tcl-interpreter/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta property=og:locale content=en_US><meta name=twitter:card content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Partcl - a tiny command language</title><meta name=description content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/tcl-interpreter/><meta property="og:title" content="Partcl - a tiny command language"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/tcl-interpreter/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta property="og:locale" content="en_US"><meta name=twitter:card content="Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Partcl - a tiny command language</h1><p>Minimalist interpreters have always attracted me. First of all, they are a good
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Partcl - a tiny command language</h1><p>Minimalist interpreters have always attracted me. First of all, they are a good
 fit for embedded systems whenever you need a custom domain-specific language.</p><p>If one needs a scripting language for a microcontroller - there is not so many
 choices. Instead there are lots of constraints, like the size of the compiled
 binary code, RAM usage and memory management. Of course the language itself is
@@ -26,17 +26,16 @@ command languages again and again, is in fact very simple.</p><p>A script is a s
 command name, &ldquo;led&rdquo; and &ldquo;on&rdquo; are just words passed as parameters to the
 command.</p><p>There is no data types other than a string. Square brackets inside the
 strings are interpolated, e.g. the expression inside the brackets is evaluated
-and its result is put into the original string. For example, in <code>puts [add 1
-2]</code> the square brackets part gets substituted by <code>3</code> and then <code>puts 3</code> is
+and its result is put into the original string. For example, in <code>puts [add 1 2]</code> the square brackets part gets substituted by <code>3</code> and then <code>puts 3</code> is
 executed.</p><p>This approach is definitely slow, but it is what makes Tcl interpreters so
 simple. All the language does is string substitution. The only place where no
 substitution happens is braces. That&rsquo;s why the following is just a 5-word
-command, and not a special language syntax:</p><pre><code class=language-tcl>if {$x &gt; 0} {
-	puts &quot;Positive&quot;
-} else {
-	puts &quot;Negative&quot;
-}
-</code></pre><p>The command is <code>if</code>, the second word is <code>$x &gt; 0</code> (which is substituted later by
+command, and not a special language syntax:</p><div class=highlight><pre class=chroma><code class=language-tcl data-lang=tcl><span class=k>if</span> <span class=k>{</span><span class=nv>$x</span> <span class=o>&gt;</span> <span class=nv>0</span><span class=k>}</span> <span class=k>{</span>
+	<span class=nb>puts</span> <span class=s2>&#34;Positive&#34;</span>
+<span class=k>}</span> <span class=k>else</span> <span class=k>{</span>
+	<span class=nb>puts</span> <span class=s2>&#34;Negative&#34;</span>
+<span class=k>}</span>
+</code></pre></div><p>The command is <code>if</code>, the second word is <code>$x > 0</code> (which is substituted later by
 the command internally), the third word is <code>{puts Positive}</code>, then <code>else</code>, then
 <code>{puts Negative}</code>. <code>If</code> substitutes the second word and evaluates the third or
 the fifth one depending on the result. Loops, procedures etc - everything is
@@ -55,13 +54,13 @@ project. Apparently, I&rsquo;m not that smart. Still, I&rsquo;m very satisfied w
 results - I ran my TCL interpreter on a STM32F051 microcontroller and firmware
 size was only 10KB!</p><p>Although <code>partcl</code> is a toy language, you might want to give it a try in your
 next project, so let me explain how it works.</p><h2 id=lexer>Lexer</h2><p>Any symbol can be a part of the partcl word, except for the following special
-symbols:</p><ul><li>Whitespace symbols: space and tab, used to delimit words</li><li>Command terminators: newline, semicolon or EOF</li><li>Grouping or substitution: square brackets, dollar sign, quotes, braces</li></ul><p>Partcl lexer has special helper functions for these char classes:</p><pre><code class=language-c>static int tcl_is_space(char c);
-static int tcl_is_end(char c);
-static int tcl_is_special(char c, int q);
-</code></pre><p><code>tcl_is_special</code> behaves differently depending on the quoting mode (<code>q</code>
+symbols:</p><ul><li>Whitespace symbols: space and tab, used to delimit words</li><li>Command terminators: newline, semicolon or EOF</li><li>Grouping or substitution: square brackets, dollar sign, quotes, braces</li></ul><p>Partcl lexer has special helper functions for these char classes:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>static</span> <span class=kt>int</span> <span class=nf>tcl_is_space</span><span class=p>(</span><span class=kt>char</span> <span class=n>c</span><span class=p>);</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>tcl_is_end</span><span class=p>(</span><span class=kt>char</span> <span class=n>c</span><span class=p>);</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>tcl_is_special</span><span class=p>(</span><span class=kt>char</span> <span class=n>c</span><span class=p>,</span> <span class=kt>int</span> <span class=n>q</span><span class=p>);</span>
+</code></pre></div><p><code>tcl_is_special</code> behaves differently depending on the quoting mode (<code>q</code>
 parameter) because semicolon, braces and new line lose their special meaning
-and become regular printable characters inside the quoted strings.</p><p>The whole lexer is implemented in a single function:</p><pre><code class=language-c>int tcl_next(const char *s, size_t n, const char **from, const char **to, int *q);
-</code></pre><p><code>tcl_next</code> function finds the next token in the string <code>s</code>. <code>from</code> and <code>to</code> are
+and become regular printable characters inside the quoted strings.</p><p>The whole lexer is implemented in a single function:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>tcl_next</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=n>size_t</span> <span class=n>n</span><span class=p>,</span> <span class=k>const</span> <span class=kt>char</span> <span class=o>**</span><span class=n>from</span><span class=p>,</span> <span class=k>const</span> <span class=kt>char</span> <span class=o>**</span><span class=n>to</span><span class=p>,</span> <span class=kt>int</span> <span class=o>*</span><span class=n>q</span><span class=p>);</span>
+</code></pre></div><p><code>tcl_next</code> function finds the next token in the string <code>s</code>. <code>from</code> and <code>to</code> are
 set to point to the token start/end, <code>q</code> denotes the quoting mode and is
 changed if double quote is met. It&rsquo;s very efficient because it doesn&rsquo;t allocate
 any memory and it doesn&rsquo;t mutate the original string (making it possible to
@@ -78,52 +77,52 @@ but takes precious memory space.</p><p>Partcl has a special <code>tcl_value_t</c
 it. By default it&rsquo;s just a char pointer, but one can rewrite ~100 lines to
 optimize it for their needs (e.g. use a pool of strings, or handle lists
 separately). In other words, we have an abstract type and the implementation
-may vary.</p><p>Here&rsquo;s a full list of operations done with Partcl values:</p><pre><code class=language-c>/* Raw string values */
-tcl_value_t *tcl_alloc(const char *s, size_t len);
-tcl_value_t *tcl_dup(tcl_value_t *v);
-tcl_value_t *tcl_append(tcl_value_t *v, tcl_value_t *tail);
-int tcl_length(tcl_value_t *v);
-void tcl_free(tcl_value_t *v);
+may vary.</p><p>Here&rsquo;s a full list of operations done with Partcl values:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cm>/* Raw string values */</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_alloc</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=n>size_t</span> <span class=n>len</span><span class=p>);</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_dup</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_append</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>,</span> <span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>tail</span><span class=p>);</span>
+<span class=kt>int</span> <span class=nf>tcl_length</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
+<span class=kt>void</span> <span class=nf>tcl_free</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
 
-/* Helpers to access raw string or numeric value */
-int tcl_int(tcl_value_t *v);
-const char *tcl_string(tcl_value_t *v);
+<span class=cm>/* Helpers to access raw string or numeric value */</span>
+<span class=kt>int</span> <span class=nf>tcl_int</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
+<span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=nf>tcl_string</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
 
-/* List values */
-tcl_value_t *tcl_list_alloc();
-tcl_value_t *tcl_list_append(tcl_value_t *v, tcl_value_t *tail);
-tcl_value_t *tcl_list_at(tcl_value_t *v, int index);
-int tcl_list_length(tcl_value_t *v);
-void tcl_list_free(tcl_value_t *v);
-</code></pre><p>The default implementation uses malloc/free and keeps lists as raw strings with
+<span class=cm>/* List values */</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_list_alloc</span><span class=p>();</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_list_append</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>,</span> <span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>tail</span><span class=p>);</span>
+<span class=n>tcl_value_t</span> <span class=o>*</span><span class=nf>tcl_list_at</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>,</span> <span class=kt>int</span> <span class=n>index</span><span class=p>);</span>
+<span class=kt>int</span> <span class=nf>tcl_list_length</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
+<span class=kt>void</span> <span class=nf>tcl_list_free</span><span class=p>(</span><span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>v</span><span class=p>);</span>
+</code></pre></div><p>The default implementation uses malloc/free and keeps lists as raw strings with
 the items quoted. Despite the simplicity, it may break if you put some badly
 escaped strings into a list. So probably avoid using unpaired braces in
 strings if you use the default list implementation. Or rewrite it using proper
 linked lists.</p><h2 id=environments>Environments</h2><p>Tcl interpreter uses a stack of environments where variables are stored.
 Environment is handled by 3 functions and it can be customized if needed (e.g.
-use hash maps to speed up variable lookup):</p><pre><code class=language-c>static struct tcl_env *tcl_env_alloc(struct tcl_env *parent);
-static struct tcl_var *tcl_env_var(struct tcl_env *env, tcl_value_t *name);
-static struct tcl_env *tcl_env_free(struct tcl_env *env);
-</code></pre><p>Environments have links from child to parent, making it possible to implement
+use hash maps to speed up variable lookup):</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>static</span> <span class=k>struct</span> <span class=n>tcl_env</span> <span class=o>*</span><span class=nf>tcl_env_alloc</span><span class=p>(</span><span class=k>struct</span> <span class=n>tcl_env</span> <span class=o>*</span><span class=n>parent</span><span class=p>);</span>
+<span class=k>static</span> <span class=k>struct</span> <span class=n>tcl_var</span> <span class=o>*</span><span class=nf>tcl_env_var</span><span class=p>(</span><span class=k>struct</span> <span class=n>tcl_env</span> <span class=o>*</span><span class=n>env</span><span class=p>,</span> <span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>name</span><span class=p>);</span>
+<span class=k>static</span> <span class=k>struct</span> <span class=n>tcl_env</span> <span class=o>*</span><span class=nf>tcl_env_free</span><span class=p>(</span><span class=k>struct</span> <span class=n>tcl_env</span> <span class=o>*</span><span class=n>env</span><span class=p>);</span>
+</code></pre></div><p>Environments have links from child to parent, making it possible to implement
 <code>upeval</code> and other commands.</p><h2 id=commands>Commands</h2><p>The default set of commands includes &ldquo;subst&rdquo;, &ldquo;set&rdquo;, &ldquo;while&rdquo;, &ldquo;if&rdquo;, &ldquo;proc&rdquo;,
 &ldquo;return&rdquo;, &ldquo;break&rdquo; and &ldquo;continue&rdquo;. There is also &ldquo;puts&rdquo; which can be disabled if
 your target system has no stdout. Also there are some mathematical operations
 taken from Picol that can be optionally disabled if you&rsquo;re going to use Partcl
-as a command shell and not as a programming language.</p><p>A typical command is just a C function of the following look:</p><pre><code class=language-c>static int tcl_cmd_puts(struct tcl *tcl, tcl_value_t *args, void *arg) {
-	tcl_value_t *text = tcl_list_at(args, 1);
-	puts(tcl_string(text));
-	return FNORMAL; /* continue to the next command normally */
-}
-</code></pre><p>It takes an interpreter object, a list of arguments and an optional pointer to
+as a command shell and not as a programming language.</p><p>A typical command is just a C function of the following look:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>static</span> <span class=kt>int</span> <span class=nf>tcl_cmd_puts</span><span class=p>(</span><span class=k>struct</span> <span class=n>tcl</span> <span class=o>*</span><span class=n>tcl</span><span class=p>,</span> <span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+	<span class=n>tcl_value_t</span> <span class=o>*</span><span class=n>text</span> <span class=o>=</span> <span class=n>tcl_list_at</span><span class=p>(</span><span class=n>args</span><span class=p>,</span> <span class=mi>1</span><span class=p>);</span>
+	<span class=n>puts</span><span class=p>(</span><span class=n>tcl_string</span><span class=p>(</span><span class=n>text</span><span class=p>));</span>
+	<span class=k>return</span> <span class=n>FNORMAL</span><span class=p>;</span> <span class=cm>/* continue to the next command normally */</span>
+<span class=p>}</span>
+</code></pre></div><p>It takes an interpreter object, a list of arguments and an optional pointer to
 some context. Some commands have fixed arity, then the interpreter controls it.
 For zero arity the command must control it internally, which makes it possible
-to use variadic arguments.</p><h2 id=what-s-next>What&rsquo;s next?</h2><p>It was fun to write a real Tcl interpreter. It was even more fun to actually
+to use variadic arguments.</p><h2 id=whats-next>What&rsquo;s next?</h2><p>It was fun to write a real Tcl interpreter. It was even more fun to actually
 use it on a real MCU. Good test coverage and no memory leaks (according to
 valgrind) make it a good candidate for low-end scripting.</p><p>The whole interpreter is just a single file with no other dependencies than
-libc (for <code>&lt;strings.h&gt;</code> and malloc/free).</p><p>I&rsquo;m not sure what to do next with it, but here are some ideas:</p><ul><li>Run some benchmarks to see how fast the lexer and the interpterer are.</li><li>Make an alternative implementation for <code>tcl_value_t</code> that uses real lists and
+libc (for <code>&lt;strings.h></code> and malloc/free).</p><p>I&rsquo;m not sure what to do next with it, but here are some ideas:</p><ul><li>Run some benchmarks to see how fast the lexer and the interpterer are.</li><li>Make an alternative implementation for <code>tcl_value_t</code> that uses real lists and
 caches numbers.</li><li>Make a library of commands for lists, hash maps, strings, <code>for</code> loops etc.</li></ul><p>If you find it interesting - feel free to contribute or report issues at
 <a href=https://github.com/zserge/partcl>https://github.com/zserge/partcl</a></p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Aug 11, 2016</em></p><p>See also:
 <a href=/posts/kotlin/>kotlin - a new hope</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

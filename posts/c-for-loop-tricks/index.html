@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Syntactic sugar in C - (ab)using &#34;for&#34; loops</title><meta name=description content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/c-for-loop-tricks/><meta property=og:title content='Syntactic sugar in C - (ab)using "for" loops'><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/c-for-loop-tricks/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta property=og:locale content=en_US><meta name=twitter:card content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Syntactic sugar in C - (ab)using "for" loops</title><meta name=description content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/c-for-loop-tricks/><meta property="og:title" content="Syntactic sugar in C - (ab)using &#34;for&#34; loops"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/c-for-loop-tricks/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta property="og:locale" content="en_US"><meta name=twitter:card content="C metaprogramming with loops and commas, pretending that it's a good idea"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Syntactic sugar in C - (ab)using &#34;for&#34; loops</h1><p>The <code>for</code> loop is one of the most powerful constructions in the C language.</p><p>It consists of three different parts. The first one is initialization,
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Syntactic sugar in C - (ab)using "for" loops</h1><p>The <code>for</code> loop is one of the most powerful constructions in the C language.</p><p>It consists of three different parts. The first one is initialization,
 performed exactly once at the beginning of the loop. The second one is the
 conditional part, called every time before the loop body. The last one is the
 increment part, executed on every iteration right after the loop body. Such a
@@ -14,40 +14,40 @@ is often mislooked by the developers and there is a <a href=https://stackoverflo
 exists and how it works in C.</p><h2 id=comma-vs-semicolon>Comma vs semicolon</h2><p>Commas are used to separate expressions, just as semicolons separate
 statements. If two expressions are separated by a comma - they will be
 evaluated from left to right, but only the result of the latter will be
-returned:</p><pre><code class=language-c>printf(&quot;hello\n&quot;), printf(&quot;world\n&quot;); // Both words will be printed one after another:
-int i = (2+3, 4+5);  // i == 9
-int j = (printf(&quot;hello!\n&quot;), 5); // j == 5, and hello will be printed
-</code></pre><p>Keep in mind, that comma is an operator (like plus or minus) and it should
+returned:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>printf</span><span class=p>(</span><span class=s>&#34;hello</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>),</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;world</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span> <span class=c1>// Both words will be printed one after another:
+</span><span class=c1></span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=p>(</span><span class=mi>2</span><span class=o>+</span><span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=o>+</span><span class=mi>5</span><span class=p>);</span>  <span class=c1>// i == 9
+</span><span class=c1></span><span class=kt>int</span> <span class=n>j</span> <span class=o>=</span> <span class=p>(</span><span class=n>printf</span><span class=p>(</span><span class=s>&#34;hello!</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>),</span> <span class=mi>5</span><span class=p>);</span> <span class=c1>// j == 5, and hello will be printed
+</span></code></pre></div><p>Keep in mind, that comma is an operator (like plus or minus) and it should
 return a value. That&rsquo;s why the last expression in the comma list should be of
-the right type:</p><pre><code class=language-c>void f() {}
-int g() { return 42; }
-...
-int i = (f(), g()); // works fine, because g() returns int.
-int j = (g(), f()); // compilation error, because f() returns void, but int is expected
-g(), f();           // works fine, because no value is expected
-</code></pre><p>Commas can most often be found inside the loops. You may be familiar with the
-following iteration approach:</p><pre><code class=language-c>/* Loosely based on OpenBSD source code */
-char* strcpy(char *to, const char *from) {
-  char *save = to;
-  for (; (*to = *from) != '\0'; ++from, ++to);
-  return save;
-}
-</code></pre><p>Here both pointers are incremented in one step, which makes the loop syntax
+the right type:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>void</span> <span class=nf>f</span><span class=p>()</span> <span class=p>{}</span>
+<span class=kt>int</span> <span class=nf>g</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=mi>42</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>...</span>
+<span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=p>(</span><span class=n>f</span><span class=p>(),</span> <span class=n>g</span><span class=p>());</span> <span class=c1>// works fine, because g() returns int.
+</span><span class=c1></span><span class=kt>int</span> <span class=n>j</span> <span class=o>=</span> <span class=p>(</span><span class=n>g</span><span class=p>(),</span> <span class=n>f</span><span class=p>());</span> <span class=c1>// compilation error, because f() returns void, but int is expected
+</span><span class=c1></span><span class=n>g</span><span class=p>(),</span> <span class=n>f</span><span class=p>();</span>           <span class=c1>// works fine, because no value is expected
+</span></code></pre></div><p>Commas can most often be found inside the loops. You may be familiar with the
+following iteration approach:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cm>/* Loosely based on OpenBSD source code */</span>
+<span class=kt>char</span><span class=o>*</span> <span class=nf>strcpy</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>to</span><span class=p>,</span> <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>from</span><span class=p>)</span> <span class=p>{</span>
+  <span class=kt>char</span> <span class=o>*</span><span class=n>save</span> <span class=o>=</span> <span class=n>to</span><span class=p>;</span>
+  <span class=k>for</span> <span class=p>(;</span> <span class=p>(</span><span class=o>*</span><span class=n>to</span> <span class=o>=</span> <span class=o>*</span><span class=n>from</span><span class=p>)</span> <span class=o>!=</span> <span class=sc>&#39;\0&#39;</span><span class=p>;</span> <span class=o>++</span><span class=n>from</span><span class=p>,</span> <span class=o>++</span><span class=n>to</span><span class=p>);</span>
+  <span class=k>return</span> <span class=n>save</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>Here both pointers are incremented in one step, which makes the loop syntax
 more compact. It’s a common technique, often used for simultaneous iteration
 over two arrays (or with two related pointers).</p><h2 id=simple-custom-loop>Simple custom loop</h2><p>Now, let’s say we want to customize a for-loop by adding some &ldquo;hooks&rdquo;. One
 &ldquo;hook&rdquo; action is performed before the loop, another after the loop, and the
 third action is performed after each iteration. It can be done with the
-following macro:</p><pre><code class=language-c>void loop_prologue() { printf(&quot;starting loop\n&quot;); }
-void loop_epilogue() { printf(&quot;terminating loop\n&quot;); }
-void loop_iter() { printf(&quot;iteration\n&quot;); }
-#define loop(cond) \
-  for (loop_prologue(); (cond) || (loop_epilogue(), 0); loop_iter())
-
-// You can use it as a regular loop with or without the braces
-loop(some_condition) {
-  ...
-}
-</code></pre><p>It may look unusual, but it&rsquo;s a valid loop - initialization part may not
+following macro:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>void</span> <span class=nf>loop_prologue</span><span class=p>()</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;starting loop</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span> <span class=p>}</span>
+<span class=kt>void</span> <span class=nf>loop_epilogue</span><span class=p>()</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;terminating loop</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span> <span class=p>}</span>
+<span class=kt>void</span> <span class=nf>loop_iter</span><span class=p>()</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;iteration</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span> <span class=p>}</span>
+<span class=cp>#define loop(cond) \
+</span><span class=cp>  for (loop_prologue(); (cond) || (loop_epilogue(), 0); loop_iter())
+</span><span class=cp></span>
+<span class=c1>// You can use it as a regular loop with or without the braces
+</span><span class=c1></span><span class=n>loop</span><span class=p>(</span><span class=n>some_condition</span><span class=p>)</span> <span class=p>{</span>
+  <span class=p>...</span>
+<span class=p>}</span>
+</code></pre></div><p>It may look unusual, but it&rsquo;s a valid loop - initialization part may not
 include any variables at all, and increment part may not do any of the
 increments.</p><p>The only non-trivial part here is the conditional part. Like in most
 programming languages, logical OR operator evaluates the left-hand side first.
@@ -56,80 +56,80 @@ case the loop condition is checked first, and if the condition is false - we
 should break out of the loop. In this case OR operator calls the epilogue part
 and returns a zero constant, which is used to terminate the actual loop.</p><h2 id=domain-specific-language>Domain-specific language</h2><p>A much more practical use case is constructing DSLs. One example could be
 defining an HTML layout in C and then converting it that into a string as the
-code is executed. One possible implementation could be this simple macro:</p><pre><code class=language-c>#define print_tag(tag)                                                         \
-       for (int _break = (tag_prologue(tag), 1); _break;                       \
-         _break = 0, tag_epilogue(tag)) 
+code is executed. One possible implementation could be this simple macro:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#define print_tag(tag)                                                         \
+</span><span class=cp>       for (int _break = (tag_prologue(tag), 1); _break;                       \
+</span><span class=cp>         _break = 0, tag_epilogue(tag)) 
+</span><span class=cp></span>
+<span class=kt>void</span> <span class=nf>tag_prologue</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>tag</span><span class=p>)</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;&lt;%s&gt;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>tag</span><span class=p>);</span> <span class=p>}</span>
+<span class=kt>void</span> <span class=nf>tag_epilogue</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>tag</span><span class=p>)</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;&lt;/%s&gt;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>tag</span><span class=p>);</span> <span class=p>}</span>
 
-void tag_prologue(char *tag) { printf(&quot;&lt;%s&gt;\n&quot;, tag); }
-void tag_epilogue(char *tag) { printf(&quot;&lt;/%s&gt;\n&quot;, tag); }
-
-#define html print_tag(&quot;html&quot;)
-#define body print_tag(&quot;body&quot;)
-#define p print_tag(&quot;p&quot;)
-
-void print_html() {
-  html {
-    body {
-      p printf(&quot;hello\n&quot;);
-      p {
-        printf(&quot;world\n&quot;);
-      }
-    }
-  }
-  printf(&quot;\n&quot;);
-}
-</code></pre><p>We have introduced a special local variable, <code>_break</code> that terminates the loop
+<span class=cp>#define html print_tag(&#34;html&#34;)
+</span><span class=cp>#define body print_tag(&#34;body&#34;)
+</span><span class=cp>#define p print_tag(&#34;p&#34;)
+</span><span class=cp></span>
+<span class=kt>void</span> <span class=nf>print_html</span><span class=p>()</span> <span class=p>{</span>
+  <span class=n>html</span> <span class=p>{</span>
+    <span class=n>body</span> <span class=p>{</span>
+      <span class=n>p</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;hello</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+      <span class=n>p</span> <span class=p>{</span>
+        <span class=n>printf</span><span class=p>(</span><span class=s>&#34;world</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+      <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=n>printf</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+<span class=p>}</span>
+</code></pre></div><p>We have introduced a special local variable, <code>_break</code> that terminates the loop
 exactly after one iteration. That&rsquo;s why our braced blocks behave like linear
 code, and not like a loop.</p><p>As you can see, every block has a its own custom initialization and
 deinitialization parts. These parts could be used to create DSLs that handle
-resources, such as semaphores, files or memory:</p><pre><code class=language-c>synchronized(&amp;some_mutex) {
-  // do something
-}
-with_file(f, &quot;somefile.txt&quot;) {
-  // file should be closed automatically
-  fread(f, ....);
-}
-</code></pre><p>The actual implementations are left as an excercise to the reader.</p><h2 id=nuklear>Nuklear</h2><p>Similar DSL syntax can be used to simplify APIs of a GUI framework, such as
+resources, such as semaphores, files or memory:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>synchronized</span><span class=p>(</span><span class=o>&amp;</span><span class=n>some_mutex</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// do something
+</span><span class=c1></span><span class=p>}</span>
+<span class=n>with_file</span><span class=p>(</span><span class=n>f</span><span class=p>,</span> <span class=s>&#34;somefile.txt&#34;</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// file should be closed automatically
+</span><span class=c1></span>  <span class=n>fread</span><span class=p>(</span><span class=n>f</span><span class=p>,</span> <span class=p>....);</span>
+<span class=p>}</span>
+</code></pre></div><p>The actual implementations are left as an excercise to the reader.</p><h2 id=nuklear>Nuklear</h2><p>Similar DSL syntax can be used to simplify APIs of a GUI framework, such as
 <a href=https://github.com/vurtun/nuklear>nuklear</a>. Currently to create layouts in Nuklear you have to write
-the code like this:</p><pre><code class=language-c>nk_layout_row_begin(&amp;ctx, NK_STATIC, 30, 2);
-{
-  nk_layout_row_push(&amp;ctx, 50);
-  nk_label(&amp;ctx, &quot;Volume:&quot;, NK_TEXT_LEFT);
-  nk_layout_row_push(&amp;ctx, 110);
-  nk_slider_float(&amp;ctx, 0, &amp;value, 1.0f, 0.1f);
-}
-nk_layout_row_end(&amp;ctx);
-</code></pre><p>Noticed the semicolon before the braces? Although it creates an illusion of
+the code like this:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>nk_layout_row_begin</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=n>NK_STATIC</span><span class=p>,</span> <span class=mi>30</span><span class=p>,</span> <span class=mi>2</span><span class=p>);</span>
+<span class=p>{</span>
+  <span class=n>nk_layout_row_push</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>50</span><span class=p>);</span>
+  <span class=n>nk_label</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=s>&#34;Volume:&#34;</span><span class=p>,</span> <span class=n>NK_TEXT_LEFT</span><span class=p>);</span>
+  <span class=n>nk_layout_row_push</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>110</span><span class=p>);</span>
+  <span class=n>nk_slider_float</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>value</span><span class=p>,</span> <span class=mf>1.0f</span><span class=p>,</span> <span class=mf>0.1f</span><span class=p>);</span>
+<span class=p>}</span>
+<span class=n>nk_layout_row_end</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>);</span>
+</code></pre></div><p>Noticed the semicolon before the braces? Although it creates an illusion of
 nesting, it doesn&rsquo;t look right to me. But the following macro could simplify
-the syntax:</p><pre><code class=language-c>#define nk_layout_row(ctx, a, b, c) \
-  for (int _break = (nk_layout_row_begin(ctx, a, b, c), 1); _break; \
-       _break = 0, nk_layout_row_end(ctx))
-
-// usage:
-nk_layout_row(&amp;ctx, NK_STATIC, 30, 2) {
-  nk_layout_row_push(&amp;ctx, 50);
-  nk_label(&amp;ctx, &quot;Volume:&quot;, NK_TEXT_LEFT);
-  nk_layout_row_push(&amp;ctx, 110);
-  nk_slider_float(&amp;ctx, 0, &amp;value, 1.0f, 0.1f);
-}
-</code></pre><h2 id=benchmarks>Benchmarks</h2><p>C developers like to benchmark their code. To do a poor-man benchmark one has
+the syntax:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#define nk_layout_row(ctx, a, b, c) \
+</span><span class=cp>  for (int _break = (nk_layout_row_begin(ctx, a, b, c), 1); _break; \
+</span><span class=cp>       _break = 0, nk_layout_row_end(ctx))
+</span><span class=cp></span>
+<span class=c1>// usage:
+</span><span class=c1></span><span class=n>nk_layout_row</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=n>NK_STATIC</span><span class=p>,</span> <span class=mi>30</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>nk_layout_row_push</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>50</span><span class=p>);</span>
+  <span class=n>nk_label</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=s>&#34;Volume:&#34;</span><span class=p>,</span> <span class=n>NK_TEXT_LEFT</span><span class=p>);</span>
+  <span class=n>nk_layout_row_push</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>110</span><span class=p>);</span>
+  <span class=n>nk_slider_float</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ctx</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>value</span><span class=p>,</span> <span class=mf>1.0f</span><span class=p>,</span> <span class=mf>0.1f</span><span class=p>);</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=benchmarks>Benchmarks</h2><p>C developers like to benchmark their code. To do a poor-man benchmark one has
 to measure time before the loop, perform the loop, measure time again and print
 the time difference. This operation can be wrapped into a convenient macro
-using the for-loop:</p><pre><code class=language-c>#define BENCH_CLOCK() ((float)clock() * 1000000000L / CLOCKS_PER_SEC)
-
-#define BENCH(_name, _iter)                                       \
-  for (long _start_ns = BENCH_CLOCK(), _i = (_iter);              \
-       _i &gt; 0 ||                                                  \
-         (printf(&quot;BENCH: %30s: %f ns/op\n&quot;,                       \
-                 _name, (BENCH_CLOCK() - _start_ns) / _iter), 0); \
-      _i--)
-...
-BENCH(&quot;foo_func()&quot;, 1000000L) {
-  foo_func();
-}
-// Output:
-BENCH:                      foo_func(): 46.247002 ns/op
-</code></pre><p>Nothing prevents you from writing more complex benchmark loops, e.g. like Go
+using the for-loop:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#define BENCH_CLOCK() ((float)clock() * 1000000000L / CLOCKS_PER_SEC)
+</span><span class=cp></span>
+<span class=cp>#define BENCH(_name, _iter)                                       \
+</span><span class=cp>  for (long _start_ns = BENCH_CLOCK(), _i = (_iter);              \
+</span><span class=cp>       _i &gt; 0 ||                                                  \
+</span><span class=cp>         (printf(&#34;BENCH: %30s: %f ns/op\n&#34;,                       \
+</span><span class=cp>                 _name, (BENCH_CLOCK() - _start_ns) / _iter), 0); \
+</span><span class=cp>      _i--)
+</span><span class=cp></span><span class=p>...</span>
+<span class=n>BENCH</span><span class=p>(</span><span class=s>&#34;foo_func()&#34;</span><span class=p>,</span> <span class=mi>1000000L</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>foo_func</span><span class=p>();</span>
+<span class=p>}</span>
+<span class=c1>// Output:
+</span><span class=c1></span><span class=nl>BENCH</span><span class=p>:</span>                      <span class=n>foo_func</span><span class=p>()</span><span class=o>:</span> <span class=mf>46.247002</span> <span class=n>ns</span><span class=o>/</span><span class=n>op</span>
+</code></pre></div><p>Nothing prevents you from writing more complex benchmark loops, e.g. like Go
 benchmarks, where a single iteration time is measured first, based on its
 duration the total number of iterations is estimated, and the final results are
 reported in ns/us/ms depending on the value. It will require a few more local
@@ -137,59 +137,59 @@ variables and maybe a custom reporting function, but it still fits into the
 for-loop structure.</p><h2 id=loops-with-an-else-clause>Loops with an &ldquo;else&rdquo; clause?!</h2><p>Finally, let’s try to make a more complicated loop, inspired by this wonderful
 <a href=https://www.chiark.greenend.org.uk/~sgtatham/mp>metaprogramming</a> article. A loop will have a body with an
 optional else branch, that should be executed only once and only if the initial
-loop condition was false:</p><pre><code class=language-c>try_loop(item = get_next_item_from_list()) {
-  // process item
-} else {
-  // list is empty
-}
+loop condition was false:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>try_loop</span><span class=p>(</span><span class=n>item</span> <span class=o>=</span> <span class=n>get_next_item_from_list</span><span class=p>())</span> <span class=p>{</span>
+  <span class=c1>// process item
+</span><span class=c1></span><span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+  <span class=c1>// list is empty
+</span><span class=c1></span><span class=p>}</span>
 
-// Dangling else should not be a problem
-if (...)
-  try_loop(item = get_next_item_from_list())
-    process_item(item);
-  else // this &quot;else&quot; belongs to the loop, not to the &quot;if&quot; statement above
-    ...
-</code></pre><p>To handle &ldquo;else&rdquo; clause we obviously need a macro ending with an &ldquo;if&rdquo;
+<span class=c1>// Dangling else should not be a problem
+</span><span class=c1></span><span class=k>if</span> <span class=p>(...)</span>
+  <span class=n>try_loop</span><span class=p>(</span><span class=n>item</span> <span class=o>=</span> <span class=n>get_next_item_from_list</span><span class=p>())</span>
+    <span class=n>process_item</span><span class=p>(</span><span class=n>item</span><span class=p>);</span>
+  <span class=k>else</span> <span class=c1>// this &#34;else&#34; belongs to the loop, not to the &#34;if&#34; statement above
+</span><span class=c1></span>    <span class=p>...</span>
+</code></pre></div><p>To handle &ldquo;else&rdquo; clause we obviously need a macro ending with an &ldquo;if&rdquo;
 statement. Also, we will need an outer for-loop to handle all the loop logic.
-At a high level it could roughly be described like this:</p><pre><code class=language-c># Loop initialization
-prologue = true # flag to handle prologues on the first iteration
-initial_cond = cond = evaluate_loop_condition()
+At a high level it could roughly be described like this:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp># Loop initialization
+</span><span class=cp></span><span class=n>prologue</span> <span class=o>=</span> <span class=nb>true</span> <span class=err>#</span> <span class=n>flag</span> <span class=n>to</span> <span class=n>handle</span> <span class=n>prologues</span> <span class=n>on</span> <span class=n>the</span> <span class=n>first</span> <span class=n>iteration</span>
+<span class=n>initial_cond</span> <span class=o>=</span> <span class=n>cond</span> <span class=o>=</span> <span class=n>evaluate_loop_condition</span><span class=p>()</span>
 
-while true:
+<span class=k>while</span> <span class=nb>true</span><span class=o>:</span>
 
-  # Loop condition
-  if prologue:
-    if initial_cond:
-      then_prologue()
-    else:
-      else_prologue()
-  else:
-    if cond == false: # condition is false, evaludate epilogues
-      if initial_cond:
-        then_epilogue()
-      else:
-        else_epilogue()
-      break
+  <span class=cp># Loop condition
+</span><span class=cp></span>  <span class=k>if</span> <span class=nl>prologue</span><span class=p>:</span>
+    <span class=k>if</span> <span class=nl>initial_cond</span><span class=p>:</span>
+      <span class=n>then_prologue</span><span class=p>()</span>
+    <span class=k>else</span><span class=o>:</span>
+      <span class=n>else_prologue</span><span class=p>()</span>
+  <span class=k>else</span><span class=o>:</span>
+    <span class=k>if</span> <span class=n>cond</span> <span class=o>==</span> <span class=nb>false</span><span class=o>:</span> <span class=err>#</span> <span class=n>condition</span> <span class=n>is</span> <span class=nb>false</span><span class=p>,</span> <span class=n>evaludate</span> <span class=n>epilogues</span>
+      <span class=k>if</span> <span class=nl>initial_cond</span><span class=p>:</span>
+        <span class=n>then_epilogue</span><span class=p>()</span>
+      <span class=k>else</span><span class=o>:</span>
+        <span class=n>else_epilogue</span><span class=p>()</span>
+      <span class=k>break</span>
 
-  # Loop body
-  if initial_cond:
-    # loop body here, with an optional else branch
-
-  # Loop iteration
-  then_iter()
-  prologue = 0
-  cond = evaluate_loop_condition()
-</code></pre><p>Looks like a lot of if/else branches. But we can’t put if-else statements
+  <span class=cp># Loop body
+</span><span class=cp></span>  <span class=k>if</span> <span class=nl>initial_cond</span><span class=p>:</span>
+    <span class=cp># loop body here, with an optional else branch
+</span><span class=cp></span>
+  <span class=cp># Loop iteration
+</span><span class=cp></span>  <span class=n>then_iter</span><span class=p>()</span>
+  <span class=n>prologue</span> <span class=o>=</span> <span class=mi>0</span>
+  <span class=n>cond</span> <span class=o>=</span> <span class=n>evaluate_loop_condition</span><span class=p>()</span>
+</code></pre></div><p>Looks like a lot of if/else branches. But we can’t put if-else statements
 inside the for-loop declaration. Or can we? We still have a ternary operator,
 or as an alternative we could use logical AND/OR operators.</p><p>After transforming the above algorithm into ternary expressions we get the
-following macro:</p><pre><code class=language-c>#define try_loop(cond)                                                         \
-  for (int _prologue = 1, _cond = cond, _branch = _cond;                       \
-       (_prologue                                                              \
-      ? (((_branch ? then_prologue() : else_prologue()), 1))                   \
-      : (_cond || ((_branch ? then_epilogue() : else_epilogue()), 0)));        \
-       then_iter(), _prologue = 0, _cond = cond)                               \
-    if (_branch)
-</code></pre><p>It may look complex, but if you only need certain prologues/epilogues instead
+following macro:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#define try_loop(cond)                                                         \
+</span><span class=cp>  for (int _prologue = 1, _cond = cond, _branch = _cond;                       \
+</span><span class=cp>       (_prologue                                                              \
+</span><span class=cp>      ? (((_branch ? then_prologue() : else_prologue()), 1))                   \
+</span><span class=cp>      : (_cond || ((_branch ? then_epilogue() : else_epilogue()), 0)));        \
+</span><span class=cp>       then_iter(), _prologue = 0, _cond = cond)                               \
+</span><span class=cp>    if (_branch)
+</span></code></pre></div><p>It may look complex, but if you only need certain prologues/epilogues instead
 of all of them - it becomes much simpler.</p><h2 id=summary>Summary</h2><p>There are many ways to customize the behavior of a for-loop in C, and it’s
 tempting to abuse the macros for that. But every developer knows that macros
 are evil, especially if not used properly. They always have plenty of
@@ -199,10 +199,10 @@ will puzzle you, if you decide to put a <code>continue</code> into a block expec
 continue some outer loop. It is likely to get fixed with gotos and labels (like
 in the <a href=https://www.chiark.greenend.org.uk/~sgtatham/mp>original article</a>, but that would create yet another
 constraint - two macros on the same line would not work.</p><p>On the other hand, I believe that well-thought loop macros could simplify the
-code and sometimes even make it more readable. A good example is <code>&lt;sys/queue.h&gt;</code>
+code and sometimes even make it more readable. A good example is <code>&lt;sys/queue.h></code>
 header that has macros for iterating over lists and queues.</p><p>So despite of all the danger hidden in the C macros, they are still a fun topic
 to explore, because meta-programming is never boring.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jul 17, 2017</em></p><p>See also:
 <a href=/posts/aaml/>AAML - another android markup language</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

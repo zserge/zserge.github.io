@@ -1,12 +1,12 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>android UI development made easy</title><meta name=description content="Bringing the ideas from Mithril, React, Bloop to Android"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/android-mvx/><meta property=og:title content="android UI development made easy"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/android-mvx/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="Bringing the ideas from Mithril, React, Bloop to Android"><meta property=og:locale content=en_US><meta name=twitter:card content="Bringing the ideas from Mithril, React, Bloop to Android"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>android UI development made easy</title><meta name=description content="Bringing the ideas from Mithril, React, Bloop to Android"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/android-mvx/><meta property="og:title" content="android UI development made easy"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/android-mvx/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Bringing the ideas from Mithril, React, Bloop to Android"><meta property="og:locale" content="en_US"><meta name=twitter:card content="Bringing the ideas from Mithril, React, Bloop to Android"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>android UI development made easy</h1><p>TL;DR: I offer declarative strongly typed layouts with data bindings in pure
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>android UI development made easy</h1><p>TL;DR: I offer declarative strongly typed layouts with data bindings in pure
 Java.</p><p>Android UI development is broken. It normally ends up with lots of boilerplate
 code and poor architecture. Here are some (very subjective) issues:</p><ul><li>There is no MVC (or M-V-Whatever).</li><li>XMLs always contain lots of copy-pasted code, very poor code reuse.</li><li>XMLs are very fragile, so you can type &ldquo;TextVeiw&rdquo; and it will not warn you
 during the compilation but will throw an InflateException in runtime.</li><li>Poor support for styles. Poor support for variables. No support for macros
-and calculated values (like 10dp+2px)</li><li>No data binding, you have to do all those &ldquo;findViewById&rdquo; and &ldquo;setOn&hellip;Listener&rdquo;.</li><li>You may create your layout in Java but it will be hardly readable.</li></ul><h2 id=building-user-interfaces-with-mithril-js>Building user interfaces with Mithril.js</h2><p>Web developers quickly realized that writing complex applications without MVx
+and calculated values (like 10dp+2px)</li><li>No data binding, you have to do all those &ldquo;findViewById&rdquo; and &ldquo;setOn&mldr;Listener&rdquo;.</li><li>You may create your layout in Java but it will be hardly readable.</li></ul><h2 id=building-user-interfaces-with-mithriljs>Building user interfaces with Mithril.js</h2><p>Web developers quickly realized that writing complex applications without MVx
 is hard. They realized the problem of jQuery and invented Backbone, Knockout,
-Angular, Ember&hellip;</p><p>But with Android we still have just a number of functions to chaotically change
+Angular, Ember&mldr;</p><p>But with Android we still have just a number of functions to chaotically change
 view properties, much like in jQuery:</p><pre><code>$('.myview').text('Hello');
 $('.myview').on('click', function() {
 
@@ -34,7 +34,7 @@ Java objects that represent the actual android layout. The tree is constructed
 as many times as the app data changes, but the actual layout should be modified
 only for the parts where the virtual layout has been modified.</p><p>Our framework will be just one class which I assume to be imported using
 &ldquo;static&rdquo; keyword, so all its static methods would be accessed without any class
-name prefix (e.g. &ldquo;v()&rdquo; instead of &ldquo;Render.v()&rdquo;). This brings a bit of syntax
+name prefix (e.g. &ldquo;v()&rdquo; instead of &ldquo;Render.v()"). This brings a bit of syntax
 sugar.</p><p>Here&rsquo;s an example of how the layout would be declared:</p><pre><code>v(LinearLayout.class,
     orientation(LinearLayout.VERTICAL),
     v(TextView.class,
@@ -48,7 +48,7 @@ Views!).</p><p>When <code>someText</code> variable is changed - the virtual tree
 node value for the next rendering cycle, and setText() would be called for the
 TextView instance. But the rest of the physical layout will remain untouched.</p><p>A virtual layout tree should ideally be just one class, let&rsquo;s call it a Node.
 But there are two major types of nodes: a view node, like v(TextView.class,
-&hellip;) and an attribute setter node, like text(someText)</p><p>Which means the node may optionally contain a view class and a function to
+&mldr;) and an attribute setter node, like text(someText)</p><p>Which means the node may optionally contain a view class and a function to
 modify the view attribute:</p><pre><code>interface AttributeSetter {
     public void set(View v);
 }
@@ -74,7 +74,7 @@ attach the actual layout views:</p><pre><code>public interface Renderable {
     Node view();
     ViewGroup getRootView();
 }
-</code></pre><p>Now, the v() method. It takes the first argument of <code>Class&lt;? extends View&gt;</code>, so
+</code></pre><p>Now, the v() method. It takes the first argument of <code>Class&lt;? extends View></code>, so
 you can be safe about the type. Remaining arguments are all of type <code>Node</code> so
 we simply add them to the list. It could be helpful to ignore null nodes:</p><pre><code>public static Node v(final Class&lt;? extends View&gt; cls, final Node ...nodes) {
     return new Node(cls) {
@@ -116,12 +116,12 @@ kind of a diff to avoid rendering when the node has not been changed).</p><pre><
 }
 </code></pre><p>Now we can actually get rid of XMLs and inflate our layouts in Java in a nice
 clean way.</p><p>inflateNode is not supposed to be used directly, instead there are two methods -
-&ldquo;render(Renderer r)&rdquo; and just &ldquo;render()&rdquo;. The first one re-renders one view, the
+&ldquo;render(Renderer r)&rdquo; and just &ldquo;render()". The first one re-renders one view, the
 second one re-renders all present views. Renderers are stored in a weak hash
 map, so once the view is removed or activity is destroyed - their renderers
 won&rsquo;t be used anymore.</p><h2 id=when-to-render>When to render?</h2><p>The selling point is automatic re-rendering so the UI would always represent
 the most recent virtual layout state. It means render() should be called at
-certain points.</p><p>I followed the way of Mithril, so I wrap every On&hellip;Listener and call render on
+certain points.</p><p>I followed the way of Mithril, so I wrap every On&mldr;Listener and call render on
 every UI interaction:</p><pre><code>public static Node onClick(final View.OnClickListener listener) {
     return new Node(new AttributeSetter() {
         public void set(View v) {
@@ -137,8 +137,7 @@ every UI interaction:</p><pre><code>public static Node onClick(final View.OnClic
     });
 }
 </code></pre><p>I think it makes sense because in most android applications data is changed
-when user interaction happens. If your data is updated from some other sources
-- call render() manually.</p><h2 id=summing-up>Summing up</h2><p>This simple approach is really powerful:</p><ul><li>you can define your layout hierarchy in an XML-like manner (with nested &ldquo;v()&rdquo; calls)</li><li>you can bind data and bind listeners in a nice declarative way</li><li>layouts are type-safe and your IDE will help with autocomplete</li><li>no runtime overhead, no reflection, no code generation</li><li>you can use java in all its power (variables, expressions, &ldquo;macros&rdquo; to
+when user interaction happens. If your data is updated from some other sources</p><ul><li>call render() manually.</li></ul><h2 id=summing-up>Summing up</h2><p>This simple approach is really powerful:</p><ul><li>you can define your layout hierarchy in an XML-like manner (with nested &ldquo;v()&rdquo; calls)</li><li>you can bind data and bind listeners in a nice declarative way</li><li>layouts are type-safe and your IDE will help with autocomplete</li><li>no runtime overhead, no reflection, no code generation</li><li>you can use java in all its power (variables, expressions, &ldquo;macros&rdquo; to
 generate layouts)</li><li>you can use custom views and custom attribute setters</li><li>since all your UI data is kept in attributes - you can easily make it
 persistent</li><li>you can easily use views as your UI components (as suggested in
 <a href=http://corner.squareup.com/2014/10/advocating-against-android-fragments.html>&ldquo;Advocating Against Android Fragments&rdquo;</a>)</li><li>it&rsquo;s all in less than 250 LOC of pure Java!</li></ul><p>This proves that the concept is viable. Now I wonder if anyone wants to join
@@ -157,6 +156,6 @@ and I hope it will make this experiment more useful.</p><p>Anyway, the current c
 <a href=https://github.com/zserge/android-virtual-layout>Github</a>, MIT licensed.
 Comments and pull requests are welcome!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jan 14, 2015</em></p><p>See also:
 <a href=/posts/aaml/>AAML - another android markup language</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

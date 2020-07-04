@@ -1,293 +1,293 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Ode to J</title><meta name=description content="From a confusing page of old C code to APL/J praise."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/j/><meta property=og:title content="Ode to J"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/j/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="From a confusing page of old C code to APL/J praise."><meta property=og:locale content=en_US><meta name=twitter:card content="From a confusing page of old C code to APL/J praise."><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Ode to J</title><meta name=description content="From a confusing page of old C code to APL/J praise."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/j/><meta property="og:title" content="Ode to J"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/j/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="From a confusing page of old C code to APL/J praise."><meta property="og:locale" content="en_US"><meta name=twitter:card content="From a confusing page of old C code to APL/J praise."><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>Ode to J</h1><p>While self-isolating orchestras and amateur musicians are playing &lsquo;Ode to Joy&rsquo;
-from their open windows, I would like to give it a try with my ode to <a href=https://en.wikipedia.org/wiki/J_(programming_language>J</a>.</p><p>If you read the Hacker News or other programming resources, you probably have read <a href=https://code.jsoftware.com/wiki/Essays/Incunabulum>the following passage</a>:</p><p>&ldquo;One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm and produced—on one page and in one afternoon—an interpreter fragment on the AT&amp;T 3B1 computer. I studied this interpreter for about a week for its organization and programming style; and on Sunday, August 27, 1989, at about four o&rsquo;clock in the afternoon, wrote the first line of code that became the implementation described in this document.&rdquo; (An Implementation of J, Appendix A: Incunabulum).</p><p>It was the beginning of the story of the J language, a weird-looking array programming language. This family of languages is notable for their terse notation, where a clever one-liner can represent what would have taken a page of Java code.</p><p>For example a common for loop <code>for (int i = 0; i &lt; n; i++) a[i] += b[i];</code> in J would simple become <code>a=:a+b</code>.</p><p>It&rsquo;s no wonder that the snippet of code that inspired the creation of the J language is also very concise:</p><pre><code class=language-c>typedef char C;typedef long long I;
-typedef struct a{I t,r,d[3],p[2];}*A;
-#define P printf
-#define R return
-#define V1(f) A f(w)A w;
-#define V2(f) A f(a,w)A a,w;
-#define DO(n,x) {I i=0,_n=(n);for(;i&lt;_n;++i){x;}}
-I *ma(n){R(I*)malloc(n*8);}mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
-tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
-A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z-&gt;t=t,z-&gt;r=r,mv(z-&gt;d,d,r);
- R z;}
-V1(iota){I n=*w-&gt;p;A z=ga(0,1,&amp;n);DO(n,z-&gt;p[i]=i);R z;}
-V2(plus){I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);A z=ga(0,r,d);
- DO(n,z-&gt;p[i]=a-&gt;p[i]+w-&gt;p[i]);R z;}
-V2(from){I r=w-&gt;r-1,*d=w-&gt;d+1,n=tr(r,d);
- A z=ga(w-&gt;t,r,d);mv(z-&gt;p,w-&gt;p+(n**a-&gt;p),n);R z;}
-V1(box){A z=ga(1,0,0);*z-&gt;p=(I)w;R z;}
-V2(cat){I an=tr(a-&gt;r,a-&gt;d),wn=tr(w-&gt;r,w-&gt;d),n=an+wn;
- A z=ga(w-&gt;t,1,&amp;n);mv(z-&gt;p,a-&gt;p,an);mv(z-&gt;p+an,w-&gt;p,wn);R z;}
-V2(find){}
-V2(rsh){I r=a-&gt;r?*a-&gt;d:1,n=tr(r,a-&gt;p),wn=tr(w-&gt;r,w-&gt;d);
- A z=ga(w-&gt;t,r,a-&gt;p);mv(z-&gt;p,w-&gt;p,wn=n&gt;wn?wn:n);
- if(n-=wn)mv(z-&gt;p+wn,z-&gt;p,n);R z;}
-V1(sha){A z=ga(0,1,&amp;w-&gt;r);mv(z-&gt;p,w-&gt;d,w-&gt;r);R z;}
-V1(id){R w;}V1(size){A z=ga(0,0,0);*z-&gt;p=w-&gt;r?*w-&gt;d:1;R z;}
-pi(i){P(&quot;%d &quot;,i);}nl(){P(&quot;\n&quot;);}
-pr(w)A w;{I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);DO(r,pi(d[i]));nl();
- if(w-&gt;t)DO(n,P(&quot;&lt; &quot;);pr(w-&gt;p[i]))else DO(n,pi(w-&gt;p[i]));nl();}
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>Ode to J</h1><p>While self-isolating orchestras and amateur musicians are playing &lsquo;Ode to Joy&rsquo;
+from their open windows, I would like to give it a try with my ode to <a href=https://en.wikipedia.org/wiki/J_(programming_language>J</a>.</p><p>If you read the Hacker News or other programming resources, you probably have read <a href=https://code.jsoftware.com/wiki/Essays/Incunabulum>the following passage</a>:</p><p>&ldquo;One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm and produced—on one page and in one afternoon—an interpreter fragment on the AT&T 3B1 computer. I studied this interpreter for about a week for its organization and programming style; and on Sunday, August 27, 1989, at about four o&rsquo;clock in the afternoon, wrote the first line of code that became the implementation described in this document.&rdquo; (An Implementation of J, Appendix A: Incunabulum).</p><p>It was the beginning of the story of the J language, a weird-looking array programming language. This family of languages is notable for their terse notation, where a clever one-liner can represent what would have taken a page of Java code.</p><p>For example a common for loop <code>for (int i = 0; i &lt; n; i++) a[i] += b[i];</code> in J would simple become <code>a=:a+b</code>.</p><p>It&rsquo;s no wonder that the snippet of code that inspired the creation of the J language is also very concise:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>typedef</span> <span class=kt>char</span> <span class=n>C</span><span class=p>;</span><span class=k>typedef</span> <span class=kt>long</span> <span class=kt>long</span> <span class=n>I</span><span class=p>;</span>
+<span class=k>typedef</span> <span class=k>struct</span> <span class=n>a</span><span class=p>{</span><span class=n>I</span> <span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>[</span><span class=mi>3</span><span class=p>],</span><span class=n>p</span><span class=p>[</span><span class=mi>2</span><span class=p>];}</span><span class=o>*</span><span class=n>A</span><span class=p>;</span>
+<span class=cp>#define P printf
+</span><span class=cp>#define R return
+</span><span class=cp>#define V1(f) A f(w)A w;
+</span><span class=cp>#define V2(f) A f(a,w)A a,w;
+</span><span class=cp>#define DO(n,x) {I i=0,_n=(n);for(;i&lt;_n;++i){x;}}
+</span><span class=cp></span><span class=n>I</span> <span class=o>*</span><span class=nf>ma</span><span class=p>(</span><span class=n>n</span><span class=p>){</span><span class=n>R</span><span class=p>(</span><span class=n>I</span><span class=o>*</span><span class=p>)</span><span class=n>malloc</span><span class=p>(</span><span class=n>n</span><span class=o>*</span><span class=mi>8</span><span class=p>);}</span><span class=n>mv</span><span class=p>(</span><span class=n>d</span><span class=p>,</span><span class=n>s</span><span class=p>,</span><span class=n>n</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>,</span><span class=o>*</span><span class=n>s</span><span class=p>;{</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]);}</span>
+<span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>;{</span><span class=n>I</span> <span class=n>z</span><span class=o>=</span><span class=mi>1</span><span class=p>;</span><span class=n>DO</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>z</span><span class=o>=</span><span class=n>z</span><span class=o>*</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>A</span> <span class=n>ga</span><span class=p>(</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>;{</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=p>(</span><span class=n>A</span><span class=p>)</span><span class=n>ma</span><span class=p>(</span><span class=mi>5</span><span class=o>+</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>));</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>t</span><span class=o>=</span><span class=n>t</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>=</span><span class=n>r</span><span class=p>,</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>d</span><span class=p>,</span><span class=n>r</span><span class=p>);</span>
+ <span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>iota</span><span class=p>){</span><span class=n>I</span> <span class=n>n</span><span class=o>=*</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>;</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>n</span><span class=p>);</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>i</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V2</span><span class=p>(</span><span class=n>plus</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>+</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V2</span><span class=p>(</span><span class=n>from</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>-</span><span class=mi>1</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=p>(</span><span class=n>n</span><span class=o>**</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>),</span><span class=n>n</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>box</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=p>(</span><span class=n>I</span><span class=p>)</span><span class=n>w</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V2</span><span class=p>(</span><span class=n>cat</span><span class=p>){</span><span class=n>I</span> <span class=n>an</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>),</span><span class=n>wn</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>),</span><span class=n>n</span><span class=o>=</span><span class=n>an</span><span class=o>+</span><span class=n>wn</span><span class=p>;</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>n</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>an</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>an</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>wn</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V2</span><span class=p>(</span><span class=n>find</span><span class=p>){}</span>
+<span class=n>V2</span><span class=p>(</span><span class=n>rsh</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>?*</span><span class=n>a</span><span class=o>-&gt;</span><span class=nl>d</span><span class=p>:</span><span class=mi>1</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>),</span><span class=n>wn</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>wn</span><span class=o>=</span><span class=n>n</span><span class=o>&gt;</span><span class=n>wn</span><span class=o>?</span><span class=nl>wn</span><span class=p>:</span><span class=n>n</span><span class=p>);</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>n</span><span class=o>-=</span><span class=n>wn</span><span class=p>)</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>wn</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>n</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>sha</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>id</span><span class=p>){</span><span class=n>R</span> <span class=n>w</span><span class=p>;}</span><span class=n>V1</span><span class=p>(</span><span class=n>size</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>?*</span><span class=n>w</span><span class=o>-&gt;</span><span class=nl>d</span><span class=p>:</span><span class=mi>1</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>pi</span><span class=p>(</span><span class=n>i</span><span class=p>){</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;%d &#34;</span><span class=p>,</span><span class=n>i</span><span class=p>);}</span><span class=n>nl</span><span class=p>(){</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);}</span>
+<span class=n>pr</span><span class=p>(</span><span class=n>w</span><span class=p>)</span><span class=n>A</span> <span class=n>w</span><span class=p>;{</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>DO</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>pi</span><span class=p>(</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]));</span><span class=n>nl</span><span class=p>();</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>)</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;&lt; &#34;</span><span class=p>);</span><span class=n>pr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span><span class=k>else</span> <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>pi</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]));</span><span class=n>nl</span><span class=p>();}</span>
 
-C vt[]=&quot;+{~&lt;#,&quot;;
-A(*vd[])()={0,plus,from,find,0,rsh,cat},
- (*vm[])()={0,id,size,iota,box,sha,0};
-I st[26]; qp(a){R  a&gt;='a'&amp;&amp;a&lt;='z';}qv(a){R a&lt;'a';}
-A ex(e)I *e;{I a=*e;
- if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
- R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
-noun(c){A z;if(c&lt;'0'||c&gt;'9')R 0;z=ga(0,0,0);*z-&gt;p=c-'0';R z;}
-verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
-I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
- DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
+<span class=n>C</span> <span class=n>vt</span><span class=p>[]</span><span class=o>=</span><span class=s>&#34;+{~&lt;#,&#34;</span><span class=p>;</span>
+<span class=n>A</span><span class=p>(</span><span class=o>*</span><span class=n>vd</span><span class=p>[])()</span><span class=o>=</span><span class=p>{</span><span class=mi>0</span><span class=p>,</span><span class=n>plus</span><span class=p>,</span><span class=n>from</span><span class=p>,</span><span class=n>find</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=n>rsh</span><span class=p>,</span><span class=n>cat</span><span class=p>},</span>
+ <span class=p>(</span><span class=o>*</span><span class=n>vm</span><span class=p>[])()</span><span class=o>=</span><span class=p>{</span><span class=mi>0</span><span class=p>,</span><span class=n>id</span><span class=p>,</span><span class=n>size</span><span class=p>,</span><span class=n>iota</span><span class=p>,</span><span class=n>box</span><span class=p>,</span><span class=n>sha</span><span class=p>,</span><span class=mi>0</span><span class=p>};</span>
+<span class=n>I</span> <span class=n>st</span><span class=p>[</span><span class=mi>26</span><span class=p>];</span> <span class=n>qp</span><span class=p>(</span><span class=n>a</span><span class=p>){</span><span class=n>R</span>  <span class=n>a</span><span class=o>&gt;=</span><span class=sc>&#39;a&#39;</span><span class=o>&amp;&amp;</span><span class=n>a</span><span class=o>&lt;=</span><span class=sc>&#39;z&#39;</span><span class=p>;}</span><span class=n>qv</span><span class=p>(</span><span class=n>a</span><span class=p>){</span><span class=n>R</span> <span class=n>a</span><span class=o>&lt;</span><span class=sc>&#39;a&#39;</span><span class=p>;}</span>
+<span class=n>A</span> <span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>e</span><span class=p>;{</span><span class=n>I</span> <span class=n>a</span><span class=o>=*</span><span class=n>e</span><span class=p>;</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>qp</span><span class=p>(</span><span class=n>a</span><span class=p>)){</span><span class=k>if</span><span class=p>(</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>==</span><span class=sc>&#39;=&#39;</span><span class=p>)</span><span class=n>R</span> <span class=n>st</span><span class=p>[</span><span class=n>a</span><span class=o>-</span><span class=sc>&#39;a&#39;</span><span class=p>]</span><span class=o>=</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>2</span><span class=p>);</span><span class=n>a</span><span class=o>=</span> <span class=n>st</span><span class=p>[</span> <span class=n>a</span><span class=o>-</span><span class=sc>&#39;a&#39;</span><span class=p>];}</span>
+ <span class=n>R</span> <span class=n>qv</span><span class=p>(</span><span class=n>a</span><span class=p>)</span><span class=o>?</span><span class=p>(</span><span class=o>*</span><span class=n>vm</span><span class=p>[</span><span class=n>a</span><span class=p>])(</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>1</span><span class=p>))</span><span class=o>:</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>?</span><span class=p>(</span><span class=o>*</span><span class=n>vd</span><span class=p>[</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]])(</span><span class=n>a</span><span class=p>,</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>2</span><span class=p>))</span><span class=o>:</span><span class=p>(</span><span class=n>A</span><span class=p>)</span><span class=n>a</span><span class=p>;}</span>
+<span class=n>noun</span><span class=p>(</span><span class=n>c</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=p>;</span><span class=k>if</span><span class=p>(</span><span class=n>c</span><span class=o>&lt;</span><span class=sc>&#39;0&#39;</span><span class=o>||</span><span class=n>c</span><span class=o>&gt;</span><span class=sc>&#39;9&#39;</span><span class=p>)</span><span class=n>R</span> <span class=mi>0</span><span class=p>;</span><span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=n>c</span><span class=o>-</span><span class=sc>&#39;0&#39;</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>verb</span><span class=p>(</span><span class=n>c</span><span class=p>){</span><span class=n>I</span> <span class=n>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=k>for</span><span class=p>(;</span><span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=p>];)</span><span class=k>if</span><span class=p>(</span><span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=o>++</span><span class=p>]</span><span class=o>==</span><span class=n>c</span><span class=p>)</span><span class=n>R</span> <span class=n>i</span><span class=p>;</span><span class=n>R</span> <span class=mi>0</span><span class=p>;}</span>
+<span class=n>I</span> <span class=o>*</span><span class=n>wd</span><span class=p>(</span><span class=n>s</span><span class=p>)</span><span class=n>C</span> <span class=o>*</span><span class=n>s</span><span class=p>;{</span><span class=n>I</span> <span class=n>a</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>strlen</span><span class=p>(</span><span class=n>s</span><span class=p>),</span><span class=o>*</span><span class=n>e</span><span class=o>=</span><span class=n>ma</span><span class=p>(</span><span class=n>n</span><span class=o>+</span><span class=mi>1</span><span class=p>);</span><span class=n>C</span> <span class=n>c</span><span class=p>;</span>
+ <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>e</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=p>(</span><span class=n>a</span><span class=o>=</span><span class=n>noun</span><span class=p>(</span><span class=n>c</span><span class=o>=</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span><span class=o>?</span><span class=nl>a</span><span class=p>:(</span><span class=n>a</span><span class=o>=</span><span class=n>verb</span><span class=p>(</span><span class=n>c</span><span class=p>))</span><span class=o>?</span><span class=nl>a</span><span class=p>:</span><span class=n>c</span><span class=p>);</span><span class=n>e</span><span class=p>[</span><span class=n>n</span><span class=p>]</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=n>R</span> <span class=n>e</span><span class=p>;}</span>
 
-main(){C s[99];while(gets(s))pr(ex(wd(s)));}
-</code></pre><p>I dared to update the code a little bit, originally it was using <code>long</code> data type, and was casting it to pointers, which are 64-bit these days. So I replaced it with <code>long long</code> to be able to run this code.</p><p>Yes, it looks weird to modern eyes. Even if we prettify the code with clang-format - we will still find that it uses old-school K&amp;R coding style and it&rsquo;s a miracle that this code is 30 years old and still works.</p><p>What does it do? Well, it&rsquo;s an interpreter. Yes, it&rsquo;s a tiny array programming language, like APL or K. It has certain limitations that we will discover later, but for now I invite you to the journey of deciphering this code.</p><h2 id=data-types>Data types</h2><p>As we are dealing with an array programming language, the only data type it supports is an array. Arrays may contain numbers, or other nested arrays, which is known as &ldquo;boxing&rdquo;.</p><pre><code class=language-c>typedef struct a{I t,r,d[3],p[2];}*A;
-// or
-typedef struct {
-  I t; // t=0: normal array, t=1: &quot;boxed&quot;
-  I r; // rank: number of dimensions
-  I d[3]; // depth: size in each dimension (up to 3)
-  I p[2]; // array data - numbers mixed with pointers
-} *A;
-</code></pre><p>As you can see, arrays are limited to only integer elements, may contain other arrays and may have up to 3 dimensions (linear vectors, rectangular matrices and 3-dimensional arrays.</p><p>The fixed size of 2 for data array was probably chosen to avoid dynamic memory allocation for single numbers (arrays of zero rank with one element). But I suspect it has not been used correctly (I might be wrong, though).</p><p>For allocating integer arrays there is a helper function &ldquo;ma&rdquo;, which only wraps malloc to allocate <code>n</code> integers:</p><pre><code class=language-c>I *ma(n){R(I*)malloc(n*8);}
-// or
-typedef long long I;
-I *ma(int n) {
-  return (I *) malloc(n * sizeof(I));
-}
-</code></pre><p>For copying array elements there is a hand-written memmove:</p><pre><code class=language-c>mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
-// or
-void mv(I *d, I *s, int n) {
-  for (int i = 0; i &lt; n; i++) {
-    d[i] = s[i];
-  }
-}
-</code></pre><p>As you see, <code>DO(n, op)</code> is a macro to avoid numerous for-loops, that are untypical in the array programming nature.</p><p>Then goes a function to multiply dimensions in each rank (to get the total number of elements in all dimensions):</p><pre><code class=language-c>tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
-// or
-I tr(I r, I *d) {
-  I z = 1;
-  for (int i = 0; i &lt; r; i++) {
-    z = z * d[i];
-  }
-  return z;
-}
-</code></pre><p>It is commonly used before calling DO() to apply some operation to all elements in all dimensions of an array.</p><p>Finally, there is a constructor for the array type:</p><pre><code class=language-c>A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z-&gt;t=t,z-&gt;r=r,mv(z-&gt;d,d,r);R z;}
-// or
-A ga(I t, I r, I *d) {
-  A z = (A) ma(5 + tr(r, d)); // tr() returns number of elements here
-  z-&gt;t = t;
-  z-&gt;r = r;
-  mv(z-&gt;d, d, r);
-  return z;
-}
-</code></pre><h2 id=parser>parser</h2><p>Now I suggest to skip the part with many V1 and V2 functions, and jump to the end of the program, the main function:</p><pre><code class=language-c>main(){C s[99];while(gets(s))pr(ex(wd(s)));}
-// or
-int main() {
-  char s[99];             // maximum input line length
-  while (gets(s)) {       // until end of input:
-    I *words = wd(s);     // tokenize input
-    A result = ex(words); // evaluate words
-    pr(result);           // print result
-  }
-}
-</code></pre><p>Yes, it&rsquo;s a simple REPL (read-eval-print) loop, that we commonly see in every interpreter.</p><p>Let&rsquo;s have a look at the parser (which is only a tokenizer in fact):</p><pre><code class=language-c>C vt[]=&quot;+{~&lt;#,&quot;;
-noun(c){A z;if(c&lt;'0'||c&gt;'9')R 0;z=ga(0,0,0);*z-&gt;p=c-'0';R z;}
-verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
-I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
- DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
+<span class=n>main</span><span class=p>(){</span><span class=n>C</span> <span class=n>s</span><span class=p>[</span><span class=mi>99</span><span class=p>];</span><span class=k>while</span><span class=p>(</span><span class=n>gets</span><span class=p>(</span><span class=n>s</span><span class=p>))</span><span class=n>pr</span><span class=p>(</span><span class=n>ex</span><span class=p>(</span><span class=n>wd</span><span class=p>(</span><span class=n>s</span><span class=p>)));}</span>
+</code></pre></div><p>I dared to update the code a little bit, originally it was using <code>long</code> data type, and was casting it to pointers, which are 64-bit these days. So I replaced it with <code>long long</code> to be able to run this code.</p><p>Yes, it looks weird to modern eyes. Even if we prettify the code with clang-format - we will still find that it uses old-school K&R coding style and it&rsquo;s a miracle that this code is 30 years old and still works.</p><p>What does it do? Well, it&rsquo;s an interpreter. Yes, it&rsquo;s a tiny array programming language, like APL or K. It has certain limitations that we will discover later, but for now I invite you to the journey of deciphering this code.</p><h2 id=data-types>Data types</h2><p>As we are dealing with an array programming language, the only data type it supports is an array. Arrays may contain numbers, or other nested arrays, which is known as &ldquo;boxing&rdquo;.</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>typedef</span> <span class=k>struct</span> <span class=n>a</span><span class=p>{</span><span class=n>I</span> <span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>[</span><span class=mi>3</span><span class=p>],</span><span class=n>p</span><span class=p>[</span><span class=mi>2</span><span class=p>];}</span><span class=o>*</span><span class=n>A</span><span class=p>;</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=k>typedef</span> <span class=k>struct</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>t</span><span class=p>;</span> <span class=c1>// t=0: normal array, t=1: &#34;boxed&#34;
+</span><span class=c1></span>  <span class=n>I</span> <span class=n>r</span><span class=p>;</span> <span class=c1>// rank: number of dimensions
+</span><span class=c1></span>  <span class=n>I</span> <span class=n>d</span><span class=p>[</span><span class=mi>3</span><span class=p>];</span> <span class=c1>// depth: size in each dimension (up to 3)
+</span><span class=c1></span>  <span class=n>I</span> <span class=n>p</span><span class=p>[</span><span class=mi>2</span><span class=p>];</span> <span class=c1>// array data - numbers mixed with pointers
+</span><span class=c1></span><span class=p>}</span> <span class=o>*</span><span class=n>A</span><span class=p>;</span>
+</code></pre></div><p>As you can see, arrays are limited to only integer elements, may contain other arrays and may have up to 3 dimensions (linear vectors, rectangular matrices and 3-dimensional arrays.</p><p>The fixed size of 2 for data array was probably chosen to avoid dynamic memory allocation for single numbers (arrays of zero rank with one element). But I suspect it has not been used correctly (I might be wrong, though).</p><p>For allocating integer arrays there is a helper function &ldquo;ma&rdquo;, which only wraps malloc to allocate <code>n</code> integers:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>I</span> <span class=o>*</span><span class=nf>ma</span><span class=p>(</span><span class=n>n</span><span class=p>){</span><span class=n>R</span><span class=p>(</span><span class=n>I</span><span class=o>*</span><span class=p>)</span><span class=n>malloc</span><span class=p>(</span><span class=n>n</span><span class=o>*</span><span class=mi>8</span><span class=p>);}</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=k>typedef</span> <span class=kt>long</span> <span class=kt>long</span> <span class=n>I</span><span class=p>;</span>
+<span class=n>I</span> <span class=o>*</span><span class=nf>ma</span><span class=p>(</span><span class=kt>int</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=p>(</span><span class=n>I</span> <span class=o>*</span><span class=p>)</span> <span class=n>malloc</span><span class=p>(</span><span class=n>n</span> <span class=o>*</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>I</span><span class=p>));</span>
+<span class=p>}</span>
+</code></pre></div><p>For copying array elements there is a hand-written memmove:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>mv</span><span class=p>(</span><span class=n>d</span><span class=p>,</span><span class=n>s</span><span class=p>,</span><span class=n>n</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>,</span><span class=o>*</span><span class=n>s</span><span class=p>;{</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]);}</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=kt>void</span> <span class=n>mv</span><span class=p>(</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>,</span> <span class=n>I</span> <span class=o>*</span><span class=n>s</span><span class=p>,</span> <span class=kt>int</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>n</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>];</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>As you see, <code>DO(n, op)</code> is a macro to avoid numerous for-loops, that are untypical in the array programming nature.</p><p>Then goes a function to multiply dimensions in each rank (to get the total number of elements in all dimensions):</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>;{</span><span class=n>I</span> <span class=n>z</span><span class=o>=</span><span class=mi>1</span><span class=p>;</span><span class=n>DO</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>z</span><span class=o>=</span><span class=n>z</span><span class=o>*</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=n>I</span> <span class=n>tr</span><span class=p>(</span><span class=n>I</span> <span class=n>r</span><span class=p>,</span> <span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>z</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>r</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>z</span> <span class=o>=</span> <span class=n>z</span> <span class=o>*</span> <span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>];</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>It is commonly used before calling DO() to apply some operation to all elements in all dimensions of an array.</p><p>Finally, there is a constructor for the array type:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>A</span> <span class=nf>ga</span><span class=p>(</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>;{</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=p>(</span><span class=n>A</span><span class=p>)</span><span class=n>ma</span><span class=p>(</span><span class=mi>5</span><span class=o>+</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>));</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>t</span><span class=o>=</span><span class=n>t</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>=</span><span class=n>r</span><span class=p>,</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>d</span><span class=p>,</span><span class=n>r</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=n>A</span> <span class=n>ga</span><span class=p>(</span><span class=n>I</span> <span class=n>t</span><span class=p>,</span> <span class=n>I</span> <span class=n>r</span><span class=p>,</span> <span class=n>I</span> <span class=o>*</span><span class=n>d</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=p>(</span><span class=n>A</span><span class=p>)</span> <span class=n>ma</span><span class=p>(</span><span class=mi>5</span> <span class=o>+</span> <span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span> <span class=n>d</span><span class=p>));</span> <span class=c1>// tr() returns number of elements here
+</span><span class=c1></span>  <span class=n>z</span><span class=o>-&gt;</span><span class=n>t</span> <span class=o>=</span> <span class=n>t</span><span class=p>;</span>
+  <span class=n>z</span><span class=o>-&gt;</span><span class=n>r</span> <span class=o>=</span> <span class=n>r</span><span class=p>;</span>
+  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span> <span class=n>d</span><span class=p>,</span> <span class=n>r</span><span class=p>);</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=parser>parser</h2><p>Now I suggest to skip the part with many V1 and V2 functions, and jump to the end of the program, the main function:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>main</span><span class=p>(){</span><span class=n>C</span> <span class=n>s</span><span class=p>[</span><span class=mi>99</span><span class=p>];</span><span class=k>while</span><span class=p>(</span><span class=n>gets</span><span class=p>(</span><span class=n>s</span><span class=p>))</span><span class=n>pr</span><span class=p>(</span><span class=n>ex</span><span class=p>(</span><span class=n>wd</span><span class=p>(</span><span class=n>s</span><span class=p>)));}</span>
+<span class=c1>// or
+</span><span class=c1></span><span class=kt>int</span> <span class=n>main</span><span class=p>()</span> <span class=p>{</span>
+  <span class=kt>char</span> <span class=n>s</span><span class=p>[</span><span class=mi>99</span><span class=p>];</span>             <span class=c1>// maximum input line length
+</span><span class=c1></span>  <span class=k>while</span> <span class=p>(</span><span class=n>gets</span><span class=p>(</span><span class=n>s</span><span class=p>))</span> <span class=p>{</span>       <span class=c1>// until end of input:
+</span><span class=c1></span>    <span class=n>I</span> <span class=o>*</span><span class=n>words</span> <span class=o>=</span> <span class=n>wd</span><span class=p>(</span><span class=n>s</span><span class=p>);</span>     <span class=c1>// tokenize input
+</span><span class=c1></span>    <span class=n>A</span> <span class=n>result</span> <span class=o>=</span> <span class=n>ex</span><span class=p>(</span><span class=n>words</span><span class=p>);</span> <span class=c1>// evaluate words
+</span><span class=c1></span>    <span class=n>pr</span><span class=p>(</span><span class=n>result</span><span class=p>);</span>           <span class=c1>// print result
+</span><span class=c1></span>  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>Yes, it&rsquo;s a simple REPL (read-eval-print) loop, that we commonly see in every interpreter.</p><p>Let&rsquo;s have a look at the parser (which is only a tokenizer in fact):</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>C</span> <span class=n>vt</span><span class=p>[]</span><span class=o>=</span><span class=s>&#34;+{~&lt;#,&#34;</span><span class=p>;</span>
+<span class=n>noun</span><span class=p>(</span><span class=n>c</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=p>;</span><span class=k>if</span><span class=p>(</span><span class=n>c</span><span class=o>&lt;</span><span class=sc>&#39;0&#39;</span><span class=o>||</span><span class=n>c</span><span class=o>&gt;</span><span class=sc>&#39;9&#39;</span><span class=p>)</span><span class=n>R</span> <span class=mi>0</span><span class=p>;</span><span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=n>c</span><span class=o>-</span><span class=sc>&#39;0&#39;</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>verb</span><span class=p>(</span><span class=n>c</span><span class=p>){</span><span class=n>I</span> <span class=n>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=k>for</span><span class=p>(;</span><span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=p>];)</span><span class=k>if</span><span class=p>(</span><span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=o>++</span><span class=p>]</span><span class=o>==</span><span class=n>c</span><span class=p>)</span><span class=n>R</span> <span class=n>i</span><span class=p>;</span><span class=n>R</span> <span class=mi>0</span><span class=p>;}</span>
+<span class=n>I</span> <span class=o>*</span><span class=n>wd</span><span class=p>(</span><span class=n>s</span><span class=p>)</span><span class=n>C</span> <span class=o>*</span><span class=n>s</span><span class=p>;{</span><span class=n>I</span> <span class=n>a</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>strlen</span><span class=p>(</span><span class=n>s</span><span class=p>),</span><span class=o>*</span><span class=n>e</span><span class=o>=</span><span class=n>ma</span><span class=p>(</span><span class=n>n</span><span class=o>+</span><span class=mi>1</span><span class=p>);</span><span class=n>C</span> <span class=n>c</span><span class=p>;</span>
+ <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>e</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=p>(</span><span class=n>a</span><span class=o>=</span><span class=n>noun</span><span class=p>(</span><span class=n>c</span><span class=o>=</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span><span class=o>?</span><span class=nl>a</span><span class=p>:(</span><span class=n>a</span><span class=o>=</span><span class=n>verb</span><span class=p>(</span><span class=n>c</span><span class=p>))</span><span class=o>?</span><span class=nl>a</span><span class=p>:</span><span class=n>c</span><span class=p>);</span><span class=n>e</span><span class=p>[</span><span class=n>n</span><span class=p>]</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=n>R</span> <span class=n>e</span><span class=p>;}</span>
 
-//or
+<span class=c1>//or
+</span><span class=c1></span>
+<span class=c1>// for 0..9 - return array with one number inside,
+</span><span class=c1>// otherwise return NULL.
+</span><span class=c1></span><span class=n>A</span> <span class=n>noun</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=n>c</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>c</span> <span class=o>&lt;</span> <span class=sc>&#39;0&#39;</span> <span class=o>||</span> <span class=n>c</span> <span class=o>&gt;</span> <span class=sc>&#39;9&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=nb>NULL</span><span class=p>;</span>
+  <span class=p>}</span>
+  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+  <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=n>c</span><span class=o>-</span><span class=sc>&#39;0&#39;</span><span class=p>;</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// for 0..9 - return array with one number inside,
-// otherwise return NULL.
-A noun(const char c) {
-  if (c &lt; '0' || c &gt; '9') {
-    return NULL;
-  }
-  A z = ga(0, 0, 0);
-  z-&gt;p[0] = c-'0';
-  return z;
-}
+<span class=c1>// for verbs (&#34;functions&#34;) return their index+1 in the table vt,
+</span><span class=c1>// otherwise return NULL.
+</span><span class=c1></span><span class=n>A</span> <span class=n>verb</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=n>c</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=p>];)</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>vt</span><span class=p>[</span><span class=n>i</span><span class=o>++</span><span class=p>]</span> <span class=o>==</span> <span class=n>c</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=n>i</span><span class=p>;</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
 
-// for verbs (&quot;functions&quot;) return their index+1 in the table vt,
-// otherwise return NULL.
-A verb(const char c) {
-  for (int i = 0; vt[i];) {
-    if (vt[i++] == c) {
-      return i;
-    }
-  }
-  return 0;
-}
+<span class=n>I</span> <span class=o>*</span><span class=n>wd</span><span class=p>(</span><span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>s</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>strlen</span><span class=p>(</span><span class=n>s</span><span class=p>);</span>
+  <span class=n>I</span> <span class=o>*</span><span class=n>tokens</span> <span class=o>=</span> <span class=n>ma</span><span class=p>(</span><span class=n>n</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span> <span class=c1>// allocate a token per char + 1
+</span><span class=c1></span>  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>n</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span> <span class=c1>// for each char
+</span><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=n>noun</span><span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span> <span class=p>{</span>
+      <span class=n>tokens</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>noun</span><span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span> <span class=c1>// one-digit number literals
+</span><span class=c1></span>    <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>verb</span><span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span> <span class=p>{</span>
+      <span class=n>tokens</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>verb</span><span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span> <span class=c1>// verbs
+</span><span class=c1></span>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+      <span class=n>tokens</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>s</span><span class=p>[</span><span class=n>i</span><span class=p>];</span>       <span class=c1>// one-letter variables a..z
+</span><span class=c1></span>    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=n>e</span><span class=p>[</span><span class=n>n</span><span class=p>]</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=c1>// null-terminate and return tokens
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>e</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>So the parser converts each and every character in the input line to either a noun (numeric literal from 0 to 9), a verb (a one-symbol function) or a variable (&lsquo;a&rsquo;..&lsquo;z&rsquo;). It&rsquo;s very fragile so you should be really careful with the input.</p><p>Now as we have an input string converted into an array of tokens - we can evaluate them.</p><h2 id=eval>eval</h2><p>Evaluator is recursive-decent, with right-side recursion (when right part of the expression is evaluated before the left one):</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>A</span><span class=p>(</span><span class=o>*</span><span class=n>vd</span><span class=p>[])()</span><span class=o>=</span><span class=p>{</span><span class=mi>0</span><span class=p>,</span><span class=n>plus</span><span class=p>,</span><span class=n>from</span><span class=p>,</span><span class=n>find</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=n>rsh</span><span class=p>,</span><span class=n>cat</span><span class=p>},</span>
+ <span class=p>(</span><span class=o>*</span><span class=n>vm</span><span class=p>[])()</span><span class=o>=</span><span class=p>{</span><span class=mi>0</span><span class=p>,</span><span class=n>id</span><span class=p>,</span><span class=n>size</span><span class=p>,</span><span class=n>iota</span><span class=p>,</span><span class=n>box</span><span class=p>,</span><span class=n>sha</span><span class=p>,</span><span class=mi>0</span><span class=p>};</span>
+<span class=n>I</span> <span class=n>st</span><span class=p>[</span><span class=mi>26</span><span class=p>];</span> <span class=n>qp</span><span class=p>(</span><span class=n>a</span><span class=p>){</span><span class=n>R</span>  <span class=n>a</span><span class=o>&gt;=</span><span class=sc>&#39;a&#39;</span><span class=o>&amp;&amp;</span><span class=n>a</span><span class=o>&lt;=</span><span class=sc>&#39;z&#39;</span><span class=p>;}</span><span class=n>qv</span><span class=p>(</span><span class=n>a</span><span class=p>){</span><span class=n>R</span> <span class=n>a</span><span class=o>&lt;</span><span class=sc>&#39;a&#39;</span><span class=p>;}</span>
+<span class=n>A</span> <span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=p>)</span><span class=n>I</span> <span class=o>*</span><span class=n>e</span><span class=p>;{</span><span class=n>I</span> <span class=n>a</span><span class=o>=*</span><span class=n>e</span><span class=p>;</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>qp</span><span class=p>(</span><span class=n>a</span><span class=p>)){</span><span class=k>if</span><span class=p>(</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>==</span><span class=sc>&#39;=&#39;</span><span class=p>)</span><span class=n>R</span> <span class=n>st</span><span class=p>[</span><span class=n>a</span><span class=o>-</span><span class=sc>&#39;a&#39;</span><span class=p>]</span><span class=o>=</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>2</span><span class=p>);</span><span class=n>a</span><span class=o>=</span> <span class=n>st</span><span class=p>[</span> <span class=n>a</span><span class=o>-</span><span class=sc>&#39;a&#39;</span><span class=p>];}</span>
+ <span class=n>R</span> <span class=n>qv</span><span class=p>(</span><span class=n>a</span><span class=p>)</span><span class=o>?</span><span class=p>(</span><span class=o>*</span><span class=n>vm</span><span class=p>[</span><span class=n>a</span><span class=p>])(</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>1</span><span class=p>))</span><span class=o>:</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>?</span><span class=p>(</span><span class=o>*</span><span class=n>vd</span><span class=p>[</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]])(</span><span class=n>a</span><span class=p>,</span><span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>2</span><span class=p>))</span><span class=o>:</span><span class=p>(</span><span class=n>A</span><span class=p>)</span><span class=n>a</span><span class=p>;}</span>
 
-I *wd(const char *s) {
-  I n = strlen(s);
-  I *tokens = ma(n + 1); // allocate a token per char + 1
-  for (int i = 0; i &lt; n; i++) { // for each char
-    if (noun(s[i])) {
-      tokens[i] = noun(s[i]); // one-digit number literals
-    } else if (verb(s[i])) {
-      tokens[i] = verb(s[i]); // verbs
-    } else {
-      tokens[i] = s[i];       // one-letter variables a..z
-    }
-  }
-  e[n] = 0; // null-terminate and return tokens
-  return e;
-}
-</code></pre><p>So the parser converts each and every character in the input line to either a noun (numeric literal from 0 to 9), a verb (a one-symbol function) or a variable (&lsquo;a&rsquo;..&lsquo;z&rsquo;). It&rsquo;s very fragile so you should be really careful with the input.</p><p>Now as we have an input string converted into an array of tokens - we can evaluate them.</p><h2 id=eval>eval</h2><p>Evaluator is recursive-decent, with right-side recursion (when right part of the expression is evaluated before the left one):</p><pre><code class=language-c>A(*vd[])()={0,plus,from,find,0,rsh,cat},
- (*vm[])()={0,id,size,iota,box,sha,0};
-I st[26]; qp(a){R  a&gt;='a'&amp;&amp;a&lt;='z';}qv(a){R a&lt;'a';}
-A ex(e)I *e;{I a=*e;
- if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
- R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
+<span class=c1>// or
+</span><span class=c1></span>
+<span class=n>I</span> <span class=n>st</span><span class=p>[</span><span class=mi>26</span><span class=p>];</span>   <span class=c1>// global variables &#39;a&#39;..&#39;z&#39;
+</span><span class=c1></span><span class=n>I</span> <span class=nf>qp</span><span class=p>(</span><span class=n>I</span> <span class=n>a</span><span class=p>)</span> <span class=p>{</span> <span class=c1>// is a letter (variable)?
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>a</span> <span class=o>&gt;=</span> <span class=sc>&#39;a&#39;</span> <span class=o>&amp;&amp;</span> <span class=n>a</span> <span class=o>&lt;=</span> <span class=sc>&#39;z&#39;</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=n>I</span> <span class=nf>qv</span><span class=p>(</span><span class=n>a</span><span class=p>)</span> <span class=p>{</span>   <span class=c1>// is a verb symbol?
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>a</span> <span class=o>&lt;</span> <span class=sc>&#39;a&#39;</span><span class=p>;</span> 
+<span class=p>}</span>
+<span class=n>A</span> <span class=nf>ex</span><span class=p>(</span><span class=n>I</span> <span class=o>*</span><span class=n>e</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>a</span> <span class=o>=</span> <span class=o>*</span><span class=n>e</span><span class=p>;</span>            <span class=c1>// take the leftmost token
+</span><span class=c1></span>  <span class=k>if</span> <span class=p>(</span><span class=n>qp</span><span class=p>(</span><span class=n>a</span><span class=p>))</span> <span class=p>{</span>         <span class=c1>// if a variable
+</span><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;=&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=c1>// ..assignment:
+</span><span class=c1></span>      <span class=n>st</span><span class=p>[</span><span class=n>a</span> <span class=o>-</span> <span class=sc>&#39;a&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>ex</span><span class=p>(</span><span class=n>e</span> <span class=o>+</span> <span class=mi>2</span><span class=p>);</span>  <span class=c1>// evaluate right side,
+</span><span class=c1></span>      <span class=k>return</span> <span class=n>st</span><span class=p>[</span><span class=n>a</span> <span class=o>-</span> <span class=sc>&#39;a&#39;</span><span class=p>];</span>       <span class=c1>// store and return
+</span><span class=c1></span>    <span class=p>}</span>
+    <span class=n>a</span> <span class=o>=</span> <span class=n>st</span><span class=p>[</span><span class=n>a</span> <span class=o>-</span> <span class=sc>&#39;a&#39;</span><span class=p>];</span>   <span class=c1>// else: load variable
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=c1>// &#34;a&#34; now contains the value, or a verb symbol
+</span><span class=c1></span>  <span class=k>if</span> <span class=p>(</span><span class=n>qv</span><span class=p>(</span><span class=n>a</span><span class=p>))</span> <span class=p>{</span>         <span class=c1>// if a verb, it must be monadic
+</span><span class=c1></span>    <span class=n>I</span> <span class=o>*</span><span class=n>right</span> <span class=o>=</span> <span class=n>e</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// take the remaining expression
+</span><span class=c1></span>    <span class=k>return</span> <span class=p>(</span><span class=o>*</span><span class=n>vm</span><span class=p>[</span><span class=n>a</span><span class=p>])(</span><span class=n>ex</span><span class=p>(</span><span class=n>right</span><span class=p>))</span> <span class=c1>// apply verb and return
+</span><span class=c1></span>  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>])</span> <span class=p>{</span>   <span class=c1>// else, if something follows this token -
+</span><span class=c1></span>                       <span class=c1>// it must be a dyadic verb
+</span><span class=c1></span>    <span class=c1>// apply it to current token and the one coming after the verb
+</span><span class=c1></span>    <span class=k>return</span> <span class=p>(</span><span class=o>*</span><span class=n>vd</span><span class=p>[</span><span class=n>e</span><span class=p>[</span><span class=mi>1</span><span class=p>]])(</span><span class=n>a</span><span class=p>,</span> <span class=n>ex</span><span class=p>(</span><span class=n>e</span><span class=o>+</span><span class=mi>2</span><span class=p>));</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=k>return</span> <span class=n>a</span><span class=p>;</span>          <span class=c1>// else, return noun `a` as is.
+</span><span class=c1></span>  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>Again, evaluator is completely intolerant to errors and expect only correct input. You see that right-hand side of the expression is always recursively evaluated first. That&rsquo;s because in APL-like languages operators are always applied right-to-left.</p><p>If you are confused about &ldquo;monadic&rdquo; and &ldquo;dyadic&rdquo; verbs - these are merely functions with one (monadic) or two (dyadic) arguments.</p><p>So, once it is clear how evaluation works - let&rsquo;s have a look at the actual verbs, that manipulate our arrays.</p><h2 id=verbs>verbs</h2><p>All verbs take an array or two and return another array, which is a result.</p><p>First, monadic verbs, there&rsquo;s only five of them:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>V1</span><span class=p>(</span><span class=n>id</span><span class=p>){</span><span class=n>R</span> <span class=n>w</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>size</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>?*</span><span class=n>w</span><span class=o>-&gt;</span><span class=nl>d</span><span class=p>:</span><span class=mi>1</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>iota</span><span class=p>){</span><span class=n>I</span> <span class=n>n</span><span class=o>=*</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>;</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>n</span><span class=p>);</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>i</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>box</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=mi>0</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span><span class=o>*</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>=</span><span class=p>(</span><span class=n>I</span><span class=p>)</span><span class=n>w</span><span class=p>;</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
+<span class=n>V1</span><span class=p>(</span><span class=n>sha</span><span class=p>){</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
 
-// or
+<span class=c1>// or
+</span><span class=c1></span>
+<span class=c1>// Example: id([1,2,3]) -&gt; [1,2,3]
+</span><span class=c1></span><span class=n>A</span> <span class=n>id</span><span class=p>(</span><span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span> 
+  <span class=k>return</span> <span class=n>w</span><span class=p>;</span>          <span class=c1>// simply returns the given argument
+</span><span class=c1></span><span class=p>}</span>
 
-I st[26];   // global variables 'a'..'z'
-I qp(I a) { // is a letter (variable)?
-  return a &gt;= 'a' &amp;&amp; a &lt;= 'z';
-}
-I qv(a) {   // is a verb symbol?
-  return a &lt; 'a'; 
-}
-A ex(I *e) {
-  I a = *e;            // take the leftmost token
-  if (qp(a)) {         // if a variable
-    if (e[1] == '=') { // ..assignment:
-      st[a - 'a'] = ex(e + 2);  // evaluate right side,
-      return st[a - 'a'];       // store and return
-    }
-    a = st[a - 'a'];   // else: load variable
-  }
-  // &quot;a&quot; now contains the value, or a verb symbol
-  if (qv(a)) {         // if a verb, it must be monadic
-    I *right = e + 1;  // take the remaining expression
-    return (*vm[a])(ex(right)) // apply verb and return
-  } else if (e[1]) {   // else, if something follows this token -
-                       // it must be a dyadic verb
-    // apply it to current token and the one coming after the verb
-    return (*vd[e[1]])(a, ex(e+2));
-  } else {
-    return a;          // else, return noun `a` as is.
-  }
-}
-</code></pre><p>Again, evaluator is completely intolerant to errors and expect only correct input. You see that right-hand side of the expression is always recursively evaluated first. That&rsquo;s because in APL-like languages operators are always applied right-to-left.</p><p>If you are confused about &ldquo;monadic&rdquo; and &ldquo;dyadic&rdquo; verbs - these are merely functions with one (monadic) or two (dyadic) arguments.</p><p>So, once it is clear how evaluation works - let&rsquo;s have a look at the actual verbs, that manipulate our arrays.</p><h2 id=verbs>verbs</h2><p>All verbs take an array or two and return another array, which is a result.</p><p>First, monadic verbs, there&rsquo;s only five of them:</p><pre><code class=language-c>V1(id){R w;}
-V1(size){A z=ga(0,0,0);*z-&gt;p=w-&gt;r?*w-&gt;d:1;R z;}
-V1(iota){I n=*w-&gt;p;A z=ga(0,1,&amp;n);DO(n,z-&gt;p[i]=i);R z;}
-V1(box){A z=ga(1,0,0);*z-&gt;p=(I)w;R z;}
-V1(sha){A z=ga(0,1,&amp;w-&gt;r);mv(z-&gt;p,w-&gt;d,w-&gt;r);R z;}
+<span class=c1>// Example: size([4,5,6]) -&gt; 3
+</span><span class=c1></span><span class=n>A</span> <span class=n>size</span><span class=p>(</span><span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>        <span class=c1>// return size of the vector
+</span><span class=c1></span>  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span> <span class=c1>// allocate result
+</span><span class=c1></span>  <span class=k>if</span> <span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>)</span> <span class=p>{</span>        <span class=c1>// if w has any rank (is a vector or matrix)
+</span><span class=c1></span>    <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span> <span class=c1>// return its first dimension
+</span><span class=c1></span>  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>     <span class=c1>// otherwise, return 1
+</span><span class=c1></span>  <span class=p>}</span>
+<span class=p>}</span>
 
-// or
+<span class=c1>// Example: iota(4) -&gt; [0, 1, 2, 3]
+</span><span class=c1></span><span class=n>A</span> <span class=n>iota</span><span class=p>(</span><span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>];</span>      <span class=c1>// number of elements to cretae
+</span><span class=c1></span>  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>n</span><span class=p>);</span> <span class=c1>// allocate vector of n elements
+</span><span class=c1></span>  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>n</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>i</span><span class=p>;</span>      <span class=c1>// fill array from 0 to n-1.
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// Example: id([1,2,3]) -&gt; [1,2,3]
-A id(A w) { 
-  return w;          // simply returns the given argument
-}
+<span class=c1>// Example: box([1, 2, 3]) -&gt; [[1, 2, 3]]
+</span><span class=c1></span><span class=n>A</span> <span class=n>box</span><span class=p>(</span><span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>  <span class=c1>// allocate a boxed array
+</span><span class=c1></span>  <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=n>w</span><span class=p>;</span>        <span class=c1>// put w into the boxed array
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// Example: size([4,5,6]) -&gt; 3
-A size(A w) {        // return size of the vector
-  A z = ga(0, 0, 0); // allocate result
-  if (w-&gt;r) {        // if w has any rank (is a vector or matrix)
-    z-&gt;p[0] = w-&gt;d[0]; // return its first dimension
-  } else {
-    z-&gt;p[0] = 1;     // otherwise, return 1
-  }
-}
+<span class=c1>// Example: sha([1, 3, 4,
+</span><span class=c1></span>                 <span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mi>7</span><span class=p>])</span> <span class=o>-&gt;</span> <span class=p>[</span><span class=mi>3</span><span class=p>,</span> <span class=mi>2</span><span class=p>]</span> <span class=p>(</span><span class=n>shape</span> <span class=n>of</span> <span class=n>the</span> <span class=n>array</span><span class=p>)</span>
+<span class=n>A</span> <span class=n>sha</span><span class=p>(</span><span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span>  <span class=c1>// create array to hold the shape of w
+</span><span class=c1></span>  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>);</span>   <span class=c1>// copy dimensions of w into result z
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>Obviously, in Arthur Whitney&rsquo;s notation these verbs are compact and maybe even easy to read once you know what they are supposed to do.</p><p>Now, the dyadic verbs that operate on two arguments:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>V2</span><span class=p>(</span><span class=n>plus</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>+</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
 
-// Example: iota(4) -&gt; [0, 1, 2, 3]
-A iota(A w) {
-  I n = w-&gt;p[0];      // number of elements to cretae
-  A z = ga(0, 1, &amp;n); // allocate vector of n elements
-  for (int i = 0; i &lt; n; i++) {
-    z-&gt;p[i] = i;      // fill array from 0 to n-1.
-  }
-  return z;
-}
+<span class=c1>// Example: [1,2,3] + [4,5,6] -&gt; [5,7,9]
+</span><span class=c1></span><span class=n>A</span> <span class=n>plus</span><span class=p>(</span><span class=n>A</span> <span class=n>a</span><span class=p>,</span> <span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span> <span class=c1>// how many elements in w
+</span><span class=c1></span>  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span> <span class=c1>// create result of the same size
+</span><span class=c1></span>  <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>n</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>+</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>];</span> <span class=c1>// sum elements pairwise
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// Example: box([1, 2, 3]) -&gt; [[1, 2, 3]]
-A box(A w) {
-  A z = ga(1, 0, 0);  // allocate a boxed array
-  z-&gt;p[0] = w;        // put w into the boxed array
-  return z;
-}
+<span class=n>V2</span><span class=p>(</span><span class=n>from</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>-</span><span class=mi>1</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=p>(</span><span class=n>n</span><span class=o>**</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>),</span><span class=n>n</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
 
-// Example: sha([1, 3, 4,
-                 5, 6, 7]) -&gt; [3, 2] (shape of the array)
-A sha(A w) {
-  A z = ga(0, 1, &amp;w-&gt;r);  // create array to hold the shape of w
-  mv(z-&gt;p, w-&gt;d, w-&gt;r);   // copy dimensions of w into result z
-  return z;
-}
-</code></pre><p>Obviously, in Arthur Whitney&rsquo;s notation these verbs are compact and maybe even easy to read once you know what they are supposed to do.</p><p>Now, the dyadic verbs that operate on two arguments:</p><pre><code class=language-c>V2(plus){I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);A z=ga(0,r,d);
- DO(n,z-&gt;p[i]=a-&gt;p[i]+w-&gt;p[i]);R z;}
+<span class=c1>// Example: 1st from [4,5,6] -&gt; 5
+</span><span class=c1></span><span class=n>A</span> <span class=n>from</span><span class=p>(</span><span class=n>A</span> <span class=n>a</span><span class=p>,</span> <span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span> <span class=o>-</span> <span class=mi>1</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span> <span class=c1>// one dimension less
+</span><span class=c1></span>  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span> <span class=o>-</span> <span class=mi>1</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span>
+  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span> <span class=o>+</span> <span class=p>(</span><span class=n>n</span> <span class=o>*</span> <span class=p>(</span><span class=o>*</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>)),</span> <span class=n>n</span><span class=p>);</span> <span class=c1>// copy all dimensions but the first one
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// Example: [1,2,3] + [4,5,6] -&gt; [5,7,9]
-A plus(A a, A w) {
-  I n = tr(w-&gt;r, w-&gt;d); // how many elements in w
-  A z = ga(0, w-&gt;r, w-&gt;d); // create result of the same size
-  for (int i = 0; i &lt; n; i++) {
-    z-&gt;p[i] = a-&gt;p[i] + w-&gt;p[i]; // sum elements pairwise
-  }
-  return z;
-}
+<span class=n>V2</span><span class=p>(</span><span class=n>cat</span><span class=p>){</span><span class=n>I</span> <span class=n>an</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>),</span><span class=n>wn</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>),</span><span class=n>n</span><span class=o>=</span><span class=n>an</span><span class=o>+</span><span class=n>wn</span><span class=p>;</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=mi>1</span><span class=p>,</span><span class=o>&amp;</span><span class=n>n</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>an</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>an</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>wn</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
 
-V2(from){I r=w-&gt;r-1,*d=w-&gt;d+1,n=tr(r,d);
- A z=ga(w-&gt;t,r,d);mv(z-&gt;p,w-&gt;p+(n**a-&gt;p),n);R z;}
+<span class=c1>// Example: [1,2,3] cat [4,5,6] -&gt; [1,2,3,4,5,6]
+</span><span class=c1></span><span class=n>A</span> <span class=n>cat</span><span class=p>(</span><span class=n>A</span> <span class=n>a</span><span class=p>,</span> <span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>an</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span>
+  <span class=n>I</span> <span class=n>wn</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span>
+  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>an</span> <span class=o>+</span> <span class=n>wn</span><span class=p>;</span>
+  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>n</span><span class=p>);</span> <span class=c1>// works only with vectors!
+</span><span class=c1></span>  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>an</span><span class=p>);</span>    <span class=c1>// copy a
+</span><span class=c1></span>  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>an</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>wn</span><span class=p>);</span> <span class=c1>// append w
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
 
-// Example: 1st from [4,5,6] -&gt; 5
-A from(A a, A w) {
-  I n = tr(w-&gt;r - 1, w-&gt;d + 1); // one dimension less
-  A z = ga(w-&gt;t, w-&gt;r - 1, w-&gt;d + 1);
-  mv(z-&gt;p, w-&gt;p + (n * (*a-&gt;p)), n); // copy all dimensions but the first one
-  return z;
-}
+<span class=n>V2</span><span class=p>(</span><span class=n>rsh</span><span class=p>){</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span><span class=o>?*</span><span class=n>a</span><span class=o>-&gt;</span><span class=nl>d</span><span class=p>:</span><span class=mi>1</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>),</span><span class=n>wn</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span>
+ <span class=n>A</span> <span class=n>z</span><span class=o>=</span><span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span><span class=n>r</span><span class=p>,</span><span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>);</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>wn</span><span class=o>=</span><span class=n>n</span><span class=o>&gt;</span><span class=n>wn</span><span class=o>?</span><span class=nl>wn</span><span class=p>:</span><span class=n>n</span><span class=p>);</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>n</span><span class=o>-=</span><span class=n>wn</span><span class=p>)</span><span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>wn</span><span class=p>,</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span><span class=n>n</span><span class=p>);</span><span class=n>R</span> <span class=n>z</span><span class=p>;}</span>
 
-V2(cat){I an=tr(a-&gt;r,a-&gt;d),wn=tr(w-&gt;r,w-&gt;d),n=an+wn;
- A z=ga(w-&gt;t,1,&amp;n);mv(z-&gt;p,a-&gt;p,an);mv(z-&gt;p+an,w-&gt;p,wn);R z;}
-
-// Example: [1,2,3] cat [4,5,6] -&gt; [1,2,3,4,5,6]
-A cat(A a, A w) {
-  I an = tr(a-&gt;r, a-&gt;d);
-  I wn = tr(w-&gt;r, w-&gt;d);
-  I n = an + wn;
-  A z = ga(w-&gt;t, 1, &amp;n); // works only with vectors!
-  mv(z-&gt;p, a-&gt;p, an);    // copy a
-  mv(z-&gt;p+an, w-&gt;p, wn); // append w
-  return z;
-}
-
-V2(rsh){I r=a-&gt;r?*a-&gt;d:1,n=tr(r,a-&gt;p),wn=tr(w-&gt;r,w-&gt;d);
- A z=ga(w-&gt;t,r,a-&gt;p);mv(z-&gt;p,w-&gt;p,wn=n&gt;wn?wn:n);
- if(n-=wn)mv(z-&gt;p+wn,z-&gt;p,n);R z;}
-
-// Example: [2,3] reshape [1,2,    [1,2,3,
-//                         3,4] -&gt;  4,1,2]
-//   Also:  [4] reshape [1] -&gt; [1,1,1,1] (repeat)
-A rsh(A a, A w) {
-  I r = a-&gt;r ? a-&gt;d : 1; // if has dimensions - first dimension, else - 1.
-  I n = tr(r, a-&gt;p);     // length of the resulting array/matrix
-  I wn = tr(w-&gt;r, w-&gt;d); // number of elements in w
-  A z = ga(w-&gt;t, r, a-&gt;p); 
-  I m = MIN(wn, n);      // number of elements in w,
-                         // if we don't have to repeat them.
-                         // n otherwise
-  mv(z-&gt;p, w-&gt;p, m);
-  if (n != m) {          // if we have to repeat...
-    mv(z-&gt;p+m, z-&gt;p, n); // as it copes left to right - it may
-                         // repeat initial elements many times,
-                         // until the length is n, as requested.
-  }
-  return z;
-}
-</code></pre><h2 id=print>print</h2><p>Finally, printing arrays. I will leave this without any comments, but instead will show the usage of the interpreter:</p><pre><code class=language-c>// pi(i) print an interger
-pi(i){P(&quot;%d &quot;,i);}nl(){P(&quot;\n&quot;);}
-// pr(w) prints an array, first shape then data, &quot;&lt;&quot; indicates boxing
-pr(w)A w;{I r=w-&gt;r,*d=w-&gt;d,n=tr(r,d);DO(r,pi(d[i]));nl();
- if(w-&gt;t)DO(n,P(&quot;&lt; &quot;);pr(w-&gt;p[i]))else DO(n,pi(w-&gt;p[i]));nl();}
-</code></pre><p>And here&rsquo;s the usage of the whole program:</p><pre><code>$ gcc odetoj.c -o j
+<span class=c1>// Example: [2,3] reshape [1,2,    [1,2,3,
+</span><span class=c1>//                         3,4] -&gt;  4,1,2]
+</span><span class=c1>//   Also:  [4] reshape [1] -&gt; [1,1,1,1] (repeat)
+</span><span class=c1></span><span class=n>A</span> <span class=n>rsh</span><span class=p>(</span><span class=n>A</span> <span class=n>a</span><span class=p>,</span> <span class=n>A</span> <span class=n>w</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>I</span> <span class=n>r</span> <span class=o>=</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>r</span> <span class=o>?</span> <span class=n>a</span><span class=o>-&gt;</span><span class=nl>d</span> <span class=p>:</span> <span class=mi>1</span><span class=p>;</span> <span class=c1>// if has dimensions - first dimension, else - 1.
+</span><span class=c1></span>  <span class=n>I</span> <span class=n>n</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>);</span>     <span class=c1>// length of the resulting array/matrix
+</span><span class=c1></span>  <span class=n>I</span> <span class=n>wn</span> <span class=o>=</span> <span class=n>tr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>);</span> <span class=c1>// number of elements in w
+</span><span class=c1></span>  <span class=n>A</span> <span class=n>z</span> <span class=o>=</span> <span class=n>ga</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>,</span> <span class=n>r</span><span class=p>,</span> <span class=n>a</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>);</span> 
+  <span class=n>I</span> <span class=n>m</span> <span class=o>=</span> <span class=n>MIN</span><span class=p>(</span><span class=n>wn</span><span class=p>,</span> <span class=n>n</span><span class=p>);</span>      <span class=c1>// number of elements in w,
+</span><span class=c1></span>                         <span class=c1>// if we don&#39;t have to repeat them.
+</span><span class=c1></span>                         <span class=c1>// n otherwise
+</span><span class=c1></span>  <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>m</span><span class=p>);</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>n</span> <span class=o>!=</span> <span class=n>m</span><span class=p>)</span> <span class=p>{</span>          <span class=c1>// if we have to repeat...
+</span><span class=c1></span>    <span class=n>mv</span><span class=p>(</span><span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=o>+</span><span class=n>m</span><span class=p>,</span> <span class=n>z</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>,</span> <span class=n>n</span><span class=p>);</span> <span class=c1>// as it copes left to right - it may
+</span><span class=c1></span>                         <span class=c1>// repeat initial elements many times,
+</span><span class=c1></span>                         <span class=c1>// until the length is n, as requested.
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>z</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=print>print</h2><p>Finally, printing arrays. I will leave this without any comments, but instead will show the usage of the interpreter:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=c1>// pi(i) print an interger
+</span><span class=c1></span><span class=n>pi</span><span class=p>(</span><span class=n>i</span><span class=p>){</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;%d &#34;</span><span class=p>,</span><span class=n>i</span><span class=p>);}</span><span class=n>nl</span><span class=p>(){</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);}</span>
+<span class=c1>// pr(w) prints an array, first shape then data, &#34;&lt;&#34; indicates boxing
+</span><span class=c1></span><span class=n>pr</span><span class=p>(</span><span class=n>w</span><span class=p>)</span><span class=n>A</span> <span class=n>w</span><span class=p>;{</span><span class=n>I</span> <span class=n>r</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>r</span><span class=p>,</span><span class=o>*</span><span class=n>d</span><span class=o>=</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>d</span><span class=p>,</span><span class=n>n</span><span class=o>=</span><span class=n>tr</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>d</span><span class=p>);</span><span class=n>DO</span><span class=p>(</span><span class=n>r</span><span class=p>,</span><span class=n>pi</span><span class=p>(</span><span class=n>d</span><span class=p>[</span><span class=n>i</span><span class=p>]));</span><span class=n>nl</span><span class=p>();</span>
+ <span class=k>if</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>t</span><span class=p>)</span><span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>P</span><span class=p>(</span><span class=s>&#34;&lt; &#34;</span><span class=p>);</span><span class=n>pr</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]))</span><span class=k>else</span> <span class=n>DO</span><span class=p>(</span><span class=n>n</span><span class=p>,</span><span class=n>pi</span><span class=p>(</span><span class=n>w</span><span class=o>-&gt;</span><span class=n>p</span><span class=p>[</span><span class=n>i</span><span class=p>]));</span><span class=n>nl</span><span class=p>();}</span>
+</code></pre></div><p>And here&rsquo;s the usage of the whole program:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ gcc odetoj.c -o j
 $ ./j
     2      // numbers
 2
@@ -317,8 +317,8 @@ $ ./j
 0 1 2 3 4 5  // 3 4 5
     2{b      // 2nd from b
 ...and so on...
-</code></pre><p>The interpreter is very limited, but still impressive. But APL family of languages itself is a remarkable part of computer science history, where Arthur Whitney plays a very significant role. I hope this lesson of computational archeology has proven it.</p><p>P.S. As I wrote this article - I was trying to rebuild this interpreter in Rust, with some minor improvements like proper number literals and less fragile handling of data. The result can be found at <a href=https://github.com/zserge/odetoj>https://github.com/zserge/odetoj</a>.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Mar 31, 2020</em></p><p>See also:
+</code></pre></div><p>The interpreter is very limited, but still impressive. But APL family of languages itself is a remarkable part of computer science history, where Arthur Whitney plays a very significant role. I hope this lesson of computational archeology has proven it.</p><p>P.S. As I wrote this article - I was trying to rebuild this interpreter in Rust, with some minor improvements like proper number literals and less fragile handling of data. The result can be found at <a href=https://github.com/zserge/odetoj>https://github.com/zserge/odetoj</a>.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Mar 31, 2020</em></p><p>See also:
 <a href=/posts/cucu-part3/>cucu: a compiler you can understand (3/3)</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

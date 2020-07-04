@@ -1,6 +1,6 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>kotlin - a new hope</title><meta name=description content="A new language for Android coding"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/kotlin/><meta property=og:title content="kotlin - a new hope"><meta property=og:type content=article><meta property=og:url content=https://zserge.com/posts/kotlin/><meta property=og:image content=https://zserge.com/logo.png><meta property=og:description content="A new language for Android coding"><meta property=og:locale content=en_US><meta name=twitter:card content="A new language for Android coding"><meta name=twitter:site content=@zsergo><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>kotlin - a new hope</title><meta name=description content="A new language for Android coding"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel="shortcut icon" type=image/png href=/favicon.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/kotlin/><meta property="og:title" content="kotlin - a new hope"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/kotlin/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="A new language for Android coding"><meta property="og:locale" content="en_US"><meta name=twitter:card content="A new language for Android coding"><meta name=twitter:site content="@zsergo"><link href=/styles.css rel=stylesheet type=text/css><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a></nav><div class=empty></div><nav><section><a href=/about/>about</a>
 <a href=/posts/>posts</a></section><section><a href=https://twitter.com/zsergo>@me</a>
-<a href=https://github.com/zserge>&lt;/&gt;me</a></section></nav></header><div id=content><h1>kotlin - a new hope</h1><p>I&rsquo;ve been looking for Java alternatives since my first days of Android
+<a href=https://github.com/zserge>&lt;/>me</a></section></nav></header><div id=content><h1>kotlin - a new hope</h1><p>I&rsquo;ve been looking for Java alternatives since my first days of Android
 development. I can&rsquo;t say I don&rsquo;t like Java. It&rsquo;s a nice language, very easy to
 learn and pretty logical. But the lack of proper functional style
 constructions often inspires me to check what&rsquo;s new in the field of JVM
@@ -15,13 +15,13 @@ wait for another minute waiting for my HelloWorld to compile.</li></ul><p>This w
 IntelliJ IDEA). The history of Kotlin starts in 2010, but Android support was
 added in 2012. The ideas behind this language are to make it safer than Java
 and faster/easier than Scala.</p><p>As a demo app I was going to make a theremin-like app that played different
-notes when phone was tilted.</p><h2 id=kotlin-the-phantom-menace>Kotlin - The Phantom Menace</h2><p>I&rsquo;ve heard Kotlin has nice support of the IDE, but as a convinced vim user I decided to try it in console/vim environment.</p><p>So, on the official <a href=http://kotlin.jetbrains.org/>website</a> I found no binaries.
+notes when phone was tilted.</p><h2 id=kotlin---the-phantom-menace>Kotlin - The Phantom Menace</h2><p>I&rsquo;ve heard Kotlin has nice support of the IDE, but as a convinced vim user I decided to try it in console/vim environment.</p><p>So, on the official <a href=http://kotlin.jetbrains.org/>website</a> I found no binaries.
 Instead, I found a link to Github release with source archives. That was not
 looking promising, as I have no installed Maven, Gradle or whatever is used these
 days to make Java world more complicated. Luckily, Kotlin build system was plain old Ant.</p><p>Dealing with dependencies and compiling the compiler took a while, and in the
 <code>$SRC/dist/kotlinc</code> directory I found compiler binaries and runtime. Also, in the
 <code>$SRC/dist/kotlinc/tools</code> directory there was a j2k app (I thought it&rsquo;s a
-translator from Java to Kotlin), but it failed to run.</p><h2 id=kotlin-empire-strikes-back>Kotlin - Empire Strikes Back</h2><p>So, let&rsquo;s get back to Google stuff and make kotlin compiler work with Android
+translator from Java to Kotlin), but it failed to run.</p><h2 id=kotlin---empire-strikes-back>Kotlin - Empire Strikes Back</h2><p>So, let&rsquo;s get back to Google stuff and make kotlin compiler work with Android
 build.xml. Customizations of build process are possible with <code>custom_rules.xml</code>.
 Again, good design of kotlin provides us with <code>kotlinc</code> Ant task, so we need
 to include that task into the <code>custom_rules.xml</code>.</p><p>So, starting with <code>android create project</code> as usual, I added the following
@@ -49,7 +49,7 @@ custom rules:</p><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-
 set correctly (it should point to the <code>kotlinc</code> folder). We use post-install
 hook, because R.java should be generated and compiled before compiling kotlin
 files.</p><p>Then, copy Kotlin runtime from <code>$KOTLIN_HOME/libs</code> to your project <code>libs</code> directory.
-Runtime is small, so I hoped apk size won&rsquo;t get large, too.</p><p>Now, create an empty source file <code>src/&lt;...package...&gt;/Main.kt</code>.</p><h2 id=kotlin-return-of-the-jedi>Kotlin - Return of the Jedi</h2><p>So, let&rsquo;s write some Kotlin. Minimal activity example looks much like Java:</p><pre><code>package kotlin.theremin
+Runtime is small, so I hoped apk size won&rsquo;t get large, too.</p><p>Now, create an empty source file <code>src/&lt;...package...>/Main.kt</code>.</p><h2 id=kotlin---return-of-the-jedi>Kotlin - Return of the Jedi</h2><p>So, let&rsquo;s write some Kotlin. Minimal activity example looks much like Java:</p><pre><code>package kotlin.theremin
 
 import android.os.Bundle
 import android.app.Activity
@@ -69,7 +69,7 @@ it&rsquo;s only a warning, so I decided to ignore it when default parameter name
 meaningless.</p><p>Build, install, run - all should work. Build process doesn&rsquo;t feel slow, but
 compiler output (warnings, errors) is a bit hard to read, since at the end of
 the build logs there is a long stack trace if your code has errors, so I had to
-scroll up to see actual error messages.</p><h2 id=kotlin-attack-of-the-clones>Kotlin - Attack of the Clones</h2><p>So, I could write some code in Kotlin. The strongest feeling was that Kotlin is
+scroll up to see actual error messages.</p><h2 id=kotlin---attack-of-the-clones>Kotlin - Attack of the Clones</h2><p>So, I could write some code in Kotlin. The strongest feeling was that Kotlin is
 a copy of Scala. I can&rsquo;t say it&rsquo;s bad. I think I would have spent more time to
 study Scala if it was not that slow, and if I saw real profit of how Scala can
 help me in Android development. Here&rsquo;s the code of theremin app in kotlin:</p><pre><code>package kotlin.theremin
@@ -176,7 +176,7 @@ class AudioThread(): Thread() {
 </code></pre><p>It was all in one source file, Main.kt. It plays major scale notes as you tilt
 the phone. Sine generator code was stolen somewhere from the web, so it&rsquo;s not
 an example of how one should write it. But I hope it&rsquo;s enough to get
-first impression of how Kotlin looks like.</p><p>Good news: overhead is only 200KB, Kotlin runtime is very small.</p><h2 id=kotlin-may-the-force-be-with-you>Kotlin - may the force be with you</h2><p>Impressions. Very nice language. Logical, consistent, fast, small. Pretty stable.
+first impression of how Kotlin looks like.</p><p>Good news: overhead is only 200KB, Kotlin runtime is very small.</p><h2 id=kotlin---may-the-force-be-with-you>Kotlin - may the force be with you</h2><p>Impressions. Very nice language. Logical, consistent, fast, small. Pretty stable.
 I think I will spend some time learning it.</p><p>What I didn&rsquo;t like: null-safety is rather painful, than safe. Most android
 objects coming from the outside are marked as null-safe, so I had to write &ldquo;?&rdquo;
 everywhere or check for null. However, the risk of getting null in those cases
@@ -184,12 +184,12 @@ is almost zero, so I would prefer not to care about it. But language prevents
 such flippancy.</p><p>Converting types in math is also verbose, and often doesn&rsquo;t work automatically
 (well, not in the way I assumed it to work). I had to split expression into
 smaller ones to make them compile.</p><p>Arrays are different. There is <code>IntArray</code> (like Java array) with no proper
-documentation on how to work with it, there is <code>Array&lt;Int&gt;</code>, which is Kotlin
+documentation on how to work with it, there is <code>Array&lt;Int></code>, which is Kotlin
 array, and they are different.</p><p>I haven&rsquo;t found a way how to declare a volatile variable.</p><p>However, theoretical possibility to make domain-specific functions and extreme
 flexibility of the language is really amazing.</p><p>So, don&rsquo;t be afraid to try Kotlin, the more developers know about it, the
 larger is the community - the better is the language and tools. Hope you will
 like it.</p><p>P.S. I will upload project sources and apk on bitbucket soon.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Nov 28, 2013</em></p><p>See also:
 <a href=/posts/aaml/>AAML - another android markup language</a>
-and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
-<a href=https://zserge.com>Serge Zaitsev</a> &middot;
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &#183;
+<a href=https://zserge.com>Serge Zaitsev</a> &#183;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
