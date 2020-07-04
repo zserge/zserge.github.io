@@ -4,21 +4,21 @@
 theoretical, so keep patience.</p><h2 id=what-we-re-going-to-achieve>what we&rsquo;re going to achieve?</h2><p>CUCU is a toy compiler for a toy language. I want it to be as close to ANSI C
 as possible, so that every valid CUCU program could be compiled with a C
 compiler without any errors. Of course, the support of the whole ANSI C
-standard is very difficult, so I picked a very small C language subset.</p><p>For example, here&rsquo;s a valid CUCU code snippet:</p><pre><code>int cucu_strlen(char *s) {
-    int i = 0;
-    while (s[i]) {
-        i = i + 1;
-    }
-    return i;
+standard is very difficult, so I picked a very small C language subset.</p><p>For example, here&rsquo;s a valid CUCU code snippet:</p><pre><code class=language-c>int cucu_strlen(char *s) {
+	int i = 0;
+	while (s[i]) {
+		i = i + 1;
+	}
+	return i;
 }
 </code></pre><h2 id=grammar>grammar</h2><p>We&rsquo;re about to define a grammar for our language. It&rsquo;s an important step,
 because everything in our compiler design depends on it.</p><p>So, let&rsquo;s go from top to bottom. Our source file contains a <strong>program</strong>.
 What is a program? We know it&rsquo;s a list of <strong>variable declarations</strong>, <strong>function
-declarations</strong> and <strong>function definitions</strong>, e.g:</p><pre><code>int func(char *s, int len); /* function declaration */
+declarations</strong> and <strong>function definitions</strong>, e.g:</p><pre><code class=language-c>int func(char *s, int len); /* function declaration */
 int i;                      /* variable declaration */
 
 int func(char *s, int len) { /* function definition */
-    ...
+	...
 }
 </code></pre><p>Let&rsquo;s try to write it down in <a href=http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form>EBNF</a> form (it&rsquo;s absolutely ok, if you don&rsquo;t
 know what EBNF is, it&rsquo;s really intuitive):</p><pre><code>&lt;program&gt; ::= { &lt;var-decl&gt; | &lt;func-decl&gt; | &lt;func-def&gt; } ;
@@ -30,16 +30,16 @@ declarations and definitions? Ok, let&rsquo;s go deeper:</p><pre><code>&lt;var-d
 &lt;func-args&gt; ::= { &lt;type&gt; &lt;ident&gt; &quot;,&quot; }
 &lt;type&gt; ::= &quot;int&quot; | &quot;char *&quot;
 </code></pre><p>So, variable declaration is simple: it&rsquo;s a type name followed by the identifier,
-and followed by a semicolon, like we usually do in C, e.g.:</p><pre><code>int i;
+and followed by a semicolon, like we usually do in C, e.g.:</p><pre><code class=language-c>int i;
 char *s;
 </code></pre><p>Function declaration is a bit more complicated. It&rsquo;s a &ldquo;type + identifier&rdquo;,
 and an optional list of function arguments <code>&lt;func-args&gt;</code> inside the braces.</p><p>Function arguments list, in it&rsquo;s turn, is a sequence of comma-separated
-&ldquo;type + identifier&rdquo;, like:</p><pre><code>char *s, int from, int to
+&ldquo;type + identifier&rdquo;, like:</p><pre><code class=language-c>char *s, int from, int to
 </code></pre><p><em>Actually, trailing comma in CUCU is still allowed, but not required. It will
 just simplify our parser code.</em></p><p>The supported data types are only <code>int</code> and <code>char *</code>. Identifier is a sequence
 of letters, digits and an underscore symbol.</p><p>The only thing left is <code>&lt;func-body&gt;</code>. But let&rsquo;s talk about <strong>statements</strong> and
 <strong>expressions</strong> first.</p><p><em>Statement</em> is a smallest standalone element of the language. Here are valid
-statements in out language:</p><pre><code>/* These are simple statements */
+statements in out language:</p><pre><code class=language-c>/* These are simple statements */
 i = 2 + 3; /* assignment statement */
 my_func(i); /* function call statement */
 return i; /* return statement */
@@ -104,7 +104,7 @@ from the stream, but has not yet been pushed to the token string.</p><p>Also, I 
 it&rsquo;s a bad style, but if I pass all values as function arguments the compiler
 would loose it&rsquo;s simplicity.</p><p>The whole lexer is just a single function <code>readtok()</code>. The algorithm is simple:</p><ul><li>skip leading spaces</li><li>try to read an identifier (a sequence of letters, digits and <code>_</code>)</li><li>if it&rsquo;s not an identifier - try to read a sequence of special operators, like
 <code>&amp;, |, &lt;, &gt;, =, !</code>.</li><li>if it&rsquo;s not an operator - try to read a string literal &ldquo;&hellip;.&rdquo; or &lsquo;&hellip;.&rsquo;</li><li>if failed - maybe it&rsquo;s a comment, like <code>/* ... */</code>?</li><li>if failed again - just read a single byte. It might be another single-byte
-token, like &ldquo;(&rdquo; or &ldquo;[&ldquo;.</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><pre><code>#include &lt;stdio.h&gt; /* for vpritnf */
+token, like &ldquo;(&rdquo; or &ldquo;[&ldquo;.</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><pre><code class=language-c>#include &lt;stdio.h&gt; /* for vpritnf */
 #include &lt;stdarg.h&gt; /* for va_list */
 #include &lt;stdlib.h&gt; /* for exit() */
 #include &lt;ctype.h&gt; /* for isspace, isalpha... */
@@ -116,78 +116,71 @@ static int tokpos;
 static int nextc;
 
 void readchr() {
-    if (tokpos == MAXTOKSZ - 1) {
-        tok[tokpos] = '\0';
-        fprintf(stderr, &quot;token too long: %s\n&quot;, tok);
-        exit(EXIT_FAILURE);
-    }
-    tok[tokpos++] = nextc;
-    nextc = fgetc(f);
+	if (tokpos == MAXTOKSZ - 1) {
+		tok[tokpos] = '\0';
+		fprintf(stderr, &quot;token too long: %s\n&quot;, tok);
+		exit(EXIT_FAILURE);
+	}
+	tok[tokpos++] = nextc;
+	nextc = fgetc(f);
 }
 
 void readtok() {
-    for (;;) {
-        while (isspace(nextc)) {
-            nextc = fgetc(f);
-        }
-        tokpos = 0;
-        while(isalnum(nextc) || nextc == '_') {
-            readchr();
-        }
-        if (tokpos == 0) {
-            while (nextc == '&lt;' || nextc == '=' || nextc == '&gt;'
-                    || nextc == '!' || nextc == '&amp;' || nextc == '|') {
-                readchr();
-            }
-        }
-        if (tokpos == 0) {
-            if (nextc == '\'' || nextc == '&quot;') {
-                char c = nextc;
-                readchr();
-                while (nextc != c) {
-                    readchr();
-                }
-                readchr();
-            } else if (nextc == '/') {
-                readchr();
-                if (nextc == '*') {
-                    nextc = fgetc(f);
-                    while (nextc != '/') {
-                        while (nextc != '*') {
-                            nextc = fgetc(f);
-                        }
-                        nextc = fgetc(f);
-                    }
-                    nextc = fgetc(f);
-                }
-            } else if (nextc != EOF) {
-                readchr();
-            }
-        }
-        break;
-    }
-    tok[tokpos] = '\0';
+	for (;;) {
+		while (isspace(nextc)) {
+			nextc = fgetc(f);
+		}
+		tokpos = 0;
+		while(isalnum(nextc) || nextc == '_') {
+			readchr();
+		}
+		if (tokpos == 0) {
+			while (nextc == '&lt;' || nextc == '=' || nextc == '&gt;'
+					|| nextc == '!' || nextc == '&amp;' || nextc == '|') {
+				readchr();
+			}
+		}
+		if (tokpos == 0) {
+			if (nextc == '\'' || nextc == '&quot;') {
+				char c = nextc;
+				readchr();
+				while (nextc != c) {
+					readchr();
+				}
+				readchr();
+			} else if (nextc == '/') {
+				readchr();
+				if (nextc == '*') {
+					nextc = fgetc(f);
+					while (nextc != '/') {
+						while (nextc != '*') {
+							nextc = fgetc(f);
+						}
+						nextc = fgetc(f);
+					}
+					nextc = fgetc(f);
+				}
+			} else if (nextc != EOF) {
+				readchr();
+			}
+		}
+		break;
+	}
+	tok[tokpos] = '\0';
 }
 
 int main() {
-    f = stdin;
-    nextc = fgetc(f);
+	f = stdin;
+	nextc = fgetc(f);
 
-    for (;;) {
-        readtok();
-        printf(&quot;TOKEN: %s\n&quot;, tok);
-        if (tok[0] == '\0') break;
-    }
-    return 0;
+	for (;;) {
+		readtok();
+		printf(&quot;TOKEN: %s\n&quot;, tok);
+		if (tok[0] == '\0') break;
+	}
+	return 0;
 }
 </code></pre><p>If we put a C file as the compiler input - it will print us a list of tokens,
-one per line.</p><p>Ok, have a cup of coffee, and let&rsquo;s <a href=/posts/cucu-part2/>go further &rarr;</a></p><p><em>You can check <a href=/posts/cucu-part3/>part3</a> to know how the story ended.</em></p><p class=date style=text-align:right><em>Oct 23, 2012</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=https%3a%2f%2fzserge.com%2fposts%2fcucu-part1%2f&title=cucu%3a%20a%20compiler%20you%20can%20understand%20%281%2f3%29">like</a>
-&nbsp;
-<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=cucu%3a%20a%20compiler%20you%20can%20understand%20%281%2f3%29+https%3a%2f%2fzserge.com%2fposts%2fcucu-part1%2f via @zsergo">tweet</a>
-&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
-&nbsp;
-<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
-&nbsp;
-<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+one per line.</p><p>Ok, have a cup of coffee, and let&rsquo;s <a href=/posts/cucu-part2/>go further &rarr;</a></p><p><em>You can check <a href=/posts/cucu-part3/>part3</a> to know how the story ended.</em></p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 23, 2012</em></p></div><footer><p>&copy;2012&ndash;2019 &middot;
 <a href=https://zserge.com>Serge Zaitsev</a> &middot;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>

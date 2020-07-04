@@ -21,7 +21,7 @@ ioctl(vm_fd, KVM_SET_USER_MEMORY_REGION, &amp;mem);
 
 // Create VCPU
 int vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
-</code></pre><p>At this point, we&rsquo;ve created a new VM, allocated its memory and assigned one VCPU for it. To make our VM actually run something we need to load VM image and configure CPU registers properly.</p><h2 id=loading-vm>loading vm</h2><p>This one is simple. Just read a file and copy its contents into the VM memory. Of course, <code>mmap</code> might be a good option here, too.</p><pre><code>int bin_fd = open(&quot;guest.bin&quot;, O_RDONLY);
+</code></pre><p>At this point, we&rsquo;ve created a new VM, allocated its memory and assigned one VCPU for it. To make our VM actually run something we need to load VM image and configure CPU registers properly.</p><h2 id=loading-vm>loading vm</h2><p>This one is simple. Just read a file and copy its contents into the VM memory. Of course, <code>mmap</code> might be a good option here, too.</p><pre><code class=language-c>int bin_fd = open(&quot;guest.bin&quot;, O_RDONLY);
 if (bin_fd &lt; 0) {
 	fprintf(stderr, &quot;can not open binary file: %d\n&quot;, errno);
 	return 1;
@@ -49,7 +49,7 @@ loop:
 	out %ax, $0x10
 	inc %ax
 	jmp loop
-</code></pre><p>If assembly is out of your interest, it&rsquo;s a tiny 16-bit executable that increments a register in a loop and outputs the value into the I/O port 0x10.</p><p>It was deliberate that we compiled it as an archaic 16-bit app, because the KVM VCPU starts can run in multiple modes, much like the real x86 processor. The simplest mode is &ldquo;real&rdquo; mode, which has been used to run 16-bit code from the last century. Real mode is notable for memory addressing, it&rsquo;s direct instead of using descriptor tables - it would be simpler to initialize our register for real mode:</p><pre><code>struct kvm_sregs sregs;
+</code></pre><p>If assembly is out of your interest, it&rsquo;s a tiny 16-bit executable that increments a register in a loop and outputs the value into the I/O port 0x10.</p><p>It was deliberate that we compiled it as an archaic 16-bit app, because the KVM VCPU starts can run in multiple modes, much like the real x86 processor. The simplest mode is &ldquo;real&rdquo; mode, which has been used to run 16-bit code from the last century. Real mode is notable for memory addressing, it&rsquo;s direct instead of using descriptor tables - it would be simpler to initialize our register for real mode:</p><pre><code class=language-c>struct kvm_sregs sregs;
 ioctl(vcpu_fd, KVM_GET_SREGS, &amp;sregs);
 // Initialize selector and base with zeros
 sregs.cs.selector = sregs.cs.base = sregs.ss.selector = sregs.ss.base = sregs.ds.selector = sregs.ds.base = sregs.es.selector = sregs.es.base = sregs.fs.selector = sregs.fs.base = sregs.gs.selector = 0;
@@ -61,7 +61,7 @@ struct kvm_regs regs;
 regs.rflags = 2; // bit 1 must always be set to 1 in EFLAGS and RFLAGS
 regs.rip = 0; // our code runs from address 0
 ioctl(vcpu_fd, KVM_SET_REGS, &amp;regs);
-</code></pre><h2 id=running>running</h2><p>Code is loaded, registers are ready. Shall we start? To run the VM we need to get a pointer to the &ldquo;run state&rdquo; for each VCPU and then enter a loop where the VM is run until it&rsquo;s interrupted by I/O or other operations, where it passes the control back to the host.</p><pre><code>int runsz = ioctl(kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
+</code></pre><h2 id=running>running</h2><p>Code is loaded, registers are ready. Shall we start? To run the VM we need to get a pointer to the &ldquo;run state&rdquo; for each VCPU and then enter a loop where the VM is run until it&rsquo;s interrupted by I/O or other operations, where it passes the control back to the host.</p><pre><code class=language-c>int runsz = ioctl(kvm_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
 struct kvm_run *run = (struct kvm_run *) mmap(NULL, runsz, PROT_READ | PROT_WRITE, MAP_SHARED, vcpu_fd, 0);
 
 for (;;) {
@@ -80,13 +80,13 @@ IO port: 10, data: 2
 IO port: 10, data: 3
 IO port: 10, data: 4
 ...
-</code></pre><p>It works! The complete sources are available in this gist: <a href=https://gist.github.com/zserge/d68683f17c68709818f8baab0ded2d15>https://gist.github.com/zserge/d68683f17c68709818f8baab0ded2d15</a> (if you spot a mistake - comments are welcome!)</p><h2 id=you-call-it-a-kernel>you call it a kernel?</h2><p>Obviously, it&rsquo;s not that impressive. How about running a Linux kernel instead?</p><p>The beginning would be the same - open /dev/kvm, create a VM etc. However, we will need a few more ioctls in the VM layer to add a periodic interval timer, to initialize TSS (required for Intel chips), to add interrupt controller:</p><pre><code>ioctl(vm_fd, KVM_SET_TSS_ADDR, 0xffffd000);
+</code></pre><p>It works! The complete sources are available in this gist: <a href=https://gist.github.com/zserge/d68683f17c68709818f8baab0ded2d15>https://gist.github.com/zserge/d68683f17c68709818f8baab0ded2d15</a> (if you spot a mistake - comments are welcome!)</p><h2 id=you-call-it-a-kernel>you call it a kernel?</h2><p>Obviously, it&rsquo;s not that impressive. How about running a Linux kernel instead?</p><p>The beginning would be the same - open /dev/kvm, create a VM etc. However, we will need a few more ioctls in the VM layer to add a periodic interval timer, to initialize TSS (required for Intel chips), to add interrupt controller:</p><pre><code class=language-c>ioctl(vm_fd, KVM_SET_TSS_ADDR, 0xffffd000);
 uint64_t map_addr = 0xffffc000;
 ioctl(vm_fd, KVM_SET_IDENTITY_MAP_ADDR, &amp;map_addr);
 ioctl(vm_fd, KVM_CREATE_IRQCHIP, 0);
 struct kvm_pit_config pit = { .flags = 0 };
 ioctl(vm_fd, KVM_CREATE_PIT2, &amp;pit);
-</code></pre><p>Also, we will need to change the way we initialize the registers. Linux kernel requires a protected mode, so we enable that in register flags and initialize base, selector, granularity for each special register:</p><pre><code>sregs.cs.base = 0;
+</code></pre><p>Also, we will need to change the way we initialize the registers. Linux kernel requires a protected mode, so we enable that in register flags and initialize base, selector, granularity for each special register:</p><pre><code class=language-c>sregs.cs.base = 0;
 sregs.cs.limit = ~0;
 sregs.cs.g = 1;
 
@@ -175,13 +175,8 @@ TAA: Mitigation: Clear CPU buffers
 MDS: Mitigation: Clear CPU buffers
 Performance Events: Broadwell events, 16-deep LBR, Intel PMU driver.
 ...
-</code></pre><p>Obviously, it&rsquo;s still a fairly useless result - there is no initrd or root partition, no actual apps that could run in this kernel, but still it proves that KVM is not that scary and a rather powerful tool.</p><h2 id=summary>summary</h2><p>To make it run a proper Linux, the VM host has to be much more advanced - we need to simulate multiple I/O drivers for disks, keyboard, graphics. But the general approach would remain the same, for example for initrd we would map is similarly to the command line options. For disks we would have to intercept I/O and respond properly.</p><p>However, no one forces you to use KVM directly. There is <a href=https://libvirt.org/>libvirt</a>, a nice friendly wrapper for low-level virtualization techniques such as KVM or BHyve.</p><p>If you are interested to learn more about KVM, I would suggest to look at the <a href=https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/tree/>kvmtool</a> sources. They are much easier to read than QEMU, and the whole project is much smaller and simpler.</p><p class=date style=text-align:right><em>May 10, 2020</em></p><section class="contacts buttons"><section><a style=background-color:#3b5997 href="https://www.facebook.com/share.php?u=https%3a%2f%2fzserge.com%2fposts%2fkvm%2f&title=KVM%20host%20in%20a%20few%20lines%20of%20code">like</a>
-&nbsp;
-<a style=background-color:#41b7d8 href="https://twitter.com/intent/tweet?status=KVM%20host%20in%20a%20few%20lines%20of%20code+https%3a%2f%2fzserge.com%2fposts%2fkvm%2f via @zsergo">tweet</a>
-&nbsp;</section><section><a style=background-color:#f26522 href=/rss.xml>rss</a>
-&nbsp;
-<a style=background-color:#41b7d8 href=https://twitter.com/zsergo>@me</a>
-&nbsp;
-<a style=background-color:#333 href=https://github.com/zserge>&lt;/&gt;me</a></section></section></div><footer><p>&copy;2012&ndash;2019 &middot;
+</code></pre><p>Obviously, it&rsquo;s still a fairly useless result - there is no initrd or root partition, no actual apps that could run in this kernel, but still it proves that KVM is not that scary and a rather powerful tool.</p><h2 id=summary>summary</h2><p>To make it run a proper Linux, the VM host has to be much more advanced - we need to simulate multiple I/O drivers for disks, keyboard, graphics. But the general approach would remain the same, for example for initrd we would map is similarly to the command line options. For disks we would have to intercept I/O and respond properly.</p><p>However, no one forces you to use KVM directly. There is <a href=https://libvirt.org/>libvirt</a>, a nice friendly wrapper for low-level virtualization techniques such as KVM or BHyve.</p><p>If you are interested to learn more about KVM, I would suggest to look at the <a href=https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/tree/>kvmtool</a> sources. They are much easier to read than QEMU, and the whole project is much smaller and simpler.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>May 10, 2020</em></p><p>See also:
+<a href=/posts/containers/>Linux containers in a few lines of code</a>
+and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2019 &middot;
 <a href=https://zserge.com>Serge Zaitsev</a> &middot;
 <a href=mailto:zaitsev.serge@gmail.com>zaitsev.serge@gmail.com</a></p></footer><script src=https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js></script><script>WebFontConfig={google:{families:['PT Serif','Roboto','Roboto Mono']}};(function(d){var wf=d.createElement('script'),s=d.scripts[0];wf.src='https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js';s.parentNode.insertBefore(wf,s);})(document);</script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-33644825-1','zserge.com');ga('send','pageview');</script></body></html>
