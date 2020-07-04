@@ -35,23 +35,23 @@ docker export $(docker create busybox) | tar -C rootfs -xvf -
  6001 pts/31   00:00:00 sh
  6004 pts/31   00:00:00 ps
 </code></pre></div><p>As we see, the shell process itself has a PID of 1, but actually can see and access all the other processes from the host OS. The reason is that the list of processes is read from procfs, which is still inherited.</p><p>So, let&rsquo;s unmount procfs:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>umount2(&#34;/proc&#34;, MNT_DETACH);
-</code></pre></div><p>Now, running the shell breaks ps, mount, and other command, because no procfs is mounted. Still better than leaking the parent&rsquo;s procfs.</p><h2 id=chroot>chroot</h2><p>In the old days chroot was a &ldquo;good enough&rdquo; isolation for most use cases, but here let&rsquo;s use a <code>pivot_root</code> instead. This system call moves and existing rootfs into some subdirectory, and make a another directory a new root:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>int child_main(void *arg) {
-  /* Unmount procfs */
-  umount2(&#34;/proc&#34;, MNT_DETACH);
-  /* Pivot root */
-  mount(&#34;./rootfs&#34;, &#34;./rootfs&#34;, &#34;bind&#34;, MS_BIND | MS_REC, &#34;&#34;);
-  mkdir(&#34;./rootfs/oldrootfs&#34;, 0755);
-  syscall(SYS_pivot_root, &#34;./rootfs&#34;, &#34;./rootfs/oldrootfs&#34;);
-  chdir(&#34;/&#34;);
-  umount2(&#34;/oldrootfs&#34;, MNT_DETACH);
-  rmdir(&#34;/oldrootfs&#34;);
-  /* Re-mount procfs */
-  mount(&#34;proc&#34;, &#34;/proc&#34;, &#34;proc&#34;, 0, NULL);
-  /* Run the process */
-  char **argv = (char **)arg;
-  execvp(argv[0], argv);
-  return 0;
-}
+</code></pre></div><p>Now, running the shell breaks ps, mount, and other command, because no procfs is mounted. Still better than leaking the parent&rsquo;s procfs.</p><h2 id=chroot>chroot</h2><p>In the old days chroot was a &ldquo;good enough&rdquo; isolation for most use cases, but here let&rsquo;s use a <code>pivot_root</code> instead. This system call moves and existing rootfs into some subdirectory, and make a another directory a new root:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+  <span class=cm>/* Unmount procfs */</span>
+  <span class=n>umount2</span><span class=p>(</span><span class=s>&#34;/proc&#34;</span><span class=p>,</span> <span class=n>MNT_DETACH</span><span class=p>);</span>
+  <span class=cm>/* Pivot root */</span>
+  <span class=n>mount</span><span class=p>(</span><span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;bind&#34;</span><span class=p>,</span> <span class=n>MS_BIND</span> <span class=o>|</span> <span class=n>MS_REC</span><span class=p>,</span> <span class=s>&#34;&#34;</span><span class=p>);</span>
+  <span class=n>mkdir</span><span class=p>(</span><span class=s>&#34;./rootfs/oldrootfs&#34;</span><span class=p>,</span> <span class=mo>0755</span><span class=p>);</span>
+  <span class=n>syscall</span><span class=p>(</span><span class=n>SYS_pivot_root</span><span class=p>,</span> <span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;./rootfs/oldrootfs&#34;</span><span class=p>);</span>
+  <span class=n>chdir</span><span class=p>(</span><span class=s>&#34;/&#34;</span><span class=p>);</span>
+  <span class=n>umount2</span><span class=p>(</span><span class=s>&#34;/oldrootfs&#34;</span><span class=p>,</span> <span class=n>MNT_DETACH</span><span class=p>);</span>
+  <span class=n>rmdir</span><span class=p>(</span><span class=s>&#34;/oldrootfs&#34;</span><span class=p>);</span>
+  <span class=cm>/* Re-mount procfs */</span>
+  <span class=n>mount</span><span class=p>(</span><span class=s>&#34;proc&#34;</span><span class=p>,</span> <span class=s>&#34;/proc&#34;</span><span class=p>,</span> <span class=s>&#34;proc&#34;</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>);</span>
+  <span class=cm>/* Run the process */</span>
+  <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span> <span class=o>=</span> <span class=p>(</span><span class=kt>char</span> <span class=o>**</span><span class=p>)</span><span class=n>arg</span><span class=p>;</span>
+  <span class=n>execvp</span><span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>argv</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
 </code></pre></div><p>It would make sense to mount tmpfs into /tmp, sysfs into /sys and create a valid /dev filesystem, but to keep things short I&rsquo;ll skip it.</p><p>Anyway, now we only see the files from busybox image rootfs, as if we chrooted into it:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>/ # ls
 bin   dev   etc   home  proc  root  sys   tmp   usr   var
 
@@ -74,30 +74,30 @@ ip link set br0 up
 sudo iptables -A FORWARD -i wlp3s0  -o br0 -j ACCEPT
 sudo iptables -A FORWARD -o wlp3s0 -i br0 -j ACCEPT
 sudo iptables -t nat -A POSTROUTING -s 172.16.0.0/16 -j MASQUERADE
-</code></pre></div><p>In my case, wlp3s0 was my primary WiFi network interface and 172.16.x.x was a network for the container.</p><p>What our container launcher should do is to create a pair of peer interfaces, veth0 and veth1, link them to the br0 and set up routing within the container.</p><p>In the main() function we will run these commands before clone:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>system(&#34;ip link add veth0 type veth peer name veth1&#34;);
-system(&#34;ip link set veth0 up&#34;);
-system(&#34;brctl addif br0 veth0&#34;);
-</code></pre></div><p>After clone() is complete, we will add veth1 to the new child namespace:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>char ip_link_set[4096];
-snprintf(ip_link_set, sizeof(ip_link_set) - 1, &#34;ip link set veth1 netns %d&#34;,
-         pid);
-system(ip_link_set);
-</code></pre></div><p>Now if we run &ldquo;ip link&rdquo; in the container shell we will see a loopback interface, and some veth1@xxxx interface. But the network still doesn&rsquo;t work. Let&rsquo;s set a unique hostname in the container and configure the routes:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>int child_main(void *arg) {
+</code></pre></div><p>In my case, wlp3s0 was my primary WiFi network interface and 172.16.x.x was a network for the container.</p><p>What our container launcher should do is to create a pair of peer interfaces, veth0 and veth1, link them to the br0 and set up routing within the container.</p><p>In the main() function we will run these commands before clone:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link add veth0 type veth peer name veth1&#34;</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link set veth0 up&#34;</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=s>&#34;brctl addif br0 veth0&#34;</span><span class=p>);</span>
+</code></pre></div><p>After clone() is complete, we will add veth1 to the new child namespace:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>char</span> <span class=n>ip_link_set</span><span class=p>[</span><span class=mi>4096</span><span class=p>];</span>
+<span class=n>snprintf</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span><span class=p>,</span> <span class=s>&#34;ip link set veth1 netns %d&#34;</span><span class=p>,</span>
+         <span class=n>pid</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>);</span>
+</code></pre></div><p>Now if we run &ldquo;ip link&rdquo; in the container shell we will see a loopback interface, and some veth1@xxxx interface. But the network still doesn&rsquo;t work. Let&rsquo;s set a unique hostname in the container and configure the routes:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
 
-  ....
+  <span class=p>....</span>
 
-  sethostname(&#34;example&#34;, 7);
-  system(&#34;ip link set veth1 up&#34;);
+  <span class=n>sethostname</span><span class=p>(</span><span class=s>&#34;example&#34;</span><span class=p>,</span> <span class=mi>7</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link set veth1 up&#34;</span><span class=p>);</span>
 
-  char ip_addr_add[4096];
-  snprintf(ip_addr_add, sizeof(ip_addr_add),
-           &#34;ip addr add 172.16.0.101/24 dev veth1&#34;);
-  system(ip_addr_add);
-  system(&#34;route add default gw 172.16.0.100 veth1&#34;);
+  <span class=kt>char</span> <span class=n>ip_addr_add</span><span class=p>[</span><span class=mi>4096</span><span class=p>];</span>
+  <span class=n>snprintf</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>),</span>
+           <span class=s>&#34;ip addr add 172.16.0.101/24 dev veth1&#34;</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=s>&#34;route add default gw 172.16.0.100 veth1&#34;</span><span class=p>);</span>
 
-  char **argv = (char **)arg;
-  execvp(argv[0], argv);
-  return 0;
-}
+  <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span> <span class=o>=</span> <span class=p>(</span><span class=kt>char</span> <span class=o>**</span><span class=p>)</span><span class=n>arg</span><span class=p>;</span>
+  <span class=n>execvp</span><span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>argv</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
 </code></pre></div><p>Let&rsquo;s see how it looks like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>/ # ip link
 1: lo: &lt;LOOPBACK&gt; mtu 65536 qdisc noop qlen 1
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
