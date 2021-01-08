@@ -27,7 +27,7 @@ The header file you should include is called <code>"jsmn.h"</code>.</p><h2 id=ap
 } jsmntype_t;
 </code></pre><p><strong>Note:</strong> Unlike JSON data types, primitive tokens are not divided into
 numbers, booleans and null, because one can easily tell the type using the
-first character:</p><ul><li>'t&rsquo;, &lsquo;f' - boolean</li><li>'n' - null</li><li>&rsquo;-', &lsquo;0&rsquo;..&lsquo;9' - number</li></ul><p>Token is an object of <code>jsmntok_t</code> type:</p><pre><code>typedef struct {
+first character:</p><ul><li>&rsquo;t', &lsquo;f&rsquo; - boolean</li><li>&lsquo;n&rsquo; - null</li><li>'-', &lsquo;0&rsquo;..&lsquo;9&rsquo; - number</li></ul><p>Token is an object of <code>jsmntok_t</code> type:</p><pre><code>typedef struct {
     jsmntype_t type; /* Token type */
     int start;       /* Token start position */
     int end;         /* Token end position */

@@ -58,9 +58,9 @@ views in a loop and style your views easily.</p><p>Here&rsquo;s an example of th
 		<span class=n>button</span> <span class=p>{</span>
 			<span class=n>size</span><span class=p>(</span><span class=n>FILL</span><span class=p>,</span> <span class=n>WRAP</span><span class=p>)</span>
 			<span class=n>text</span><span class=p>(</span><span class=n>R</span><span class=p>.</span><span class=n>string</span><span class=p>.</span><span class=n>login</span><span class=p>)</span>
-			<span class=n>enabled</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span> <span class=p>&amp;&amp;</span>
+			<span class=n>enabled</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span> <span class=o>&amp;&amp;</span>
 				<span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span><span class=p>)</span>
-			<span class=n>onClick</span> <span class=p>{</span> <span class=n>v</span> <span class=p>-&gt;</span>
+			<span class=n>onClick</span> <span class=p>{</span> <span class=n>v</span> <span class=o>-&gt;</span>
 				<span class=n>performLogin</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>(),</span> <span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>())</span>
 			<span class=p>}</span>
 		<span class=p>}</span>
@@ -88,13 +88,13 @@ views in a loop and style your views easily.</p><p>Here&rsquo;s an example of th
 	<span class=c1>// Here you can define properties common for all FontAwesome icons
 </span><span class=c1></span>	<span class=n>size</span><span class=p>(</span><span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>),</span> <span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>))</span>
 	<span class=n>gravity</span><span class=p>(</span><span class=n>CENTER</span><span class=p>)</span>
-	<span class=n>typeface</span><span class=p>(</span><span class=s>&#34;fontawesome.ttf&#34;</span><span class=p>)</span>
+	<span class=n>typeface</span><span class=p>(</span><span class=s2>&#34;fontawesome.ttf&#34;</span><span class=p>)</span>
 	<span class=c1>// You may use different styles depending on the app theme, orientation,
 </span><span class=c1></span>	<span class=c1>// screen size or user preferences
 </span><span class=c1></span>	<span class=k>if</span> <span class=n>nightMode</span><span class=p>()</span> <span class=p>{</span>
-		<span class=p>...</span>
+		<span class=o>..</span><span class=p>.</span>
 	<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
-		<span class=p>...</span>
+		<span class=o>..</span><span class=p>.</span>
 	<span class=p>}</span>
 <span class=p>}</span>
 </code></pre></div><p>As you can see the rules of refactoring (like &ldquo;don&rsquo;t repeat yourself&rdquo;) still

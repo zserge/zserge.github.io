@@ -101,7 +101,7 @@ from the stream, but has not yet been pushed to the token string.</p><p>Also, I 
 it&rsquo;s a bad style, but if I pass all values as function arguments the compiler
 would loose it&rsquo;s simplicity.</p><p>The whole lexer is just a single function <code>readtok()</code>. The algorithm is simple:</p><ul><li>skip leading spaces</li><li>try to read an identifier (a sequence of letters, digits and <code>_</code>)</li><li>if it&rsquo;s not an identifier - try to read a sequence of special operators, like
 <code>&, |, &lt;, >, =, !</code>.</li><li>if it&rsquo;s not an operator - try to read a string literal &ldquo;&mldr;.&rdquo; or &lsquo;&mldr;.&rsquo;</li><li>if failed - maybe it&rsquo;s a comment, like <code>/* ... */</code>?</li><li>if failed again - just read a single byte. It might be another single-byte
-token, like &ldquo;(&rdquo; or &ldquo;[".</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt; /* for vpritnf */</span><span class=cp>
+token, like &ldquo;(&rdquo; or &ldquo;[&rdquo;.</li></ul><p>Here&rsquo;s the whole CUCU sources we&rsquo;ve got so far:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt; /* for vpritnf */</span><span class=cp>
 </span><span class=cp>#include</span> <span class=cpf>&lt;stdarg.h&gt; /* for va_list */</span><span class=cp>
 </span><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt; /* for exit() */</span><span class=cp>
 </span><span class=cp>#include</span> <span class=cpf>&lt;ctype.h&gt; /* for isspace, isalpha... */</span><span class=cp>

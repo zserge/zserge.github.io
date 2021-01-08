@@ -114,7 +114,7 @@ kind of a diff to avoid rendering when the node has not been changed).</p><pre><
 }
 </code></pre><p>Now we can actually get rid of XMLs and inflate our layouts in Java in a nice
 clean way.</p><p>inflateNode is not supposed to be used directly, instead there are two methods -
-&ldquo;render(Renderer r)&rdquo; and just &ldquo;render()". The first one re-renders one view, the
+&ldquo;render(Renderer r)&rdquo; and just &ldquo;render()&rdquo;. The first one re-renders one view, the
 second one re-renders all present views. Renderers are stored in a weak hash
 map, so once the view is removed or activity is destroyed - their renderers
 won&rsquo;t be used anymore.</p><h2 id=when-to-render>When to render?</h2><p>The selling point is automatic re-rendering so the UI would always represent
