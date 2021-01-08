@@ -3,7 +3,7 @@ body {
   padding: 0 1em;
   max-width: 740px;
   line-height: 1.5;
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", Georgia, Cambria, "Times New Roman", Times, serif;
   font-size: 20px;
   color: rgba(0, 0, 0, 0.87);
   -webkit-font-smoothing: antialiased;
@@ -11,7 +11,7 @@ body {
 }
 h1, h2, h3 {
   line-height: 1.2;
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 400;
   text-transform: uppercase;
   margin-top: 1.34em;
@@ -34,7 +34,7 @@ img {
   max-width: 100%;
 }
 code {
-  font-family: "Roboto Mono", monospace;
+  font-family: "Roboto Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 18px;
   color: rgba(0, 0, 0, 0.6);
   background-color: #eee;
@@ -47,7 +47,7 @@ pre {
   padding: 1em;
 }
 pre code {
-  font-family: "Roboto Mono", monospace;
+  font-family: "Roboto Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 14px;
   color: rgba(0, 0, 0, 87);
 }
@@ -97,9 +97,6 @@ header a {
   color: white;
 }
 footer { font-size: 12px; }
-.wf-active body { font-family: "PT Serif", serif; }
-.wf-active h1, h2, h3 { font-family: "Roboto", sans-serif; }
-.wf-active pre code, .wf-active code { font-family: "Roboto Mono", monospace; }
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
