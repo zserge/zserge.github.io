@@ -1,0 +1,199 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>On Transpilers</title><meta name=description content="Exploring various transpilers from C to &#34;better C&#34; and how they can help replacing C in existing project."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/transpilers/><meta property="og:title" content="On Transpilers"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/transpilers/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Exploring various transpilers from C to &#34;better C&#34; and how they can help replacing C in existing project."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Exploring various transpilers from C to &#34;better C&#34; and how they can help replacing C in existing project."><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://twitter.com/zsergo rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>On Transpilers</h1><p>Transpilers, or source-to-source compilers, is a type of a translator app that converts source code from one programming language to the other. You might argue that compiler does the same thing, translating it into assembly or machine code. Transpilers are different in a sense that they operate at the similar abstraction levels: they convert high-level languages into high-level languages, keeping the semantics and using equivalent code constructs where possible.</p><p>There are plenty of transpilers that offer new syntax for existing languages (Google Closure Compiler, CoffeeScript, Dart, Haxe or TypeScript and <a href=https://github.com/dbohdan/compilers-targeting-c>many others</a>). Some of them &ldquo;compile&rdquo; things to C, assuming that C is portable and can be compiled further to any target platform.</p><p>Here, on the other hand, we&rsquo;ll pay attention to the transpilers <em>from</em> C into other high-level languages such as Go, Rust and Zig. These are direct competitors to C in many spheres and transpiler becomes a powerful mechanism to increase the adoption rate of such languages.</p><h2 id=test-source-code>Test source code</h2><p>My initial thought was to challenge the transpilers with some programs from the obfuscated C compiler contest - <a href=https://www.ioccc.org/>IOCCC</a>. However this idea quickly revealed its absurdity because many transpilers failed to recognise it as a valid C code, and probably for the best.</p><p>Instead I digged out my old toy BASIC interpreter, which was short enough to analyse by hand, was self-contained and had no external dependencies, was not even using dynamic memory to simplify the integration with memory-safe or garbage-collected languages. Here&rsquo;s the complete source code:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt;</span><span class=cp>
+</span><span class=cp>#include</span> <span class=cpf>&lt;string.h&gt;</span><span class=cp>
+</span><span class=cp></span>
+<span class=kt>int</span> <span class=n>vars</span><span class=p>[</span><span class=mi>27</span><span class=p>];</span>    <span class=cm>/* global variables, &#39;a&#39;..&#39;z&#39; */</span>
+<span class=kt>char</span> <span class=n>line</span><span class=p>[</span><span class=mi>64</span><span class=p>];</span>   <span class=cm>/* current input line */</span>
+<span class=kt>char</span> <span class=n>code</span><span class=p>[</span><span class=mi>1024</span><span class=p>];</span> <span class=cm>/* complete program code */</span>
+<span class=kt>char</span> <span class=o>*</span><span class=n>p</span><span class=p>;</span>         <span class=cm>/* current pointer */</span>
+
+<span class=cm>/* reads a number from a stream */</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>num</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=n>strtol</span><span class=p>(</span><span class=n>p</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>p</span><span class=p>,</span> <span class=mi>10</span><span class=p>);</span> <span class=p>}</span>
+<span class=cm>/* returns the end of the current line */</span>
+<span class=k>static</span> <span class=kt>char</span> <span class=o>*</span><span class=nf>eol</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=n>strchr</span><span class=p>(</span><span class=n>p</span><span class=p>,</span> <span class=sc>&#39;\n&#39;</span><span class=p>);</span> <span class=p>}</span>
+<span class=cm>/* skips while cond(c) is true */</span>
+<span class=cp>#define eat(cond) for (int c; (c = *p) &amp;&amp; (cond); p++)
+</span><span class=cp></span><span class=cm>/* skips whitespace */</span>
+<span class=cp>#define space() eat(c == &#39; &#39; || c == &#39;\t&#39;)
+</span><span class=cp></span><span class=cm>/* skips until whitespace */</span>
+<span class=cp>#define token() eat(c != &#39; &#39; &amp;&amp; c != &#39;\t&#39;)
+</span><span class=cp></span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>expr</span><span class=p>();</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>var</span><span class=p>()</span> <span class=p>{</span>
+  <span class=kt>int</span> <span class=n>c</span> <span class=o>=</span> <span class=o>*</span><span class=n>p</span> <span class=o>|</span> <span class=mh>0x20</span><span class=p>;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>c</span> <span class=o>&gt;=</span> <span class=sc>&#39;a&#39;</span> <span class=o>&amp;&amp;</span> <span class=n>c</span> <span class=o>&lt;=</span> <span class=sc>&#39;z&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+    <span class=k>return</span> <span class=n>c</span> <span class=o>-</span> <span class=sc>&#39;a&#39;</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>atom</span><span class=p>()</span> <span class=p>{</span>
+  <span class=n>space</span><span class=p>();</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;-&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=k>return</span> <span class=o>-</span><span class=n>atom</span><span class=p>();</span> <span class=p>}</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>&gt;=</span> <span class=sc>&#39;0&#39;</span> <span class=o>&amp;&amp;</span> <span class=o>*</span><span class=n>p</span> <span class=o>&lt;=</span> <span class=sc>&#39;9&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=k>return</span> <span class=n>num</span><span class=p>();</span> <span class=p>}</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;(&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+    <span class=kt>int</span> <span class=n>o</span> <span class=o>=</span> <span class=n>expr</span><span class=p>();</span>
+    <span class=n>space</span><span class=p>();</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+    <span class=k>return</span> <span class=n>o</span><span class=p>;</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>vars</span><span class=p>[</span><span class=n>var</span><span class=p>()];</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>add</span><span class=p>()</span> <span class=p>{</span>
+  <span class=kt>int</span> <span class=n>x</span> <span class=o>=</span> <span class=n>atom</span><span class=p>();</span>
+  <span class=n>space</span><span class=p>();</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;+&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=k>return</span> <span class=n>x</span> <span class=o>+</span> <span class=n>atom</span><span class=p>();</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;-&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=k>return</span> <span class=n>x</span> <span class=o>-</span> <span class=n>atom</span><span class=p>();</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>x</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>mul</span><span class=p>()</span> <span class=p>{</span>
+  <span class=kt>int</span> <span class=n>x</span> <span class=o>=</span> <span class=n>add</span><span class=p>();</span>
+  <span class=n>space</span><span class=p>();</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;*&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=k>return</span> <span class=n>x</span> <span class=o>*</span> <span class=n>mul</span><span class=p>();</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;/&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=k>return</span> <span class=n>x</span> <span class=o>/</span> <span class=n>mul</span><span class=p>();</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>x</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>expr</span><span class=p>()</span> <span class=p>{</span>
+  <span class=kt>int</span> <span class=n>x</span> <span class=o>=</span> <span class=n>mul</span><span class=p>();</span> <span class=n>space</span><span class=p>();</span>
+  <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=sc>&#39;=&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=kt>int</span> <span class=n>y</span> <span class=o>=</span> <span class=n>expr</span><span class=p>();</span> <span class=k>return</span> <span class=n>x</span> <span class=o>==</span> <span class=n>y</span><span class=p>;</span> <span class=p>}</span>
+  <span class=k>return</span> <span class=n>x</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>char</span> <span class=o>*</span><span class=nf>find</span><span class=p>(</span><span class=kt>int</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>p</span> <span class=o>=</span> <span class=n>code</span><span class=p>;</span>
+  <span class=k>while</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kt>char</span> <span class=o>*</span><span class=n>line</span> <span class=o>=</span> <span class=n>p</span><span class=p>;</span>
+    <span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>num</span><span class=p>();</span>
+    <span class=n>p</span> <span class=o>=</span> <span class=n>eol</span><span class=p>()</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>i</span> <span class=o>&gt;=</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span> <span class=k>return</span> <span class=n>p</span> <span class=o>=</span> <span class=n>line</span><span class=p>;</span> <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=n>p</span> <span class=o>=</span> <span class=p>(</span><span class=n>code</span> <span class=o>+</span> <span class=n>strlen</span><span class=p>(</span><span class=n>code</span><span class=p>));</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>void</span> <span class=nf>stmt</span><span class=p>()</span> <span class=p>{</span>
+  <span class=n>space</span><span class=p>();</span>
+  <span class=kt>char</span> <span class=o>*</span><span class=n>s</span> <span class=o>=</span> <span class=n>p</span><span class=p>;</span>
+  <span class=kt>int</span> <span class=n>v</span> <span class=o>=</span> <span class=n>var</span><span class=p>();</span>
+  <span class=n>space</span><span class=p>();</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;=&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+    <span class=n>vars</span><span class=p>[</span><span class=n>v</span><span class=p>]</span> <span class=o>=</span> <span class=n>expr</span><span class=p>();</span>
+    <span class=k>return</span><span class=p>;</span>
+  <span class=p>}</span>
+  <span class=n>p</span> <span class=o>=</span> <span class=n>s</span><span class=p>;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;p&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>token</span><span class=p>();</span>
+    <span class=n>space</span><span class=p>();</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;&#34;&#39;</span><span class=p>)</span> <span class=p>{</span>
+      <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+      <span class=n>eat</span><span class=p>(</span><span class=n>c</span> <span class=o>!=</span> <span class=sc>&#39;&#34;&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=n>putchar</span><span class=p>(</span><span class=n>c</span><span class=p>);</span> <span class=p>}</span>
+      <span class=n>p</span><span class=o>++</span><span class=p>;</span>
+    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+      <span class=n>printf</span><span class=p>(</span><span class=s>&#34;%d&#34;</span><span class=p>,</span> <span class=n>expr</span><span class=p>());</span>
+      <span class=n>space</span><span class=p>();</span>
+    <span class=p>}</span>
+    <span class=n>space</span><span class=p>();</span>
+    <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>!=</span> <span class=sc>&#39;;&#39;</span><span class=p>)</span> <span class=p>{</span> <span class=n>printf</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span> <span class=p>}</span> <span class=k>else</span> <span class=p>{</span> <span class=n>p</span><span class=o>++</span><span class=p>;</span> <span class=p>}</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;s&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>token</span><span class=p>();</span>
+    <span class=n>space</span><span class=p>();</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;g&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>token</span><span class=p>();</span>
+    <span class=kt>int</span> <span class=n>line</span> <span class=o>=</span> <span class=n>expr</span><span class=p>();</span>
+    <span class=n>find</span><span class=p>(</span><span class=n>line</span><span class=p>);</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;i&#39;</span><span class=p>)</span> <span class=p>{</span>
+    <span class=kt>int</span> <span class=n>c</span> <span class=o>=</span> <span class=n>p</span><span class=p>[</span><span class=mi>1</span><span class=p>];</span>
+    <span class=n>token</span><span class=p>();</span>
+    <span class=n>space</span><span class=p>();</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>c</span> <span class=o>==</span> <span class=sc>&#39;n&#39;</span><span class=p>)</span> <span class=p>{</span>
+      <span class=n>printf</span><span class=p>(</span><span class=s>&#34;input %s&#34;</span><span class=p>,</span> <span class=n>p</span><span class=p>);</span>
+    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+      <span class=k>if</span> <span class=p>(</span><span class=n>expr</span><span class=p>())</span> <span class=p>{</span> <span class=n>stmt</span><span class=p>();</span> <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>void</span> <span class=nf>run</span><span class=p>()</span> <span class=p>{</span>
+  <span class=n>p</span> <span class=o>=</span> <span class=n>code</span><span class=p>;</span>
+  <span class=k>for</span> <span class=p>(;;)</span> <span class=p>{</span>
+    <span class=kt>int</span> <span class=n>n</span> <span class=o>=</span> <span class=n>num</span><span class=p>();</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>n</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span> <span class=k>return</span><span class=p>;</span> <span class=p>}</span>
+    <span class=n>stmt</span><span class=p>();</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>void</span> <span class=nf>xmove</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>dst</span><span class=p>,</span> <span class=k>const</span> <span class=kt>void</span> <span class=o>*</span><span class=n>src</span><span class=p>,</span> <span class=kt>unsigned</span> <span class=kt>int</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span>
+	<span class=kt>char</span><span class=o>*</span> <span class=n>d</span> <span class=o>=</span> <span class=n>dst</span><span class=p>;</span>
+  <span class=kt>char</span><span class=o>*</span> <span class=n>s</span> <span class=o>=</span> <span class=n>src</span><span class=p>;</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>s</span> <span class=o>&lt;</span> <span class=n>d</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>s</span> <span class=o>+=</span> <span class=n>n</span><span class=p>;</span>
+    <span class=n>d</span> <span class=o>+=</span> <span class=n>n</span><span class=p>;</span>
+    <span class=k>while</span> <span class=p>(</span><span class=n>n</span><span class=o>--</span><span class=p>)</span> <span class=o>*--</span><span class=n>d</span> <span class=o>=</span> <span class=o>*--</span><span class=n>s</span><span class=p>;</span>
+  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=k>while</span> <span class=p>(</span><span class=n>n</span><span class=o>--</span><span class=p>)</span> <span class=o>*</span><span class=n>d</span><span class=o>++</span> <span class=o>=</span> <span class=o>*</span><span class=n>s</span><span class=o>++</span><span class=p>;</span>
+  <span class=p>}</span>
+<span class=p>}</span>
+<span class=k>static</span> <span class=kt>int</span> <span class=nf>loop</span><span class=p>()</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=p>(;;)</span> <span class=p>{</span>
+    <span class=kt>int</span> <span class=n>n</span><span class=p>;</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>fgets</span><span class=p>(</span><span class=n>line</span><span class=p>,</span> <span class=mi>64</span><span class=p>,</span> <span class=n>stdin</span><span class=p>)</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span> <span class=p>{</span>
+      <span class=k>break</span><span class=p>;</span>
+    <span class=p>}</span>
+    <span class=n>p</span> <span class=o>=</span> <span class=n>line</span><span class=p>;</span>
+    <span class=k>if</span> <span class=p>(</span><span class=n>n</span> <span class=o>=</span> <span class=n>num</span><span class=p>())</span> <span class=p>{</span>
+      <span class=kt>char</span> <span class=o>*</span><span class=n>start</span> <span class=o>=</span> <span class=n>find</span><span class=p>(</span><span class=n>n</span><span class=p>);</span>
+      <span class=kt>char</span> <span class=o>*</span><span class=n>end</span> <span class=o>=</span> <span class=n>eol</span><span class=p>();</span>
+      <span class=k>if</span> <span class=p>(</span><span class=n>num</span><span class=p>()</span> <span class=o>!=</span> <span class=n>n</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>end</span> <span class=o>=</span> <span class=n>start</span><span class=p>;</span>
+      <span class=p>}</span>
+      <span class=k>if</span> <span class=p>(</span><span class=n>end</span><span class=p>)</span> <span class=p>{</span>
+        <span class=n>xmove</span><span class=p>(</span><span class=n>start</span> <span class=o>+</span> <span class=n>strlen</span><span class=p>(</span><span class=n>line</span><span class=p>),</span> <span class=n>end</span><span class=p>,</span> <span class=n>strlen</span><span class=p>(</span><span class=n>end</span><span class=p>));</span>
+      <span class=p>}</span>
+      <span class=n>xmove</span><span class=p>(</span><span class=n>start</span><span class=p>,</span> <span class=n>line</span><span class=p>,</span> <span class=n>strlen</span><span class=p>(</span><span class=n>line</span><span class=p>));</span>
+    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+      <span class=k>switch</span> <span class=p>(</span><span class=n>line</span><span class=p>[</span><span class=mi>0</span><span class=p>])</span> <span class=p>{</span>
+      <span class=k>case</span> <span class=sc>&#39;n&#39;</span><span class=o>:</span> <span class=n>code</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=k>break</span><span class=p>;</span>
+      <span class=k>case</span> <span class=sc>&#39;r&#39;</span><span class=o>:</span> <span class=n>run</span><span class=p>();</span> <span class=k>break</span><span class=p>;</span>
+      <span class=k>case</span> <span class=sc>&#39;l&#39;</span><span class=o>:</span> <span class=n>puts</span><span class=p>(</span><span class=n>code</span><span class=p>);</span> <span class=k>break</span><span class=p>;</span>
+      <span class=p>}</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+<span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span> <span class=k>return</span> <span class=n>loop</span><span class=p>();</span> <span class=p>}</span>
+</code></pre></div><h2 id=go>Go</h2><p>Let&rsquo;s go alphabetically. Transpiler from C to Go made the news when SQLite was converted to pure Go without any of the <code>cgo</code> code - <a href=https://pkg.go.dev/modernc.org/sqlite>https://pkg.go.dev/modernc.org/sqlite</a>. Available at <a href=https://gitlab.com/cznic/cc>https://gitlab.com/cznic/cc</a> this transpiler is built on top of a custom C lexer/parser and AST walker that runs in multiple phases to convert C AST to Go code. For libc features it uses a custom library - <a href=https://pkg.go.dev/modernc.org/libc>https://pkg.go.dev/modernc.org/libc</a> - as well as the similar project for the CRT (C runtime). These libs become the hard dependencies of the generated code.</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>go mod init basic
+go get modernc.org/libc
+ccgo basic.c
+go build -o basic-go
+</code></pre></div><p>The resulting source code seems to be quite long, but most of that is comments. It&rsquo;s only 1000 lines of pure code. It imports &ldquo;math&rdquo;, &ldquo;reflect&rdquo;, &ldquo;unsafe&rdquo; and &ldquo;sync/atomic&rdquo; apart from the modernc libs. The code, however, is barely readable - all is wrapped into <code>unsafe.Pointer</code> casting and spiced up with <code>goto</code>. Does it work though? Sometimes. I was able to enter some basic code and run it, but it crashed on &ldquo;list&rdquo;:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>10 print &#34;hello world&#34;
+run
+hello world
+list
+libc.go:199:Xputs: TODOTODO
+goroutine 1 [running, locked to thread]:
+runtime/debug.Stack()
+        /opt/homebrew/Cellar/go/1.18.1/libexec/src/runtime/debug/stack.go:24 +0x68
+modernc.org/libc.todo({0x0?, 0x1004a5e40?}, {0x0?, 0x0?, 0x0?})
+        /Users/serge/go/pkg/mod/modernc.org/libc@v1.16.12/etc.go:100 +0x10c
+modernc.org/libc.Xputs(...)
+        /Users/serge/go/pkg/mod/modernc.org/libc@v1.16.12/libc.go:199
+main.loop(0x1000144d0?)
+        /Users/serge/src/serge/tmp/transpile/a_darwin_arm64.go:5007 +0x214
+main.main1(0x140000021a0?, 0x14280?, 0x26?)
+        /Users/serge/src/serge/tmp/transpile/a_darwin_arm64.go:5016 +0x20
+modernc.org/libc.Start(0x1003dca18)
+        /Users/serge/go/pkg/mod/modernc.org/libc@v1.16.12/libc.go:125 +0x164
+main.main()
+        /Users/serge/src/serge/tmp/transpile/a_darwin_arm64.go:22 +0x28
+</code></pre></div><p>The hint is that <code>puts()</code> is not implemented in libc. Replacing it with a printf and re-generating the Go code helped. Go wins in the simplicity category and is surprisingly convenient.</p><p>With all the amount of troubles that <code>cgo</code> brings into Go, I&rsquo;d say <code>ccgo</code> is a good solution for migrating existing C code to Go. Since generated code closely followed the original code structure &ndash; further refactoring may happen function by function, if needed.</p><h2 id=rust>Rust</h2><p>Rust is known to have a <code>c2rust</code> tool. This was the least user-friendly tool to install, at least on Mac. Go transpiler requires a single <code>go install</code> and is self-contained, Zig transpiler comes with Zig toolchain already, but <code>c2rust</code> is an external tool that requires LLVM and a few other dependencies to be installed first. No big deal, moving on.</p><p>Invoking <code>c2rust</code> is also different from other transpilers, because it&rsquo;s targeted at large C codebases from what I could tell - it can&rsquo;t transpile a single file, but can transpile a project that uses CMake, or generate transpiler config in a few other ways. All right, adding the most minimal CMakeLists.txt and running <code>cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..</code>:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>cmake_minimum_required(VERSION 3.1)
+project(basic C)
+add_executable(basic basic.c)
+</code></pre></div><p>This generates <code>compile_commands.json</code> that we can hopefully feed into <code>c2rust</code>. Somehow the transpiler process exited with an error, complaining about some internal headers in macOS SDK, but <code>basic.rs</code> has been generated. It happened to be the shortest generated transpiled code. Names and structure matches the original C code, but variable names are mangled and some switch/case statements converted char constants to integer ASCII codes.</p><p>Does it run? Yes. Nothing to be fixed, using the <code>libc</code> crate, this transpiled basic interpreter runs fine without any tweaks. Rust loses in the user experience category but wins in reliability after all.</p><h2 id=zig>Zig</h2><p>Finally, it&rsquo;s Zig turn. Since Zig compiler is also a C compiler itself, it comes with a convenient <code>translate-c</code> option:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>zig translate-c basic.c &gt; basic.zig
+zig build-exe --name basic-zig basic.zig 
+</code></pre></div><p>This creates a Zig file or ~3500 LOC where the top and the bottom part are Zig definitions for stdlib parts and the actual transpiled code is hidden in the middle of the file. The code is much more readable than Go translation and follows not only the function structure, but also the structure of conditionals and loops. Even the variable names match C code most of the time.</p><p>Does it work? Almost. Originally it failed because my C code was using <code>memmove()</code> which is not part of the Zig C runtime yet. Once I replaced that with a hand-written <code>xmove</code> - everything worked like a charm. Thus, Zig is doing a good job, but still shows the signs of its young age. Resulting executable is as large as the original C implementation and works just like that. If I was to judge how close the transpiler result is to its origins - Zig would be the winner.</p><h2 id=the-better-c-world>The &ldquo;better C&rdquo; world</h2><p>It&rsquo;s hard to imagine C fading away any time soon, but these transpilers make the sunset of C closer. It&rsquo;s great that popular C libraries and apps get translated to safer languages and even though there is no clear winner in the &ldquo;better C&rdquo; niche yet - fair competition makes it even better.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jul 06, 2022</em></p><p>See also:
+<a href=/posts/better-c-benchmark/>A "Better C" Benchmark</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2022 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a></p></footer><script>(function(e,t,n,i,s,a,c){e[n]=e[n]||function(){(e[n].q=e[n].q||[]).push(arguments)};a=t.createElement(i);c=t.getElementsByTagName(i)[0];a.async=true;a.src=s;c.parentNode.insertBefore(a,c)})(window,document,"galite","script","https://cdn.jsdelivr.net/npm/ga-lite@2/dist/ga-lite.min.js");galite('create','UA-33644825-1','auto');galite('send','pageview');</script><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
