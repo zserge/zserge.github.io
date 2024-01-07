@@ -1,0 +1,257 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>AI or ain't: LLMs</title><meta name=description content="???"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/ai-llm/><meta property="og:title" content="AI or ain't: LLMs"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/ai-llm/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="???"><meta property="og:locale" content="en_US"><meta name=twitter:card content="???"><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>AI or ain't: LLMs</h1><p>Previously we covered <a href=/posts/ai-eliza>early chatbots</a>, <a href=/posts/ai-markov>bots talking gibberish</a>, and <a href=/posts/ai-nn>self-taught number crunchers</a>.</p><p>But what we got so far is still boring. AI was promised to overthrow the world order and not just classify arrays of floats. Can we have a chat?</p><h2 id=gpt>GPT</h2><p>As unimpressive as it is, neural networks take arrays of numbers and return arrays of numbers. Just like our brain takes electric signals and emits electric signals. It&rsquo;s only a matter of how we encode such inputs and outputs. In a human body our brain is taught how to &ldquo;sense&rdquo; pictures, temperature, touch. It learns how to move legs and walk, how to write and speak. It takes years for our brain to learn such rudimentary signal encodings.</p><p>A neural network can also be &ldquo;connected&rdquo; to some webcam and treat pixels as arrays of numbers. With enough training data and time a network can learn how to recognise images, how to read handwriting or how to <a href=https://www.freecodecamp.org/news/chihuahua-or-muffin-my-search-for-the-best-computer-vision-api-cbda4d6b425d://www.freecodecamp.org/news/chihuahua-or-muffin-my-search-for-the-best-computer-vision-api-cbda4d6b425d/>tell Chihuahua from a muffin</a>. By encoding inputs as MIDI notes we can teach a network to <a href=https://magenta.tensorflow.org/>compose music</a>. By encoding inputs as words we can teach it a language and some common knowledge written in that language.</p><p><a href=https://en.wikipedia.org/wiki/Generative_pre-trained_transformer#Foundational_models>GPT</a> models, currently popularised with OpenAI&rsquo;s ChatGPT, are general-purpose transformers (that&rsquo;s network architecture) and are used to generate text by the given input. We&rsquo;ll start with GPT-2 models published by OpenAI a while ago, since they are fairly small and easy to work with. Code examples will be in Go.</p><h2 id=tokens>Tokens</h2><p>In all the <a href=/posts/ai-eliza>previous</a> <a href=/posts/ai-markov>parts</a> we simply split a sentence by whitespace. Despite its simplicity, this approach is not the best: it treats &ldquo;hello&rdquo; and &ldquo;Hello!&rdquo; as two different words, it assumes that words &ldquo;greet&rdquo; and &ldquo;greeting&rdquo; are completely unrelated etc.</p><p>A more advanced solution would be store a list of known tokens that could represent a complete word or a certain part of the word. Our tokenisation process then would have to find the longest possible token for each part of the sentence. In a list of tokens each token would have a unique index, so tokenisation essentially converts a string of words to an array of integers.</p><p>Our GPT-2 model knows ~50K words. They are stored in <code>tokens.dat</code> file as a sequence of null-terminated strings.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=c1>// load tokens from a file
+</span><span class=c1></span><span class=nx>tokens</span> <span class=o>:=</span> <span class=p>[]</span><span class=kt>string</span><span class=p>{}</span>
+<span class=nx>b</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>ioutil</span><span class=p>.</span><span class=nf>ReadFile</span><span class=p>(</span><span class=s>&#34;tokens.dat&#34;</span><span class=p>)</span>
+<span class=k>for</span> <span class=nb>len</span><span class=p>(</span><span class=nx>b</span><span class=p>)</span> <span class=p>&gt;</span> <span class=mi>0</span> <span class=p>{</span>
+  <span class=nx>i</span> <span class=o>:=</span> <span class=nx>bytes</span><span class=p>.</span><span class=nf>IndexByte</span><span class=p>(</span><span class=nx>b</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+  <span class=nx>tokens</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>tokens</span><span class=p>,</span> <span class=nb>string</span><span class=p>(</span><span class=nx>b</span><span class=p>[:</span><span class=nx>i</span><span class=p>]))</span>
+  <span class=nx>b</span> <span class=p>=</span> <span class=nx>b</span><span class=p>[</span><span class=nx>i</span><span class=o>+</span><span class=mi>1</span><span class=p>:]</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>findToken</span><span class=p>(</span><span class=nx>s</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>index</span><span class=p>,</span> <span class=nx>overlap</span> <span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>t</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>tokens</span> <span class=p>{</span>
+    <span class=nx>j</span> <span class=o>:=</span> <span class=mi>0</span>
+    <span class=k>for</span> <span class=p>;</span> <span class=nx>j</span> <span class=p>&lt;</span> <span class=nb>len</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=o>&amp;&amp;</span> <span class=nx>j</span> <span class=p>&lt;</span> <span class=nb>len</span><span class=p>(</span><span class=nx>t</span><span class=p>)</span> <span class=o>&amp;&amp;</span> <span class=nx>s</span><span class=p>[</span><span class=nx>j</span><span class=p>]</span> <span class=o>==</span> <span class=nx>t</span><span class=p>[</span><span class=nx>j</span><span class=p>];</span> <span class=nx>j</span><span class=o>++</span> <span class=p>{</span>
+    <span class=p>}</span>
+    <span class=k>if</span> <span class=nx>j</span> <span class=p>&gt;</span> <span class=nx>overlap</span> <span class=o>||</span> <span class=p>(</span><span class=nx>j</span> <span class=o>==</span> <span class=nx>overlap</span> <span class=o>&amp;&amp;</span> <span class=nx>j</span> <span class=o>==</span> <span class=nb>len</span><span class=p>(</span><span class=nx>t</span><span class=p>))</span> <span class=p>{</span>
+      <span class=nx>overlap</span><span class=p>,</span> <span class=nx>index</span> <span class=p>=</span> <span class=nx>j</span><span class=p>,</span> <span class=nx>i</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>index</span><span class=p>,</span> <span class=nx>overlap</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>tokenise</span><span class=p>(</span><span class=nx>s</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>context</span> <span class=p>[]</span><span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=nb>len</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=p>&gt;</span> <span class=mi>0</span> <span class=p>{</span>
+    <span class=nx>t</span><span class=p>,</span> <span class=nx>n</span> <span class=o>:=</span> <span class=nf>findToken</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+    <span class=k>if</span> <span class=nx>t</span> <span class=p>&lt;</span> <span class=mi>0</span> <span class=p>{</span>
+      <span class=k>return</span> <span class=nx>context</span>
+    <span class=p>}</span>
+    <span class=nx>context</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>context</span><span class=p>,</span> <span class=nx>t</span><span class=p>)</span>
+    <span class=nx>s</span> <span class=p>=</span> <span class=nx>s</span><span class=p>[</span><span class=nx>n</span><span class=p>:]</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>context</span>
+<span class=p>}</span>
+
+<span class=nf>tokenise</span><span class=p>(</span><span class=s>&#34;Paris is the capital of&#34;</span><span class=p>)</span> <span class=c1>// [40313 318 262 3139 286]
+</span><span class=c1></span><span class=nf>tokenise</span><span class=p>(</span><span class=s>&#34;The capital of Germany is&#34;</span><span class=p>)</span> <span class=c1>// [464 3139 286 4486 318]
+</span></code></pre></div><p>See that &ldquo;capital&rdquo; is token #3139, &ldquo;is&rdquo; - #318, &ldquo;of&rdquo; - #286. &ldquo;The&rdquo; and &ldquo;the&rdquo; are two different tokens, since they may indicate the start of the sentence and thus may have different meaning.</p><h2 id=word-vectors>Word vectors</h2><p>However it would be very difficult to train a network to understand what the words mean if they are represented by token indices. For example, &ldquo;Paris&rdquo; and &ldquo;capital&rdquo; are semantically very close to each other, but their token IDs are very much apart: 40313 and 3139. The word &ldquo;Germany&rdquo; is closer to &ldquo;capital&rdquo; than the actual capital city.</p><p>This is why GPT model has another layer of indirection that converts a token index to a vector of numbers, representing the word &ldquo;meaning&rdquo;. Many years ago a similar <a href=https://en.wikipedia.org/wiki/Word2vec>Word2Vec</a> algorithm has been invented, that assigned a vector to each word and the more related the words are - the smaller is the difference between their vectors. In fact, arithmetic operations on such vectors allowed to find associated words, i.e. &ldquo;Kind - Man = Queen&rdquo;.</p><p>GPT-2 model comes with a similar &ldquo;word token embedding&rdquo; matrix (WTE), in our case stored in a <code>wte.dat</code> file. This file was created as a result of GPT-2 trainig phase, performed by OpenAI. We&rsquo;re using its contents without thinking too much how it was obtained:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=c1>// read a file into a slice of 32-bit floats
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>read</span><span class=p>(</span><span class=nx>filename</span> <span class=kt>string</span><span class=p>)</span> <span class=p>[]</span><span class=kt>float32</span> <span class=p>{</span>
+  <span class=nx>b</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>ioutil</span><span class=p>.</span><span class=nf>ReadFile</span><span class=p>(</span><span class=nx>filename</span><span class=p>)</span>
+  <span class=k>return</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Slice</span><span class=p>((</span><span class=o>*</span><span class=kt>float32</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>b</span><span class=p>[</span><span class=mi>0</span><span class=p>])),</span> <span class=nb>len</span><span class=p>(</span><span class=nx>b</span><span class=p>)</span><span class=o>/</span><span class=mi>4</span><span class=p>)</span>
+<span class=p>}</span>
+
+<span class=c1>// get a vector of floats for the given token in the WTE table
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>wordvec</span><span class=p>(</span><span class=nx>wte</span> <span class=p>[]</span><span class=kt>float32</span><span class=p>,</span> <span class=nx>token</span> <span class=kt>int</span><span class=p>)</span> <span class=p>[]</span><span class=kt>float32</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=nx>wte</span><span class=p>[</span><span class=nx>WordVecSize</span><span class=o>*</span><span class=nx>token</span> <span class=p>:</span> <span class=nx>WordVecSize</span><span class=o>*</span><span class=p>(</span><span class=nx>token</span><span class=o>+</span><span class=mi>1</span><span class=p>)]</span>
+<span class=p>}</span>
+</code></pre></div><p>Let&rsquo;s pick words &ldquo;king&rdquo;, &ldquo;monarch&rdquo; and &ldquo;lettuce&rdquo;. These correspond to the tokens of 5822, 26464 and 39406 in <code>tokens.dat</code>. An AI might get an illusion that &ldquo;king&rdquo; is rather a salad plant than a monarch. But if we get the word vectors for each token and calculate the difference between the elements we get 11.1 for &ldquo;king-monarch&rdquo; distance and 21.9 for &ldquo;king-lettuce&rdquo; distance. Also &ldquo;tea+biscuit&rdquo; gives us 16 points, &ldquo;tea+coffee&rdquo; 9, but &ldquo;tea+Hare&rdquo; is 21, despite all Caroll&rsquo;s work.</p><p>Similarly, you can take a word, find its vector and find a range of the most related vectors. You may see that for input token &ldquo;absurd&rdquo; the closest matched would be:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback> absurd 0
+ ridiculous 3.4613547
+ ludicrous 3.7072947
+ outrageous 6.004274
+ ridiculously 6.71082
+ nonsensical 6.7171283
+ bizarre 6.8727217
+ laughable 7.240555
+ outlandish 7.274483
+ silly 7.331988
+ insanely 7.7595344
+ astonishing 7.8167872
+ grotesque 7.818375
+ absurdity 7.8630023
+ insane 8.12205
+ incredible 8.283726
+ monstrous 8.381887
+ weird 8.558824
+ astounding 8.615417
+ stupid 8.698734
+</code></pre></div><p>Which makes total sense! But processing one word at a time without having contextual knowledge about other words is unlikely to give any good results for natural language (consider &ldquo;working hardly&rdquo; vs &ldquo;hardly working&rdquo;).</p><p>This is where another large matrix, WPE, helps. It encodes a position of the word in the input context (sentence) and how this position corrects the word vector. We&rsquo;ll see how it&rsquo;s used in the network later.</p><h2 id=layers>Layers</h2><p>GPT-2 model is represented with a list of neuron layers. In the previous part we represented each neuron as an object with scalar parameters, which was convenient for training a neuron. Here we only focus on forward propagation and can speed up our network significantly if we treat all the weights of all the neurons in a single layer as one vector. This would batch all arithmetic operations and reduce the number of &ldquo;for&rdquo; loops a lot.</p><p>Here is all the layer data in the decomposed GPT-2 model:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>4.0K    h1_attn_cproj_b.dat
+4.0K    h1_ln1_b.dat
+4.0K    h1_ln1_g.dat
+4.0K    h1_ln2_b.dat
+4.0K    h1_ln2_g.dat
+4.0K    h1_mlp_cproj_b.dat
+ 12K    h1_attn_cattn_b.dat
+ 12K    h1_mlp_cfc_b.dat
+2.3M    h1_attn_cproj_w.dat
+6.8M    h1_attn_cattn_w.dat
+9.0M    h1_mlp_cfc_w.dat
+9.0M    h1_mlp_cproj_w.dat
+...
+4.0K    h2_...
+...
+4.0K    lnf_b.dat
+4.0K    lnf_g.dat
+364K    tokens.dat
+3.0M    wpe.dat
+147M    wte.dat
+</code></pre></div><p>GPT-2 is a multi-layer neural network, just like the toy network we used to calculate XOR or classify moon-shaped points. Except for it is much, much larger. In its smallest variant (&ldquo;124M&rdquo;) it comes with 12 layers, where each layer is in fact a combination of a few smaller layers with their own weights and biases.</p><p>Each vector or matrix within the layer is stored in an individual file, extracted from the original GPT-2 model. Simply reading that as a sequence of float32 numbers would fill in the parameter data into each layer.</p><p>Here&rsquo;s the complete code for loading a model:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Model</span> <span class=kd>struct</span> <span class=p>{</span>
+  <span class=nx>dir</span>    <span class=kt>string</span>
+  <span class=nx>lnf_g</span>  <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>lnf_b</span>  <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>wte</span>    <span class=p>[]</span><span class=kt>float32</span> <span class=c1>// word token embeddings
+</span><span class=c1></span>  <span class=nx>wpe</span>    <span class=p>[]</span><span class=kt>float32</span> <span class=c1>// word position embeddings
+</span><span class=c1></span>  <span class=nx>layers</span> <span class=p>[]</span><span class=nx>Layer</span>
+<span class=p>}</span>
+
+<span class=kd>type</span> <span class=nx>Layer</span> <span class=kd>struct</span> <span class=p>{</span>
+  <span class=nx>ln1_b</span>        <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>ln1_g</span>        <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>ln2_b</span>        <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>ln2_g</span>        <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>mlp_cfc_b</span>    <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>mlp_cfc_w</span>    <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>mlp_cproj_b</span>  <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>mlp_cproj_w</span>  <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>attn_cattn_b</span> <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>attn_cattn_w</span> <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>attn_cproj_b</span> <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>attn_cproj_w</span> <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>k</span>            <span class=p>[]</span><span class=kt>float32</span>
+  <span class=nx>v</span>            <span class=p>[]</span><span class=kt>float32</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>LoadModel</span><span class=p>(</span><span class=nx>dir</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>m</span> <span class=nx>Model</span><span class=p>)</span> <span class=p>{</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>dir</span> <span class=p>=</span> <span class=nx>dir</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>lnf_g</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=s>&#34;lnf_g.dat&#34;</span><span class=p>)</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>lnf_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=s>&#34;lnf_b.dat&#34;</span><span class=p>)</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>wte</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=s>&#34;wte.dat&#34;</span><span class=p>)</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>wpe</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=s>&#34;wpe.dat&#34;</span><span class=p>)</span>
+  <span class=nx>m</span><span class=p>.</span><span class=nx>layers</span> <span class=p>=</span> <span class=nb>make</span><span class=p>([]</span><span class=nx>Layer</span><span class=p>,</span> <span class=nx>NumLayers</span><span class=p>)</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>m</span><span class=p>.</span><span class=nx>layers</span> <span class=p>{</span>
+    <span class=nx>l</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>m</span><span class=p>.</span><span class=nx>layers</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>ln1_g</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_ln1_g.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>ln1_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_ln1_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>ln2_g</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_ln2_g.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>ln2_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_ln2_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>mlp_cfc_w</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_mlp_cfc_w.t&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>mlp_cfc_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_mlp_cfc_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>mlp_cproj_w</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_mlp_cproj_w.t&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>mlp_cproj_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_mlp_cproj_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>attn_cproj_w</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_attn_cproj_w.t&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>attn_cproj_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_attn_cproj_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>attn_cattn_w</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_attn_cattn_w.t&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>attn_cattn_b</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>read</span><span class=p>(</span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;h%d_attn_cattn_b.dat&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>))</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>k</span> <span class=p>=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>float32</span><span class=p>,</span> <span class=nx>ContextSize</span><span class=o>*</span><span class=nx>WordVecSize</span><span class=p>)</span>
+    <span class=nx>l</span><span class=p>.</span><span class=nx>v</span> <span class=p>=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>float32</span><span class=p>,</span> <span class=nx>ContextSize</span><span class=o>*</span><span class=nx>WordVecSize</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>m</span>
+<span class=p>}</span>
+</code></pre></div><p>Now we have lots and lots of numbers. But what kind of operations should we perform to make it compose a sentence?</p><p>Some arrays end with &ldquo;w&rdquo; and some with &ldquo;b&rdquo;, those are weights and biases, so we probably would end up doing the usual multiply-and-add math a lot here. All layers having &ldquo;proj&rdquo; in their names perform this operation (also known as projection from one vector into another vector space).</p><p>There are also &ldquo;g&rdquo; and &ldquo;b&rdquo; pairs. These stand for &ldquo;gamma&rdquo; and &ldquo;beta&rdquo; from the layer normalisation process (will be described below). They are used to scale the values by&mldr; multiplying them by &ldquo;g&rdquo; and adding &ldquo;b&rdquo; to that.</p><h2 id=self-attention>Self-attention</h2><p>So far we&rsquo;ve figured out the roles of the following blocks (in the order they are applied to the input):</p><ul><li><code>wpe</code> and <code>wte</code> are for input token encoding</li><li>for each layer we apply:<ul><li><code>ln1</code> gamma and beta are for the initial normalisation in each layer.</li><li><code>k</code> and <code>v</code></li><li><code>attn_cproj</code> weights and biases</li><li><code>attn_cattn</code> weights and biases</li><li><code>ln2</code> gamma and beta are for the final normalisation in each layer.</li><li><code>mlp_cfc</code> and <code>mlp_cproj</code> weights and biases form a two-layer dense network, like the one we&rsquo;ve implemented before.</li></ul></li><li><code>lnf</code> gamma and beta and are for final normalisation of the whole network output.</li></ul><p>The only unknowns are <code>k</code>, <code>v</code> and the blocks related to &ldquo;attention&rdquo; projection. But what is attention anyway?</p><p>Just like with us, human beings, attention helps the model to focus on certain words in the sentence rather than the others. Self-attention means that it only uses words from the same input context (sentence).</p><p>The main components of the self-attention layer are: a query <code>q</code>, which represents the current word, keys <code>k</code> that represent other words in the current context and values <code>v</code> that are added to the current word data if the associated key looks relevant to the query.</p><p>Multiplying query vector by each of the key vectors gives us the score of how relevant the word with the given key is to the query. Multiplying corresponding values to their scores and summing them up results in a self-attention vector that can be used to give the model more context about the input data.</p><p>Imagine a team meeting, where every team member is talking about their own work. However, other team members adjust their attention depending on how relevant each topic is. At the end, the team collectively focuses on the most important topics for the whole team. Now, replace &ldquo;team members&rdquo; with individual words/tokens in the current sentence (context). Self-attention helps to score individual tokens based on their importance to the whole context.</p><h2 id=do-the-math>Do the math</h2><p>At this point we&rsquo;ve figured out how to load model data into float32 slices, how to read tokens and how to tokenise input prompt. What&rsquo;s missing is a few helper math functions that could simplify layer operations.</p><p>First, we&rsquo;ll need the good old linear X·W+b function:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>lin</span><span class=p>(</span><span class=nx>x</span><span class=p>,</span> <span class=nx>w</span> <span class=p>[]</span><span class=kt>float32</span><span class=p>,</span> <span class=nx>b</span> <span class=kt>float32</span><span class=p>)</span> <span class=kt>float32</span> <span class=p>{</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>b</span> <span class=o>+=</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>*</span> <span class=nx>w</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>b</span>
+<span class=p>}</span>
+</code></pre></div><p>We also will need a slightly different activation function. Instead of ReLU, which we&rsquo;ve used so far, GPT-2 model requires us to use GeLU function, which is similar in shape but has a more complex implementation:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>gelu</span><span class=p>(</span><span class=nx>x</span> <span class=kt>float32</span><span class=p>)</span> <span class=kt>float32</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=mf>0.5</span> <span class=o>*</span> <span class=nx>x</span> <span class=o>*</span> <span class=p>(</span><span class=mi>1</span> <span class=o>+</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>math</span><span class=p>.</span><span class=nf>Tanh</span><span class=p>(</span><span class=mf>0.7978845676080871</span><span class=o>*</span><span class=nb>float64</span><span class=p>(</span><span class=nx>x</span><span class=o>+</span><span class=mf>0.044715</span><span class=o>*</span><span class=nx>x</span><span class=o>*</span><span class=nx>x</span><span class=o>*</span><span class=nx>x</span><span class=p>))))</span>
+<span class=p>}</span>
+</code></pre></div><p>To handle normalisation within layers we would also need a separate function. It multiplies every element from X by a mean square and gamma, then adds beta value:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>norm</span><span class=p>(</span><span class=nx>x</span><span class=p>,</span> <span class=nx>beta</span><span class=p>,</span> <span class=nx>gamma</span> <span class=p>[]</span><span class=kt>float32</span><span class=p>)</span> <span class=p>[]</span><span class=kt>float32</span> <span class=p>{</span>
+  <span class=nx>mean</span><span class=p>,</span> <span class=nx>sqmean</span> <span class=o>:=</span> <span class=nb>float32</span><span class=p>(</span><span class=mf>0.0</span><span class=p>),</span> <span class=nb>float32</span><span class=p>(</span><span class=mf>0.0</span><span class=p>)</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>mean</span> <span class=o>+=</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=nx>mean</span> <span class=p>=</span> <span class=nx>mean</span> <span class=o>/</span> <span class=nb>float32</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=nx>x</span><span class=p>))</span>
+  <span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>xi</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>sqmean</span> <span class=o>+=</span> <span class=p>(</span><span class=nx>xi</span> <span class=o>-</span> <span class=nx>mean</span><span class=p>)</span> <span class=o>*</span> <span class=p>(</span><span class=nx>xi</span> <span class=o>-</span> <span class=nx>mean</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=nx>sqmean</span> <span class=p>=</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>math</span><span class=p>.</span><span class=nf>Max</span><span class=p>(</span><span class=nb>float64</span><span class=p>(</span><span class=nx>sqmean</span><span class=o>/</span><span class=nb>float32</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=nx>x</span><span class=p>))),</span> <span class=mf>0.0000001</span><span class=p>))</span>
+  <span class=nx>m</span> <span class=o>:=</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>math</span><span class=p>.</span><span class=nf>Sqrt</span><span class=p>(</span><span class=mf>1.0</span> <span class=o>/</span> <span class=nb>float64</span><span class=p>(</span><span class=nx>sqmean</span><span class=p>)))</span>
+  <span class=nx>out</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>float32</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=nx>x</span><span class=p>))</span>
+  <span class=k>for</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>xi</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>out</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>=</span> <span class=p>(</span><span class=nx>xi</span><span class=o>-</span><span class=nx>mean</span><span class=p>)</span><span class=o>*</span><span class=nx>m</span><span class=o>*</span><span class=nx>gamma</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>+</span> <span class=nx>beta</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>out</span>
+<span class=p>}</span>
+</code></pre></div><p>Finally, we will need &ldquo;softmax&rdquo;, that converts a vector X into a probability distribution of possible values, so that each value is in the range [0..1] and the sum of them equals 1:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>softmax</span><span class=p>(</span><span class=nx>x</span> <span class=p>[]</span><span class=kt>float32</span><span class=p>)</span> <span class=p>[]</span><span class=kt>float32</span> <span class=p>{</span>
+  <span class=nx>out</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>float32</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=nx>x</span><span class=p>))</span>
+  <span class=nx>max</span><span class=p>,</span> <span class=nx>sum</span> <span class=o>:=</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>math</span><span class=p>.</span><span class=nf>Inf</span><span class=p>(</span><span class=o>-</span><span class=mi>1</span><span class=p>)),</span> <span class=nb>float32</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=k>if</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>&gt;</span> <span class=nx>max</span> <span class=p>{</span>
+      <span class=nx>max</span> <span class=p>=</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+    <span class=p>}</span>
+  <span class=p>}</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>=</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>math</span><span class=p>.</span><span class=nf>Exp</span><span class=p>(</span><span class=nb>float64</span><span class=p>(</span><span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>-</span> <span class=nx>max</span><span class=p>)))</span>
+    <span class=nx>sum</span> <span class=o>+=</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+    <span class=nx>out</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>=</span> <span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>/</span> <span class=nx>sum</span>
+  <span class=p>}</span>
+  <span class=k>return</span> <span class=nx>out</span>
+<span class=p>}</span>
+</code></pre></div><p>That&rsquo;s all the math we need to run a GPT-2 model.</p><h2 id=running-a-single-layer>Running a single layer</h2><p>A single layer takes a vector as an input, as well as a slot pointer. First of all it handles the self-attention. It normalises the input vector and using the attention weight+bias it calculates (<code>lin(x, cattn_w, cattn_b)</code>) the query <code>q</code>, key <code>k</code>, and value <code>v</code> vectors. Followed by a <code>softmax(q*k)</code> it results in a vector of scores for each key.</p><p>In GPT-2 self-attention happens simultaneously a number of times. Each calculation happens more or less independently from the others. The smalles GPT-2 model has 12 &ldquo;heads&rdquo; and each head has its own query, key, and value vectors resulting in its own set of scores. Concatenating all the scores from all the heads we have a vector that represents the multi-head attention of the whole layer.</p><p>However, simply forwarding this vector to the next layer would not give good results. We need another operation that would project the self-attention results into a more suitable vector. This part is called &ldquo;projecting&rdquo; and is implemented as another matrix multiplication <code>lin(attn, cproj_w, cproj_b)</code>.</p><p>Finally there are two fully-connected dense sub-layers, one few times larger than the word vector length, another reducing it back to the word vector length (786 for GPT-2). Why two of them and why are they different? The more neurons the network has - the more &ldquo;knowledge&rdquo; it can contain, but all this knowledge needs to be compressed back to fit the dimensionality of the following layer.</p><p>Perhaps, code speaks better than words, here&rsquo;s how a single layer operates:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>func (m Model) runLayer(x []float32, layer, slot int) {
+	l := m.layers[layer]
+	xn := norm(x, l.ln1_b, l.ln1_g)
+	q := make([]float32, WordVecSize)
+	for i := 0; i &lt; WordVecSize*3; i++ {
+		a := lin(xn, l.attn_cattn_w[WordVecSize*i:WordVecSize*(i+1)], l.attn_cattn_b[i])
+		if i &lt; WordVecSize {
+			q[i] = a
+		} else if i &lt; WordVecSize*2 {
+			l.k[slot*WordVecSize+(i-WordVecSize)] = a
+		} else {
+			l.v[(i-WordVecSize*2)*ContextSize+slot] = a
+		}
+	}
+
+	const headSize = 64
+	tmp := make([]float32, WordVecSize)
+	for h := 0; h &lt; NumHeads; h++ {
+		att := make([]float32, slot+1)
+		for i := 0; i &lt;= slot; i++ {
+			att[i] = lin(q[h*headSize:(h+1)*headSize], l.k[i*WordVecSize+h*headSize:], 0) / 8
+		}
+		att = softmax(att)
+		for j := 0; j &lt; headSize; j++ {
+			tmp[h*headSize+j] = lin(att, l.v[(j+h*headSize)*ContextSize:], 0)
+		}
+	}
+	for i := 0; i &lt; WordVecSize; i++ {
+		x[i] += lin(tmp, l.attn_cproj_w[WordVecSize*i:], l.attn_cproj_b[i])
+	}
+	xn = norm(x, l.ln2_b, l.ln2_g)
+	mlp := make([]float32, WordVecSize*4)
+	for i := 0; i &lt; WordVecSize*4; i++ {
+		mlp[i] = gelu(lin(xn, l.mlp_cfc_w[WordVecSize*i:], l.mlp_cfc_b[i]))
+	}
+	for i := 0; i &lt; WordVecSize; i++ {
+		x[i] += lin(mlp, l.mlp_cproj_w[WordVecSize*4*i:], l.mlp_cproj_b[i])
+	}
+}
+</code></pre></div><p>This was the most complicated part of GPT-2, the rest is just calling <code>runLayer</code> in a loop for every layer:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=nx>Model</span><span class=p>)</span> <span class=nf>Run</span><span class=p>(</span><span class=nx>context</span> <span class=p>[]</span><span class=kt>int</span><span class=p>,</span> <span class=nx>slot</span> <span class=kt>int</span><span class=p>)</span> <span class=p>[]</span><span class=kt>float32</span> <span class=p>{</span>
+	<span class=nx>x</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>float32</span><span class=p>,</span> <span class=nx>WordVecSize</span><span class=p>)</span>
+	<span class=nx>wv</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nf>WordVec</span><span class=p>(</span><span class=nx>context</span><span class=p>[</span><span class=nx>slot</span><span class=p>])</span>
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>x</span> <span class=p>{</span>
+		<span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>wpe</span><span class=p>[</span><span class=nx>i</span><span class=o>+</span><span class=nx>WordVecSize</span><span class=o>*</span><span class=nx>slot</span><span class=p>]</span>
+		<span class=nx>x</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>+=</span> <span class=nx>wv</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+	<span class=p>}</span>
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>m</span><span class=p>.</span><span class=nx>layers</span> <span class=p>{</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nf>runLayer</span><span class=p>(</span><span class=nx>x</span><span class=p>,</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>slot</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nf>norm</span><span class=p>(</span><span class=nx>x</span><span class=p>,</span> <span class=nx>m</span><span class=p>.</span><span class=nx>lnf_b</span><span class=p>,</span> <span class=nx>m</span><span class=p>.</span><span class=nx>lnf_g</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></div><p>You might wonder why do we need a <code>slot</code> parameter. Self-attention tends to consider the complete input vector, treating all its &ldquo;slots&rdquo; equally. But as we feed input token by token into the network - the slots are filled one after the other and no slots after the current one have any meaning yet. So we give a hint to the network that it should the consider the previous slots but ignore the following ones. This is called &ldquo;masked self-attention&rdquo;.</p><h2 id=decoding>Decoding</h2><p>The final layer of the network returns another 786-element vector of numbers. How can be translate it into a word?</p><p>For every known token from <code>tokens.dat</code> we multiply the output vector by the word vector. Result would be a single number, that indicates how good the token is to become the next one in the sentence. We choose a certain subset of such candidates (the most suitable ones) and randomly pick one. The resulting token is being added to the context and the whole context is being fed into the network again. The output of the network creates candidates for the following token and so on. The process continues as long as needed, or until the network returns a special &ldquo;end of text&rdquo; token, meaning that it had rest its case.</p><p>Time to test our network. GPT-2 comes in different model sizes, the one with 124M parameters is in the repo, the rest can be converted from the publicly available GPT-2 weights.</p><p>We can ask the network to continue phrases and see how it copes with the task:</p><div class=highlight><pre class=chroma><code class=language-txt data-lang=txt>&#34;We finish each other&#39;s...&#34;
+&gt; sentences
+&gt; work
+&gt; meals
+
+&#34;Berlin is a...&#34;
+&gt; small, but important city.
+&gt; major center.
+&gt; major transit destination
+
+&#34;Politicians are...&#34;
+&gt; divided at their view of Russia
+&gt; now calling a referendum for May
+&gt; already looking forward, saying they want better services, more choice
+&gt; not opposed to abortion rights, nor can their views be a...
+&gt; concerned about China&#39;s growing political sophistication
+
+&#34;To be or not to be?&#34;
+&gt; Are al your lives in vain?
+&gt; This isn&#39;t the final question we got
+&gt; And yet, it is the greatest of virtues
+</code></pre></div><p>The whole code is available on <a href=https://github.com/zserge/aint/tree/main/gpt2>GitHub</a> and it&rsquo;s all under 300 LOC!</p><h2 id=ai>AI?</h2><p>Clearly, the model is hallucinating. Berlin is not a small city at all, not there is referendum in May. But for an absolutely tiny model having 124M parameters (about the size of a mouse brain) it can produce rather meaningful text. If you print a list of top candidates for each token you might be surprised to see know much knowledge the model has about the world.</p><p>The final decision whether such models are &ldquo;intelligent&rdquo; or not is left to the reader, but the results prove that large networks trained on large data sets is a way to go for the artificial intelligence today. Or is it?</p><p>Next: TinyStories (Coming soon!)</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jan 04, 2024</em></p><p>See also:
+<a href=/posts/ai-nn/>AI or ain't: Neural Networks</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2023 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
