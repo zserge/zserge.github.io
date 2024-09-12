@@ -1,0 +1,110 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Tiny Great Languages: MOUSE</title><meta name=description content="From &#34;2+2=4&#34; to &#34;2 2 + 4 =&#34;, reverse Polish notation, concatenative languages, Forth and its smaller siblings."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/langs-mouse/><meta property="og:title" content="Tiny Great Languages: MOUSE"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/langs-mouse/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="From &#34;2+2=4&#34; to &#34;2 2 + 4 =&#34;, reverse Polish notation, concatenative languages, Forth and its smaller siblings."><meta property="og:locale" content="en_US"><meta name=twitter:card content="From &#34;2+2=4&#34; to &#34;2 2 + 4 =&#34;, reverse Polish notation, concatenative languages, Forth and its smaller siblings."><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Tiny Great Languages: MOUSE</h1><p><em>This is part 3 from series &ldquo;Tiny Great Languages&rdquo;.</em></p><ul><li><em>Final code is on <a href=https://github.com/zserge/tinylangs>Github</a>.</em></li><li><em><a href=/posts/langs-asm/>Part 1: Assembly</a>.</em></li><li><em><a href=/posts/langs-basic/>Part 2: BASIC</a>.</em></li><li><em><a href=/posts/langs-mouse/>Part 3: Forth/MOUSE</a>.</em></li></ul><p>Let&rsquo;s go <a href=https://en.wikipedia.org/wiki/Forth_(programming_language)>Forth</a>. A <a href=https://concatenative.org/wiki/view/Front%20Page>concatenative</a> language available on early computers, a great example of how small, elegant languages can be both powerful and efficient.</p><p>I&rsquo;ve already covered building a proper Forth from the ground up in an <a href=/posts/post-apocalyptic-programming>earlier post</a>. Now, let&rsquo;s explore a much smaller Forth-like language: MOUSE.</p><p>MOUSE, created in 1976, is often recommended as a good starting point for writing your first interpreter. It uses reverse Polish notation with single-letter operators and variables for its syntax. Like most languages from the 70s, MOUSE is compact, small enough to fit into just a few kilobytes of memory. But could the implementation be shorter than 50 lines of code?</p><p>The original MOUSE source code was published in the famous <a href=https://en.wikipedia.org/wiki/Byte_(magazine)>BYTE</a> magazine, which taught an early generation of programmers how to make the most out of their micro- (now &ldquo;retro-") computers. There is also a newer and <a href=http://mouse.davidgsimpson.com/mouse83/index.html>extended version</a> of MOUSE by the same author, but I&rsquo;ll be using the version published in BYTE &lsquo;79.</p><p>To get a feel for MOUSE, here&rsquo;s a factorial program written in it:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>&#39; A simple factorial program in MOUSE language
+N 10 =
+
+I 2 =
+F 1 =
+(
+    N. 1 + I. - ^
+    F F. I. * =
+    I I. 1 + =
+)
+N.! &#34; =&gt; &#34; F.! &#34;!&#34;
+</code></pre></div><p>At first glance, it might look cryptic, but let’s break it down. In this code, <code>N</code>, <code>I</code>, and <code>F</code> are global variables. Unlike most Forth implementations, MOUSE relies heavily on named variables rather than stack manipulation (there’s no &ldquo;dup&rdquo;, &ldquo;drop&rdquo;, &ldquo;swap&rdquo;, etc.). There are 26 variables, named A to Z. The equals sign assigns a value to a variable, so <code>N 10 =</code> is like <code>N := 10</code>. In newer versions of MOUSE, they replaced the <code>=</code> with <code>:</code> for assignment. A dot after a variable fetches its value and pushes it onto the stack. So, <code>N.1+I.-</code> translates to <code>N+1-I</code>. An exclamation point is the print operator, so <code>N.!</code> is <code>print(N)</code>.</p><p>Parentheses combined with a caret create a conditional loop: if the code to the left of the caret results in a non-positive value (0 or negative), the loop continues. Otherwise, it terminates. MOUSE also has a <code>[ ... ]</code> operator for &ldquo;if/then&rdquo; blocks, which are only executed if the current value on the stack is non-positive.</p><p>While MOUSE doesn&rsquo;t have functions, it does support macros! A macro is defined using <code>$name ... @</code> and is called with <code>#name ... ;</code>. Macro parameters, named <code>%A</code>, <code>%B</code>, etc., allow passing values into the macro and returning results. Other variables inside macros behave as local variables and are cleared when the macro exits. Macros can be nested and called recursively (your RAM is the limit, which in the 70s was often very low).</p><p>The syntax and logic of the language are simple enough to implement in a single function. We’ll also need a helper function, <code>skip()</code>, to find matching pairs of parentheses, brackets, and quotes.</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>import sys
+
+# Returns a position in string &#34;s&#34; of the unmatched delimiter &#34;r&#34; (skipping nested l+r pairs)
+#
+#     skip(&#34;2+(3+(4+5)))+6&#34;, &#34;(&#34;, &#34;)&#34;) -&gt; 12 (&#34;+6&#34;)
+#     skip(&#34;a [ b  [] [] c]] d []&#34;, &#34;[&#34;, &#34;]&#34;) -&gt; 16 (&#34; d []&#34;)
+#
+def skip(s, l, r): return next(i + 1 for i, c in enumerate(s) if (c == r and (s[:i].count(l) - s[:i].count(r)) == 0))
+
+# A MOUSE interpreter in one function:
+def mouse(s):
+    # We need to store macro definitons (they don&#39;t shadow variables),
+    # data stack, return stack and memory for variables.
+    defs, ds, rs, data = {}, [], [], [0] * 200
+    # First we loop over code and store starting addresses of all macros
+    for i, c in enumerate(s):
+        if c == &#34;$&#34;: defs[s[i + 1]] = i + 2
+    # &#34;i&#34; is a code pointer, offset if the start of the first local variable
+    # &#34;A&#34; in current environment (environments can be nested, so inner
+    # function&#39;s &#34;A&#34; becomes 26, the other inner starts with 52 etc.
+    i, offset = 0, 0
+    while i &lt; len(s) and s[i] != &#34;$&#34;:
+        # Skip whitespace
+        if s[i] in &#34; \t\r\n]$&#34;: pass
+        # Skip comments till the end of line
+        elif s[i] == &#34;&#39;&#34;: i += s[i + 1 :].find(&#34;\n&#34;)
+        # Parse numbers into integers
+        elif s[i].isdigit():
+            n = 0
+            while s[i].isdigit(): n = n * 10 + ord(s[i]) - ord(&#34;0&#34;); i = i + 1
+            i = i - 1
+            ds.append(n)
+        # Put variable address on data stack
+        elif s[i] in &#34;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#34;: ds.append(ord(s[i]) - ord(&#34;A&#34;) + offset)
+        # Read user input as a number
+        elif s[i] == &#34;?&#34;: ds.append(num(input(&#34;&gt; &#34;)))
+        # Print value from data stack as a number
+        elif s[i] == &#34;!&#34;: print(ds.pop(), end=&#34;&#34;)
+        # Print a literal string, &#34;!&#34; is newline
+        elif s[i] == &#39;&#34;&#39;: j = skip(s[i + 1 :], &#39;&#34;&#39;, &#39;&#34;&#39;); print(s[i + 1 : i + j].replace(&#34;!&#34;, &#34;\n&#34;), end=&#34;&#34;); i = i + j
+        # Common arithmetics and comparison (note the lack of == and != operators
+        elif s[i] == &#34;+&#34;: ds.append(ds.pop() + ds.pop())
+        elif s[i] == &#34;-&#34;: ds.append(-ds.pop() + ds.pop())
+        elif s[i] == &#34;*&#34;: ds.append(ds.pop() * ds.pop())
+        elif s[i] == &#34;/&#34;: ds.append(int(1 / (ds.pop() / ds.pop())))
+        elif s[i] == &#34;&gt;&#34;: ds.append(int(ds.pop() &lt; ds.pop()))
+        elif s[i] == &#34;&lt;&#34;: ds.append(int(ds.pop() &gt; ds.pop()))
+        # Fetch/dereference variable
+        elif s[i] == &#34;.&#34;: ds.append(data[ds.pop()])
+        # Store value into a variable
+        elif s[i] == &#34;=&#34;: x = ds.pop(); data[ds.pop()] = x
+        # If data stack has non-positive value: execute the block, otherwise skip it
+        elif s[i] == &#34;[&#34;: i += skip(s[i + 1 :], &#34;[&#34;, &#34;]&#34;) if ds.pop() &lt;= 0 else 0
+        # Start of the loop: store it in return stack
+        elif s[i] == &#34;(&#34;: rs.append((&#34;LOOP&#34;, i, offset))
+        # Loop condition: if condition is non-positive - continue, otherwise skip until pairing &#34;)&#34;
+        elif s[i] == &#34;^&#34;:
+            if ds.pop() &lt;= 0: _, i, _ = rs.pop(); i += skip(s[i + 1 :], &#34;(&#34;, &#34;)&#34;)
+        # End of loop: return to its start (which is stored on return stack)
+        elif s[i] == &#34;)&#34;: _, i, offset = rs[-1]
+        # Call a macro: save current code pointer and variable offset, jump to the start of the macro
+        elif s[i] == &#34;#&#34;:
+            if s[i + 1] in defs:
+                rs.append((&#34;MACRO&#34;, i, offset))
+                i = defs[s[i + 1]]
+                offset = offset + 26
+            else: i += skip(s[i + 1 :], &#34;#&#34;, &#34;;&#34;)
+        # End of macro: return to the macro call address and ignore until the last parameter (&#34;;&#34;)
+        elif s[i] == &#34;@&#34;: _, i, offset = rs.pop(); i += skip(s[i + 1 :], &#34;#&#34;, &#34;;&#34;)
+        # Macro parameter delimiter: return back to the macro and continue execution from there
+        elif s[i] == &#34;,&#34; or s[i] == &#34;;&#34;: _, i, offset = rs.pop()
+        # Macro parameter inside macro: jump to the matching value from the macro call
+        elif s[i] == &#34;%&#34;:
+            pn = ord(s[i + 1])-ord(&#34;A&#34;)+1
+            rs.append((&#34;PARAM&#34;, i + 1, offset))
+            pb = 1
+            tmp = len(rs) - 1
+            while pb:
+                tmp = tmp - 1
+                tag, nn, off = rs[tmp]
+                if tag == &#34;MACRO&#34;: pb = pb - 1
+                elif tag == &#34;PARAM&#34;: pb = pb + 1
+            _, i, offset = rs[tmp]
+            while i &lt; len(s) and pn and s[i] != &#34;;&#34;:
+                i = i + 1
+                if s[i] == &#34;#&#34;: i += skip(s[i:], &#34;#&#34;, &#34;;&#34;)
+                if s[i] == &#34;,&#34;: pn = pn - 1
+            if s[i] == &#34;;&#34;: _, i, offset = rs.pop()
+        i = i + 1
+
+
+mouse(&#34;\n&#34;.join([line for line in sys.stdin]))
+</code></pre></div><p>Not much more to add besides the comments. The code closely replicates what was suggested in BYTE magazine.</p><p>Macros must be defined at the end of the program, which is how the language was originally designed. This also means that the full program must be entered before execution (unlike BASIC, MOUSE is not a <a href=https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>REPL</a>).</p><p>Our interpreter first scans the code for macros, remembers their positions, and then executes the program byte by byte: arithmetics, conditionals, loops, input/output are just single-byte instructions that are executed immediately as they are found in code.</p><p>Without macros our MOUSE interpreter would have been half the size, but also half as useful. Macro implementation in MOUSE is rather interesting. Since the language limits itself to 26 variables - every &ldquo;call frame&rdquo; (a set of local variables per macro call) is also 26 cells long. So we keep track of an offset for the current call frame in memory and every macro can only reach out to the variables in that frame. We increase the offset as we enter the macro and restore it on return.</p><p>When a macro is called (<code>#...;</code>) the interpreter looks up its name in the definitions table. A missing macro is a no-op and does not halt the interpreter. If a macro is found - the interpreter jumps into its body (remembering the current address in code to return back) and keeps running from there.</p><p>Macro body always ends with <code>@</code>, at which point the interpreter pops up the return address and skips everything until the matching <code>;</code> of the macro call. Macros without parameters are simple as that: store address when a macro is called, restore it at the end of the macro body, skip macro call until the <code>;</code>.</p><p>Macro parameters make it more challenging. When a parameter is found in a macro (<code>%A</code>, <code>%B</code>, &mldr;) &ndash; the interpreter converts it to a number (position in the argument list during the call) and jumps back to the macro call to find the actual parameter value at that position. The value in macro call is being evaluated each time the parameter is used in a macro, which makes macros very different from functions. But overall it works very intuitively, and allows some nice tricks: writing to &ldquo;outer&rdquo; variables from the macro, using expressions as macro parameters, calling macros from inside macros and even calling them recursively.</p><p>Now that we understand how macros work - we can rewrite MOUSE factorial in a fancier and terser manner:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>&#34;10 =&gt; &#34; #F,10;! &#34;!&#34;
+$F F%A=1(F.^F.*FF.1-=) @
+</code></pre></div><p>That&rsquo;s it! MOUSE is an interesting little language and there is even a whole <a href=http://www.retroprogramming.com/2012/08/mouse-language-for-microcomputers-by.html>book</a> written about it. For inspiration, check out <a href=https://esolangs.org/wiki/FALSE>FALSE</a>, a similar but more modern and esoteric language. Or, if you’re up for a challenge, try building a full Forth system, especially one that runs on real hardware instead of a VM.</p><p>But for now, let’s move on! In the next chapter, we’ll take a closer look at Lisp. Stay tuned!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 11, 2024</em></p><p>See also:
+<a href=/posts/langs-basic/>Tiny Great Languages: BASIC</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2023 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
