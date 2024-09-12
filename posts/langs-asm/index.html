@@ -1,0 +1,113 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Tiny Great Languages: Assembly</title><meta name=description content="Summing up years of building interpreters and compilers for various programming languages. The first chapter is about assembly language. We will try to implement a tiny two-pass assembler for CPython VM."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/langs-asm/><meta property="og:title" content="Tiny Great Languages: Assembly"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/langs-asm/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Summing up years of building interpreters and compilers for various programming languages. The first chapter is about assembly language. We will try to implement a tiny two-pass assembler for CPython VM."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Summing up years of building interpreters and compilers for various programming languages. The first chapter is about assembly language. We will try to implement a tiny two-pass assembler for CPython VM."><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Tiny Great Languages: Assembly</h1><p><em>This is part 1 from series &ldquo;Tiny Great Languages&rdquo;. Full code is on <a href=https://github.com/zserge/tinylangs>Github</a>.</em></p><p>Decades ago, I wrote my first interpreter &ndash; a <a href=https://en.wikipedia.org/wiki/Turtle_graphics>Turtle Graphics</a> IDE designed to help kids at my school learn programming. I built it in Pascal, and to this day, I still wonder how I managed to make it work without any formal knowledge of writing interpreters.</p><p>Since then, I&rsquo;ve created dozens of small domain specific languages (DSLs), humble compilers, and some <a href=https://github.com/cesanta/elk>absurdly</a> <a href=https://github.com/zserge/partcl>tiny</a> <a href=https://github.com/zserge/expr>interpreters</a>.</p><p>I once read a discussion on Hacker News where someone suggested that every programmer, over their lifetime, should implement six programming languages: an assembler, a version of BASIC, a flavour of Lisp, a Forth, and a subset of C. The specific languages aren&rsquo;t as important as the families they represent. These are the Great Languages &ndash; each with a rich history that has fundamentally shaped modern programming in one way or another.</p><p>In this post I hope to re-implement these languages once more, keeping each implementation to around 50 lines of code. My goal is to highlight the unique characteristics of each language family while keeping the approach simple.</p><p>I&rsquo;ll be using Python for these implementations, for a good balance between code density and readability. The only test program our interpreters would need to run is a factorial calculator, something we&rsquo;ve all written many times (and something that can be implemented in different ways).</p><h2 id=assembly>Assembly</h2><p>One of the oldest programming languages in history is Assembly. Essentially, it&rsquo;s a textual representation of CPU machine code instructions, with some helper directives to handle labels, constants, and sometimes even primitive macros.</p><p>We could target any architecture &ndash; whether a real CPU or a virtual machine &ndash; but since we&rsquo;re using Python, why not build an assembler for the CPython VM itself?</p><p>Ironically, the CPython instruction set is somewhat <a href=https://docs.python.org/3/whatsnew/3.11.html#cpython-bytecode-changes>unstable</a> &ndash; Python 3.10 has difference in the bytecode instruction set from 3.9, and 3.11 has differences from 3.10 etc. Some instructions are being deprecated, removed, or replaced over time. Perhaps the easiest way to learn about <em>current</em> CPython bytecode is to disassemble a real function in a real VM:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=kn>import</span> <span class=nn>dis</span>
+
+<span class=k>def</span> <span class=nf>factorial</span><span class=p>(</span><span class=n>n</span><span class=p>):</span>
+    <span class=k>if</span> <span class=n>n</span> <span class=o>==</span> <span class=mi>0</span><span class=p>:</span>
+        <span class=k>return</span> <span class=mi>1</span>
+    <span class=k>else</span><span class=p>:</span>
+        <span class=k>return</span> <span class=n>n</span> <span class=o>*</span> <span class=n>factorial</span><span class=p>(</span><span class=n>n</span> <span class=o>-</span> <span class=mi>1</span><span class=p>)</span>
+
+<span class=n>dis</span><span class=o>.</span><span class=n>dis</span><span class=p>(</span><span class=n>factorial</span><span class=p>)</span>
+</code></pre></div><p>This will produce an output like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>  3           0 RESUME                   0
+  4           2 LOAD_FAST                0 (n)
+              4 LOAD_CONST               1 (0)
+              6 COMPARE_OP              40 (==)
+             10 POP_JUMP_IF_FALSE        1 (to 14)
+  5          12 RETURN_CONST             2 (1)
+  7     &gt;&gt;   14 LOAD_FAST                0 (n)
+             16 LOAD_GLOBAL              1 (NULL + factorial)
+             26 LOAD_FAST                0 (n)
+             28 LOAD_CONST               2 (1)
+             30 BINARY_OP               10 (-)
+             34 CALL                     1
+             42 BINARY_OP                5 (*)
+             46 RETURN_VALUE
+</code></pre></div><p>Each line here represents a single VM instruction, which typically takes up 2 bytes: one for the instruction opcode and one for the parameter. Parameters, like constants or variables, are referenced by their index and should be declared upfront, before assembling the bytecode. For instance, if we define the constants 1, 7, 42 for a function, we can use indices #1, #2, and #3 to refer to them in opcodes, such as <code>LOAD_CONST</code>. In this case <code>LOAD_CONST 2</code> would essentially load number 7.</p><p>Next, we can print the actual bytecode of a function and match the numerical opcode values with the corresponding instructions:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>print(&#34; &#34;.join(f&#34;{byte:02x}&#34; for byte in factorial.__code__.co_code))
+
+97 00 7c 00 64 01 6b 28 00 00 72 01 79 02 7c 00 74 01 00 00 00 00 00 00 00 00 7c 00 64 02 7a 0a 00 00 ab 01 00 00 00 00 00 00 7a 05 00 00 53 00
+</code></pre></div><p>Here, for example, we see that <code>RESUME</code> corresponds to 0x97, <code>LOAD_FAST</code> to 0x7c, <code>LOAD_CONST</code> to 0x64, <code>COMPARE_OP</code> to 0x6b, and <code>RETURN_VALUE</code> to 0x53.</p><p>There is also an unusual <code>BINARY_OP</code> which is a meta-instruction. Its parameter specifies the type of an arithmetic operation to perform. With some experimentation, we can discover their values: <code>+:0, -:10, *:5, /:3</code>. A keen eye might notice that <code>BINARY_OP</code> instructions are also 4 bytes long &ndash; the parameter is a 2-byte little-endian value followed by a zero.</p><p>Now, we&rsquo;re ready to implement a toy assembler for the Python VM. We&rsquo;ll keep the instruction names as Python defines them, but we&rsquo;ll replace <code>BINARY_OP</code> with their actual operation names, like <code>ADD</code>, <code>SUBTRACT</code>, and so on. We would also need a <code>JUMP</code> instruction to implement a factorial. We&rsquo;ll define any line containing a <code>:</code> as a label, and later, instructions like <code>POP_JUMP_IF_FALSE mylabel</code> will resolve to the correct label address. We&rsquo;ll also allow comments by ignoring everything after the instruction name and its parameter. Lines starting with <code>CONST</code> will define constants, and lines starting with <code>VAR</code> will define local variable names.</p><p>The implementation would be a typical multi-pass assembler. We can&rsquo;t build all the bytecode in one go, because we need to build a table of labels first and then assemble the instructions using the correct label addresses, otherwise forward declarations of labels wouldn&rsquo;t work.</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>import types,dis,sys
+
+# Some CPython VM opcodes, feel free to extend these
+OPS = {&#39;LOAD_CONST&#39;:100,&#39;LOAD_FAST&#39;:124,&#39;STORE_FAST&#39;:125,&#39;RETURN_VALUE&#39;:83,&#39;JUMP_FORWARD&#39;:110,&#39;JUMP_BACKWARD&#39;:140,&#39;POP_JUMP_IF_FALSE&#39;:114,&#39;POP_JUMP_IF_TRUE&#39;:115,&#39;BINARY_OP&#39;:122}
+
+# BINARY_OP parameters for arithmetic operations
+BINOPS = {&#39;ADD&#39;:0,&#39;SUBTRACT&#39;:10,&#39;MULTIPLY&#39;:5,&#39;DIVIDE&#39;:3}
+
+# Two-pass assembler
+def assemble(code):
+     bytecode, consts, vars, labels = [], [], [], {}
+     pos = 0
+     # First pass: handle constants, variables and label addresses
+     for line in code.split(&#39;\n&#39;):
+          parts = line.strip().split()
+          if not parts: continue
+          instr = parts[0]
+          if instr.endswith(&#39;:&#39;): labels[instr[:-1]] = pos
+          elif instr == &#39;CONST&#39;: consts.append(int(parts[1]))
+          elif instr == &#39;VAR&#39;: vars.append(parts[1])
+          else: pos += 2 if instr not in BINOPS else 4
+     # Second pass: translate instructions to bytecode 1:1 and fill in labels
+     for line in code.split(&#39;\n&#39;):
+          parts = line.strip().split()
+          if not parts: continue
+          instr = parts[0]
+          if instr.endswith(&#39;:&#39;) or instr == &#39;CONST&#39; or instr == &#39;VAR&#39;: continue
+          arg = parts[1] if len(parts) &gt; 1 else 0
+          # Replace labels with addresses
+          if isinstance(arg, str) and arg in labels:
+               if labels[arg] &lt; len(bytecode): arg = (len(bytecode)-labels[arg])/2+1
+               else: arg = (labels[arg]-len(bytecode))/2-1
+          if instr in BINOPS:
+              # BINARY_OP is a 4-byte command with a 2-byte parameter
+              bytecode.append(OPS[&#39;BINARY_OP&#39;])
+              bytecode.append(BINOPS[instr]&amp;255)
+              bytecode.append(BINOPS[instr]&gt;&gt;8&amp;255)
+              bytecode.append(0)
+          else:
+              bytecode.append(OPS[instr])
+              bytecode.append(int(arg))
+     return tuple(consts), tuple(vars), bytes(bytecode)
+
+code = &#39;&#39;.join([line for line in sys.stdin])
+consts, v, bytecode = assemble(code)
+code_obj = types.CodeType(0,0,0,len(v),128,64,bytecode,consts,(),v,&#39;asm&#39;,&#39;mod&#39;,&#39;&#39;,1,b&#39;&#39;,b&#39;&#39;)
+ff = types.FunctionType(code_obj, {})
+# Optionally, disassemble the bytecode for debugging
+# dis.dis(ff)
+print(ff())
+</code></pre></div><p>Here&rsquo;s a simple program for our assembler that would load a constant 42 into a variable <code>result</code> and return it:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback># Run it: python3 asm.py &lt; 42.txt
+# 42.txt:
+CONST 42
+VAR result
+LOAD_CONST 0
+RETURN_VALUE 0
+</code></pre></div><p>A factorial program would be a little bit more complicated, but still fairly straightforward:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>CONST 1
+CONST 10
+VAR n
+VAR result
+
+LOAD_CONST 0         # result = 1
+STORE_FAST 0         # store in result
+LOAD_CONST 1         # n = CONST[1] (change this to calculate factorial of different numbers)
+STORE_FAST 1         # store in n
+loop:
+LOAD_FAST 1          # load n
+POP_JUMP_IF_FALSE end  # if n == 0, jump to end
+LOAD_FAST 0          # load result
+LOAD_FAST 1          # load n
+MULTIPLY 0           # result = result * n
+STORE_FAST 0         # store result
+LOAD_FAST 1          # load n
+LOAD_CONST 0         # load 1
+SUBTRACT 0           # n = n - 11
+STORE_FAST 1         # store n
+JUMP_BACKWARD loop   # jump to start of loop
+end:
+LOAD_FAST 0          # load result
+RETURN_VALUE 0       # return result
+</code></pre></div><p>Running it should calculate the factorial of 10:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python3 asm.py &lt; factorial/fac.asm
+3628800
+</code></pre></div><p>That&rsquo;s the correct answer!</p><p>Writing an assembler is a really straightforward task (just like the language itself), and if you are looking for an inspiratoin - you might try to build one for simple architectures, such as CHIP-8, 6502, Z80 etc.</p><p>In the next part we&rsquo;ll move on to some higher-level languages, stay tuned!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 08, 2024</em></p><p>See also:
+<a href=/posts/post-apocalyptic-programming/>Post-apocalyptic programming</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2023 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
