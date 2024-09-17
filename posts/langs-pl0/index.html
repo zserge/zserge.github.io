@@ -1,0 +1,245 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Tiny Great Languages: PL/0</title><meta name=description content="Explore PL/0, a simplified subset of Pascal, and learn how to build a lexer, a parser and an interpreter from scratch."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/langs-pl0/><meta property="og:title" content="Tiny Great Languages: PL/0"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/langs-pl0/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Explore PL/0, a simplified subset of Pascal, and learn how to build a lexer, a parser and an interpreter from scratch."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Explore PL/0, a simplified subset of Pascal, and learn how to build a lexer, a parser and an interpreter from scratch."><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Tiny Great Languages: PL/0</h1><p><em>This is part 6 from series &ldquo;Tiny Great Languages&rdquo;.</em></p><ul><li><em>Final code is on <a href=https://github.com/zserge/tinylangs>Github</a>.</em></li><li><em><a href=/posts/langs-asm/>Part 1: Assembly</a>.</em></li><li><em><a href=/posts/langs-basic/>Part 2: BASIC</a>.</em></li><li><em><a href=/posts/langs-mouse/>Part 3: Forth/MOUSE</a>.</em></li><li><em><a href=/posts/langs-lisp/>Part 4: Lisp</a>.</em></li><li><em><a href=/posts/langs-apl/>Part 5: APL/K</a>.</em></li><li><em><a href=/posts/langs-pl0/>Part 6: PL/0</a>.</em></li></ul><p>Let&rsquo;s talk about Pascal. It&rsquo;s the language I first learned many years ago, and it becomes the final one we cover in this series. Well, not the full version of Pascal, but a tiny educational subset defined by the legendary <a href=https://en.wikipedia.org/wiki/Niklaus_Wirth>Niklaus Wirth</a>.</p><p>Back in 1976 (around the same time most of the languages in this series were born), Wirth wrote a book titled <em>Algorithms + Data Structures = Programs</em>. This was one of the most influential books in computer science, inspiring Anders Hejlsberg to create the famous <a href=https://en.wikipedia.org/wiki/Turbo_Pascal>Turbo Pascal</a> compiler. At the end of the book, there were chapters on language structures and compilers, explaining how to build a compiler with code generation for a small subset of Pascal known as <a href=https://en.wikipedia.org/wiki/PL/0>PL/0</a>.</p><p>For this post, we&rsquo;ll keep things simple and build an interpreter for PL/0. It&rsquo;s the largest code implementation in the series, but it&rsquo;s also the most conventional one.</p><p>Here&rsquo;s what a factorial program in PL/0 looks like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>var n, f;
+begin
+  n := 10;
+  f := 1;
+  while n &gt; 0 do
+  begin
+    f := f * n;
+    n := n - 1;
+  end;
+  ! f
+end.
+</code></pre></div><p>Looks familiar, right? It&rsquo;s quite similar to Pascal.</p><h2 id=lexer>Lexer</h2><p>So far, none of the languages we&rsquo;ve implemented had a <em>real</em> lexer. We used simple hacks like splitting strings by whitespace or brackets, or treating single characters as tokens.</p><p>Lexers are crucial for building interpreters and compilers. They transform a stream of bytes into a stream of language tokens, where each token has a type and a value:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback># the code:
+var n, f;
+
+# becomes:
+(keyword, &#34;var&#34;)
+(ident, &#34;n&#34;)
+(comma, &#34;,&#34;)
+(ident, &#34;f&#34;)
+(semicolon, &#34;;&#34;)
+</code></pre></div><p>In our case, we can cheat a bit by using regular expressions to tokenize the input with minimal code:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>lex</span><span class=p>(</span><span class=n>s</span><span class=p>):</span>
+    <span class=n>m</span> <span class=o>=</span> <span class=n>re</span><span class=o>.</span><span class=n>match</span><span class=p>(</span><span class=sa>r</span><span class=s2>&#34;(?P&lt;num&gt;[0-9]+)|(?P&lt;op&gt;[-+*/()&lt;&gt;=])|(?P&lt;ws&gt;\s+)|(?P&lt;kw&gt;begin|end\.|end|if|then|while|do|var|!|\?|call|procedure)|(?P&lt;id&gt;[a-zA-Z]+)|(?P&lt;semi&gt;;)|(?P&lt;asgn&gt;:=)|(?P&lt;comma&gt;,)&#34;</span><span class=p>,</span> <span class=n>s</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>m</span><span class=p>:</span> <span class=k>raise</span> <span class=ne>SyntaxError</span><span class=p>(</span><span class=s2>&#34;unexpected character&#34;</span><span class=p>)</span>
+    <span class=k>if</span> <span class=n>m</span><span class=o>.</span><span class=n>lastgroup</span> <span class=o>==</span> <span class=s2>&#34;ws&#34;</span><span class=p>:</span> <span class=k>return</span> <span class=n>lex</span><span class=p>(</span><span class=n>s</span><span class=p>[</span><span class=n>m</span><span class=o>.</span><span class=n>end</span><span class=p>():])</span>
+    <span class=k>return</span> <span class=n>s</span><span class=p>[:</span><span class=n>m</span><span class=o>.</span><span class=n>end</span><span class=p>()],</span> <span class=n>m</span><span class=o>.</span><span class=n>lastgroup</span><span class=p>,</span> <span class=n>s</span><span class=p>[</span><span class=n>m</span><span class=o>.</span><span class=n>end</span><span class=p>():]</span>
+</code></pre></div><p>Each call to <code>lex()</code> returns a token value, its type, and the remaining input string:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=n>s</span> <span class=o>=</span> <span class=s2>&#34;var n, f;&#34;</span>
+<span class=k>while</span> <span class=n>s</span><span class=p>:</span>
+    <span class=n>tok</span><span class=p>,</span> <span class=n>kind</span><span class=p>,</span> <span class=n>s</span> <span class=o>=</span> <span class=n>lex</span><span class=p>(</span><span class=n>s</span><span class=p>)</span>
+    <span class=k>print</span><span class=p>(</span><span class=n>tok</span><span class=p>,</span> <span class=n>kind</span><span class=p>)</span>
+
+<span class=c1># Output:</span>
+<span class=n>kw</span> <span class=n>var</span>
+<span class=nb>id</span> <span class=n>n</span>
+<span class=n>comma</span> <span class=p>,</span>
+<span class=nb>id</span> <span class=n>f</span>
+<span class=n>semi</span> <span class=p>;</span>
+</code></pre></div><p>Of course, if the language supported more complex tokens (like string literals with escapes or unary operators), we&rsquo;d need a more sophisticated lexer or even a lexer generator. But for PL/0, this approach will do.</p><h2 id=parser>Parser</h2><p>With the lexer in place, we can now build a syntax tree. In previous languages, we didn&rsquo;t need a formal syntax tree. Lisp was close, but it didn&rsquo;t require one because of its &ldquo;code is data&rdquo; philosophy. This time, things are different.</p><p>To interpret the code, we need to parse it into a tree structure. The &ldquo;root&rdquo; of the tree is the program&rsquo;s entry point, containing a block of statements. Each statement may contain expressions made of factors and terms.</p><p>The expression parser will look similar to what we implemented for BASIC, but the statements are very different. We will have conditional statements, loop statements, variable declarations, procedure declarations etc. We&rsquo;ll represent each statement as a tuple, with the first element being the statement type, and the remaining elements being its components (nested statements).</p><p>Our main parser function will be <code>parse()</code>, and we&rsquo;ll need a helper function <code>eat()</code> to consume tokens from the stream:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>parse</span><span class=p>(</span><span class=n>code</span><span class=p>):</span>
+    <span class=n>tok</span><span class=p>,</span> <span class=n>kind</span><span class=p>,</span> <span class=n>code</span> <span class=o>=</span> <span class=n>lex</span><span class=p>(</span><span class=n>code</span><span class=p>)</span>
+
+    <span class=k>def</span> <span class=nf>eat</span><span class=p>(</span><span class=n>expected</span><span class=p>):</span>
+        <span class=n>nonlocal</span> <span class=n>code</span><span class=p>,</span> <span class=n>tok</span><span class=p>,</span> <span class=n>kind</span>
+        <span class=k>if</span> <span class=n>kind</span> <span class=o>!=</span> <span class=n>expected</span><span class=p>:</span>
+            <span class=k>raise</span> <span class=ne>SyntaxError</span><span class=p>(</span><span class=n>f</span><span class=s2>&#34;Expected {expected} but got {kind}&#34;</span><span class=p>)</span>
+        <span class=n>prevtok</span><span class=o>=</span><span class=n>tok</span>
+        <span class=n>tok</span><span class=p>,</span> <span class=n>kind</span><span class=p>,</span> <span class=n>code</span> <span class=o>=</span> <span class=n>lex</span><span class=p>(</span><span class=n>code</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>prevtok</span>
+
+    <span class=c1># Example:</span>
+    <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span> <span class=c1># consume &#34;var&#34;</span>
+    <span class=n>v1</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span> <span class=c1># consume &#34;n&#34;</span>
+    <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;comma&#34;</span><span class=p>)</span>
+    <span class=n>v2</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span> <span class=c1># consume &#34;f&#34;</span>
+    <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;semi&#34;</span><span class=p>)</span>
+
+<span class=n>parse</span><span class=p>(</span><span class=s2>&#34;var n, f;&#34;</span><span class=p>)</span>
+</code></pre></div><p>There might be a better way to organize the code, like turning the parser into a class and keeping the internal state there. But for simplicity, using nested functions with <code>nonlocal</code> variables works good enough.</p><p>The first statement in PL/0 is the &ldquo;block&rdquo;. Blocks begin with an optional list of variables, followed by procedures and a body of statements, often starting with &ldquo;begin&rdquo; and ending with &ldquo;end&rdquo;:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>block</span><span class=p>():</span>
+    <span class=n>var</span><span class=p>,</span> <span class=n>proc</span> <span class=o>=</span> <span class=p>[],</span> <span class=p>[]</span>
+    <span class=c1># var &lt;name&gt; , ... ;</span>
+    <span class=k>while</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;var&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span> <span class=c1># consume &#34;var&#34;</span>
+        <span class=k>while</span> <span class=n>tok</span> <span class=o>!=</span> <span class=s2>&#34;;&#34;</span><span class=p>:</span>
+            <span class=n>var</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>))</span> <span class=c1># consume variable name</span>
+            <span class=k>if</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;,&#34;</span><span class=p>:</span> 
+                <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;comma&#34;</span><span class=p>)</span> <span class=c1># consume comma delimiter</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;semi&#34;</span><span class=p>)</span> <span class=c1># consume final semicolon</span>
+
+    <span class=c1># procedure &lt;name&gt; ; begin ... end;</span>
+    <span class=k>while</span> <span class=n>tok</span> <span class=o>==</span> <span class=s1>&#39;procedure&#39;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s1>&#39;kw&#39;</span><span class=p>)</span> <span class=c1># consume &#34;procedure&#34;</span>
+        <span class=n>n</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s1>&#39;id&#39;</span><span class=p>)</span> <span class=c1># consume procedure name</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s1>&#39;semi&#39;</span><span class=p>)</span> <span class=c1># consume semicolon</span>
+        <span class=n>proc</span><span class=o>.</span><span class=n>append</span><span class=p>((</span><span class=n>n</span><span class=p>,</span> <span class=n>block</span><span class=p>()))</span> <span class=c1># consume procedure body (recursion)</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s1>&#39;semi&#39;</span><span class=p>)</span> <span class=c1># consume final semicolon</span>
+
+    <span class=c1># begin ... end (statement)</span>
+    <span class=k>return</span> <span class=s1>&#39;block&#39;</span><span class=p>,</span> <span class=n>var</span><span class=p>,</span> <span class=n>proc</span><span class=p>,</span> <span class=n>stmt</span><span class=p>()</span> <span class=c1># consume main block body</span>
+</code></pre></div><p>This is the core of the parser, but it relies heavily on a <code>stmt()</code> function that can handle different types of statements:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>stmt</span><span class=p>():</span>
+    <span class=c1># &lt;id&gt; := &lt;expr&gt;</span>
+    <span class=k>if</span> <span class=n>kind</span> <span class=o>==</span> <span class=s2>&#34;id&#34;</span><span class=p>:</span>
+        <span class=n>n</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;asgn&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=s2>&#34;asgn&#34;</span><span class=p>,</span> <span class=n>n</span><span class=p>,</span> <span class=n>expr</span><span class=p>()</span>
+
+    <span class=c1># call &lt;id&gt; -- call a procedure</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;call&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=n>n</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=s2>&#34;call&#34;</span><span class=p>,</span> <span class=n>n</span>
+
+    <span class=c1># ? &lt;id&gt; -- console input</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;?&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=n>n</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=s2>&#34;read&#34;</span><span class=p>,</span> <span class=n>n</span>
+
+    <span class=c1># ! &lt;expr&gt; -- console output</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;!&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=s2>&#34;write&#34;</span><span class=p>,</span> <span class=n>expr</span><span class=p>()</span>
+
+    <span class=c1># begin &lt;stmt...&gt; end -- composite statement</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;begin&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=n>body</span> <span class=o>=</span> <span class=p>[]</span>
+        <span class=k>while</span> <span class=n>tok</span> <span class=o>!=</span> <span class=s2>&#34;end&#34;</span> <span class=ow>and</span> <span class=n>tok</span> <span class=o>!=</span> <span class=s2>&#34;end.&#34;</span><span class=p>:</span>
+            <span class=n>body</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>stmt</span><span class=p>())</span>
+            <span class=k>if</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;;&#34;</span><span class=p>:</span>
+                <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;semi&#34;</span><span class=p>)</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=s2>&#34;begin&#34;</span><span class=p>,</span> <span class=n>body</span>
+
+    <span class=c1># if &lt;cond&gt; then &lt;stmt&gt;</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;if&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=n>c</span> <span class=o>=</span> <span class=n>cond</span><span class=p>()</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=p>(</span><span class=s2>&#34;if&#34;</span><span class=p>,</span> <span class=n>c</span><span class=p>,</span> <span class=n>stmt</span><span class=p>())</span>
+
+    <span class=c1># while &lt;cond&gt; do &lt;stmt&gt;</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;while&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=n>c</span> <span class=o>=</span> <span class=n>cond</span><span class=p>()</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;kw&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=p>(</span><span class=s2>&#34;while&#34;</span><span class=p>,</span> <span class=n>c</span><span class=p>,</span> <span class=n>stmt</span><span class=p>())</span>
+</code></pre></div><p>We now have a good overview of what PL/0 can do: it supports expressions, conditionals, loops, procedures (without arguments or return values), and basic input/output.</p><p>To finish the parser, we just need to handle expressions, conditions, factors, and terms:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>cond</span><span class=p>():</span>
+    <span class=n>e</span> <span class=o>=</span> <span class=n>expr</span><span class=p>()</span>
+    <span class=n>op</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>)</span>
+    <span class=k>return</span> <span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>,</span> <span class=n>op</span><span class=p>,</span> <span class=n>e</span><span class=p>,</span> <span class=n>expr</span><span class=p>())</span>
+
+<span class=k>def</span> <span class=nf>expr</span><span class=p>():</span>
+    <span class=n>e</span> <span class=o>=</span> <span class=n>term</span><span class=p>()</span>
+    <span class=k>while</span> <span class=n>tok</span> <span class=ow>in</span> <span class=s2>&#34;+-&#34;</span><span class=p>:</span>
+        <span class=n>op</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>)</span>
+        <span class=n>e</span> <span class=o>=</span> <span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>,</span> <span class=n>op</span><span class=p>,</span> <span class=n>e</span><span class=p>,</span> <span class=n>term</span><span class=p>())</span>
+    <span class=k>return</span> <span class=n>e</span>
+
+<span class=k>def</span> <span class=nf>term</span><span class=p>():</span>
+    <span class=n>t</span> <span class=o>=</span> <span class=n>factor</span><span class=p>()</span>
+    <span class=k>while</span> <span class=n>tok</span> <span class=ow>in</span> <span class=s2>&#34;*/&#34;</span><span class=p>:</span>
+        <span class=n>op</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>)</span>
+        <span class=n>t</span> <span class=o>=</span> <span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>,</span> <span class=n>op</span><span class=p>,</span> <span class=n>t</span><span class=p>,</span> <span class=n>factor</span><span class=p>())</span>
+    <span class=k>return</span> <span class=n>t</span>
+
+<span class=k>def</span> <span class=nf>factor</span><span class=p>():</span>
+    <span class=k>if</span> <span class=n>kind</span> <span class=o>==</span> <span class=s2>&#34;id&#34;</span><span class=p>:</span>
+        <span class=n>n</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=p>(</span><span class=s2>&#34;id&#34;</span><span class=p>,</span> <span class=n>n</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>kind</span> <span class=o>==</span> <span class=s2>&#34;num&#34;</span><span class=p>:</span>
+        <span class=n>num</span> <span class=o>=</span> <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;num&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=nb>int</span><span class=p>(</span><span class=n>num</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>tok</span> <span class=o>==</span> <span class=s2>&#34;(&#34;</span><span class=p>:</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>)</span>
+        <span class=n>e</span> <span class=o>=</span> <span class=n>expr</span><span class=p>()</span>
+        <span class=n>eat</span><span class=p>(</span><span class=s2>&#34;op&#34;</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>e</span>
+</code></pre></div><p>At the end of parse(), we return the top-level block, representing the main program:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>return</span> <span class=n>block</span><span class=p>()</span>
+</code></pre></div><h2 id=evaluation>Evaluation</h2><p>With the syntax tree built, we can now traverse it to execute the code. You could also use the tree for other purposes, like pretty-printing, code analysis, or profiling, but in this case, we&rsquo;ll just focus on running the code.</p><p>Our <code>eval()</code> function will handle all statement types and walk through the tree:</p><div class=highlight><pre class=chroma><code class=language-python data-lang=python><span class=k>def</span> <span class=nf>eval</span><span class=p>(</span><span class=n>node</span><span class=p>,</span> <span class=n>scope</span><span class=o>=</span><span class=p>(</span><span class=bp>None</span><span class=p>,</span> <span class=p>{},</span> <span class=p>{})):</span>
+    <span class=k>def</span> <span class=nf>find</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=n>i</span><span class=o>=</span><span class=mi>1</span><span class=p>):</span>
+        <span class=n>frame</span> <span class=o>=</span> <span class=n>scope</span>
+        <span class=k>while</span> <span class=n>frame</span> <span class=o>!=</span> <span class=bp>None</span><span class=p>:</span>
+            <span class=k>if</span> <span class=n>x</span> <span class=ow>in</span> <span class=n>frame</span><span class=p>[</span><span class=n>i</span><span class=p>]:</span>
+                <span class=k>return</span> <span class=n>frame</span><span class=p>[</span><span class=n>i</span><span class=p>]</span>
+            <span class=k>else</span><span class=p>:</span>
+                <span class=n>frame</span> <span class=o>=</span> <span class=n>frame</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
+
+    <span class=k>if</span> <span class=nb>type</span><span class=p>(</span><span class=n>node</span><span class=p>)</span> <span class=ow>is</span> <span class=nb>int</span><span class=p>:</span>
+        <span class=k>return</span> <span class=n>node</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;id&#34;</span><span class=p>:</span>
+        <span class=k>return</span> <span class=n>find</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=mi>1</span><span class=p>)[</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]]</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;asgn&#34;</span><span class=p>:</span>
+        <span class=n>env</span> <span class=o>=</span> <span class=n>find</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>env</span><span class=p>[</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]]</span> <span class=o>=</span> <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>2</span><span class=p>],</span> <span class=n>scope</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;begin&#34;</span><span class=p>:</span>
+        <span class=k>for</span> <span class=n>n</span> <span class=ow>in</span> <span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]:</span>
+            <span class=nb>eval</span><span class=p>(</span><span class=n>n</span><span class=p>,</span> <span class=n>scope</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;read&#34;</span><span class=p>:</span>
+        <span class=n>env</span> <span class=o>=</span> <span class=n>find</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>env</span><span class=p>[</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]]</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=nb>input</span><span class=p>(</span><span class=s2>&#34;&gt; &#34;</span><span class=p>))</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;op&#34;</span><span class=p>:</span>
+        <span class=k>return</span> <span class=p>{</span>
+            <span class=s2>&#34;+&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>add</span><span class=p>,</span>
+            <span class=s2>&#34;-&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>sub</span><span class=p>,</span>
+            <span class=s2>&#34;*&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>mul</span><span class=p>,</span>
+            <span class=s2>&#34;/&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>floordiv</span><span class=p>,</span>
+            <span class=s2>&#34;&lt;&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>lt</span><span class=p>,</span>
+            <span class=s2>&#34;&gt;&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>gt</span><span class=p>,</span>
+            <span class=s2>&#34;=&#34;</span><span class=p>:</span> <span class=n>operator</span><span class=o>.</span><span class=n>eq</span><span class=p>,</span>
+        <span class=p>}[</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]](</span><span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>2</span><span class=p>],</span> <span class=n>scope</span><span class=p>),</span> <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>3</span><span class=p>],</span> <span class=n>scope</span><span class=p>))</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;if&#34;</span><span class=p>:</span>
+        <span class=k>if</span> <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=n>scope</span><span class=p>):</span>
+            <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>2</span><span class=p>],</span> <span class=n>scope</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;while&#34;</span><span class=p>:</span>
+        <span class=k>while</span> <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=n>scope</span><span class=p>):</span>
+            <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>2</span><span class=p>],</span> <span class=n>scope</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;write&#34;</span><span class=p>:</span>
+        <span class=k>print</span><span class=p>(</span><span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=n>scope</span><span class=p>))</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;block&#34;</span><span class=p>:</span>
+        <span class=n>env</span> <span class=o>=</span> <span class=p>(</span><span class=n>scope</span><span class=p>,</span> <span class=p>{},</span> <span class=p>{})</span>
+        <span class=k>for</span> <span class=n>v</span> <span class=ow>in</span> <span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]:</span>
+            <span class=n>env</span><span class=p>[</span><span class=mi>1</span><span class=p>][</span><span class=n>v</span><span class=p>]</span> <span class=o>=</span> <span class=mi>0</span>
+        <span class=k>for</span> <span class=n>p</span> <span class=ow>in</span> <span class=n>node</span><span class=p>[</span><span class=mi>2</span><span class=p>]:</span>
+            <span class=n>env</span><span class=p>[</span><span class=mi>2</span><span class=p>][</span><span class=n>p</span><span class=p>[</span><span class=mi>0</span><span class=p>]]</span> <span class=o>=</span> <span class=n>p</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span>
+        <span class=nb>eval</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>3</span><span class=p>],</span> <span class=n>env</span><span class=p>)</span>
+    <span class=k>elif</span> <span class=n>node</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=s2>&#34;call&#34;</span><span class=p>:</span>
+        <span class=nb>eval</span><span class=p>(</span><span class=n>find</span><span class=p>(</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=mi>2</span><span class=p>)[</span><span class=n>node</span><span class=p>[</span><span class=mi>1</span><span class=p>]],</span> <span class=n>scope</span><span class=p>)</span>
+</code></pre></div><p>The <code>scope</code> and <code>find</code> functions might seem a bit unclear. Since PL/0 allows for nested procedures, we need to manage variable scopes for them. In our interpreter, a scope is represented as a tuple containing three elements: a reference to the parent scope, a dictionary of variables, and a dictionary of procedures. Each new scope is created when entering a new block, and the <code>find</code> function works by traversing upwards through the scopes until it locates the required variable or procedure.</p><p>We can now run a factorial program with our PL/0 interpreter:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python pl0.py &lt; factorial/fac.pas
+3628800
+</code></pre></div><p>For something a bit more challenging, let&rsquo;s try running a program that finds prime numbers:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>var max, arg, ret;
+
+procedure isprime;
+var i;
+begin
+  ret := 1;
+  i := 2;
+  while i &lt; arg do
+  begin
+    if arg / i * i = arg then
+    begin
+      ret := 0;
+      i := arg;
+    end;
+    i := i + 1;
+  end;
+end;
+
+procedure primes;
+begin
+  arg := 2;
+  while arg &lt; max do
+  begin
+    call isprime;
+    if ret = 1 then ! arg;
+    arg := arg + 1;
+  end;
+end;
+
+begin
+  max := 100;
+  call primes;
+end.
+</code></pre></div><p>This program should print the prime numbers between 2 and 100: 2, 3, 5, 7, 11, 13, 17, &mldr;, 89, 97.</p><p>Well, that&rsquo;s it! We&rsquo;ve journeyed through the programming languages of the 1970s, languages that have deeply influenced modern programming. Despite the constraints of hardware at the time, these languages and their implementations were often remarkably small and simple. Constraints can truly inspire creativity.</p><p>I hope reading this wasn&rsquo;t a complete waste of time! As a bonus, the repository with all the <a href=https://github.com/zserge/tinylangs>code examples</a> includes another little interpreter for the <a href=/posts/tcl-interpreter>TCL</a> language in just 48 lines of code. If you spot any errors in the interpreters, feel free to open a PR to fix them! All contributions are welcome, and I hope you have fun writing your own programming languages!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 17, 2024</em></p><p>See also:
+<a href=/posts/langs-apl/>Tiny Great Languages: APL</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2024 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
