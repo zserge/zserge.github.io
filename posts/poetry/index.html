@@ -1,0 +1,106 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>On Poetry</title><meta name=description content="Building a simple poet assistant utility, exploring the enchanted world of dictionaries and rhymes."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/poetry/><meta property="og:title" content="On Poetry"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/poetry/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Building a simple poet assistant utility, exploring the enchanted world of dictionaries and rhymes."><meta property="og:locale" content="en_US"><meta name=twitter:card content="Building a simple poet assistant utility, exploring the enchanted world of dictionaries and rhymes."><meta name=twitter:site content="@zsergo"><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>On Poetry</h1><p>Recently with friends we talked about an early web site I&rsquo;ve programmed, probably the very first web service I&rsquo;ve ever done. It was a simple dictionary.</p><p>Back then, we had Nokia phones without real web browsers, just something called the <a href=https://en.wikipedia.org/wiki/Wireless_Application_Protocol>WAP</a> protocol and <a href=https://en.wikipedia.org/wiki/Wireless_Markup_Language>WML</a> markup. Since I struggled with foreign languages as a student (I still do!), I decided to create a mobile site in WAP/WML to help me translate words, show definitions, thesaurus entries, pronunciations, and more.</p><p>I don’t remember all the details of how I built it, but I do recall that I had to process hundreds of megabytes of text quickly enough so that the web hosting company, who generously offered me free space, didn&rsquo;t evict me.</p><p>Now, years later, I thought I’d check if things have changed in linguistic programming. Of course, there are plenty of tools like <a href=https://en.wikipedia.org/wiki/Natural_Language_Toolkit>NLTK</a> these days, but in this article, we’re going to build a poet’s assistant from scratch, without any third-party code or libraries, to see how coding a dictionary looks like.</p><h2 id=thesaurus>Thesaurus</h2><p>Of course, every poet needs to find the most suitable, worthy, acceptable, fitting, proper, right word from time to time. For that, they need a thesaurus. A quick search led me to the <a href=https://github.com/elitejake/Moby-Project>Moby Project</a>.</p><p>They have an impressive file called <code>mthesaur.txt</code> which is &ldquo;the largest and most comprehensive thesaurus in English in public domain&rdquo;.</p><p>After downloading 23MB of text, let&rsquo;s take a peek at its contents:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>...
+cavern,abri,antre,bunker,burrow,cave,cove,dugout,foxhole,grot,grotto,hole,lair,sewer,subterrane,subterranean,subway,tunnel,warren
+...
+magenta,amethystine,lavender,lilac,livid,mauve,mulberry,orchid,pansy-purple,plum-colored,plum-purple,purple,purplescent,purplish,purply,purpurate,purpure,purpureal,purpurean,purpureous,raisin-colored,violaceous,violet
+...
+</code></pre></div><p>Is that it? Every line is a list of words, separated by commas? Yes. With that, here&rsquo;s a quick Python thesaurus tool:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>import sys
+thesaurus = {w[0].lower(): w[1:] for w in (line.split(&#39;,&#39;) for line in open(&#39;mthesaur.txt&#39;))}
+print(&#34;\n&#34;.join(thesaurus[sys.argv[1].lower()]))
+</code></pre></div><p>It&rsquo;s almost a one-liner. The script reads the file line by line, splits each line, and stores the first word as the key and the rest as synonyms in a Python dictionary. Then, it looks up the requested word and prints a list of all the synonyms found:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python3 thesaurus.py sunbeam | column
+broad day       daylight        dusk            midday sun      shine           sunlight
+dawn            dayshine        full sun        noonlight       sun spark       sunshine
+day             daytide         green flash     noontide light  sunbreak        twilight
+day glow        daytime         light of day    ray of sunshine sunburst
+</code></pre></div><p>Pretty satisfying. But then, this happens:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python3 thesaurus.py zebra
+...
+KeyError: &#39;zebra&#39;
+</code></pre></div><p>Sure, &ldquo;zebra&rdquo; is a word, and it probably has a few synonyms?</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ grep zebra mthesaur.txt | cut -d &#39;,&#39; -f1 
+animal
+antelope
+...
+crossbreed
+...
+horse
+...
+pig
+platypus
+...
+</code></pre></div><p>I&rsquo;m no zoologist, but of these seem like <em>very</em> distant cousins to a zebra. Still, this shows that &ldquo;zebra&rdquo; is in the thesaurus.</p><p>The issue is that in this database, a word &ldquo;A&rdquo; may have &ldquo;B&rdquo; as a synonym, but not every word &ldquo;B&rdquo; necessarily points back to &ldquo;A.&rdquo; This becomes clear when you realize the database has 30,259 records but contains 103,306 unique words. Most words have 20-40 synonyms, so if we tried to fully interlink all synonyms, the file would balloon in size. For example, if we connected every word to all its occurrences in other records, we’d end up with a dictionary of nearly 2GB! However, if we only reconnect each word to the <em>first</em> word of any record it appears in, the dictionary grows to just 34MB instead of 24MB — not too bad, considering that now it includes a &ldquo;zebra&rdquo;!</p><p>Alternatively, we could avoid modifying the database and instead scan it entirely to find a word, whether it appears at the start or anywhere within a record. For a 23MB file, this shouldn&rsquo;t take long on modern machines.</p><h2 id=dictionary>Dictionary</h2><p>One of the most well-known databases for word definitions, semantic relationships, and usage examples is <a href=https://wordnet.princeton.edu/>WordNet</a>. It&rsquo;s structured into a set of text files, each dedicated to a specific word category: nouns, verbs, adjectives, and adverbs. These files contain metadata (lines that start with whitespace) and &ldquo;synsets&rdquo; (sets of synonyms that share the same meaning).</p><p>Each synset is structured like this:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...] [frames...]  |  gloss
+</code></pre></div><p>What we care about are:</p><ul><li><code>word</code>: the actual words for which the synset provides a definition,</li><li><code>gloss</code>: the definition and usage examples,</li><li><code>ss_type</code>: the word type: &ldquo;n&rdquo; for noun, &ldquo;v&rdquo; for verb, &ldquo;a&rdquo; for adjective, &ldquo;s&rdquo; for adjective satellite, and &ldquo;r&rdquo; for adverb.</li></ul><p>Each synset can contain multiple words sharing the same meaning, so we need to check the <code>w_cnt</code> field (a hexadecimal number) to know how many words are listed in that synset, since the word we would be looking for may not be the first one there.</p><p>Here&rsquo;s a Python script that parses WordNet data and prints the definitions and usage examples for a given word:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>import sys
+
+with open(&#34;wordnet.txt&#34;) as f:
+    for line in f:
+        if line.startswith(&#34; &#34;): continue  # ignore dictionary metadata
+        parts = line.split(&#34; | &#34;)  # Split gloss from the rest of the data
+        meta = parts[0].split()  # The first part contains record metadata
+        gloss = parts[1].strip() if len(parts) &gt; 1 else &#34;&#34;  # Gloss (definition)
+        w_cnt = int(meta[3], 16)  # The word count is in hexadecimal
+        for i in range(w_cnt):
+            # Every second field after the 4th one is a word
+            word = meta[4 + 2 * i].lower()
+            if word.lower() == sys.argv[1].lower():
+                lines = [l.strip() for l in gloss.split(&#34;;&#34;)]
+                print(&#34;\n&#34;.join(lines))
+                print()
+</code></pre></div><p>This script is quite straightforward: it reads the file line by line, skips the metadata, splits the useful data from the <code>gloss</code>, checks how many words are in the synset, and prints the definitions and usage examples if the word matches the input.</p><p>Here’s an example of how it works:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python3 wordnet.py format
+the general appearance of a publication
+
+the organization of information according to preset specifications (usually for computer processing)
+
+divide (a disk) into marked sectors so that it may store data
+&#34;Please format this disk before entering data!&#34;
+
+determine the arrangement of (data) for storage and display (in computer science)
+
+set (printed matter) into a specific format
+&#34;Format this letter so it can be printed out&#34;
+</code></pre></div><p>While this is a very basic dictionary tool, it gets the job done by displaying word definitions and examples directly from the WordNet data.</p><h2 id=rhymes>Rhymes</h2><p>The last tool in our poet&rsquo;s toolkit is a rhyming dictionary. A popular choice for this is the <a href=http://www.speech.cs.cmu.edu/cgi-bin/cmudict>CMU Pronouncing Dictionary</a> (cmudict), which provides phonetic transcriptions of over 100,000 words. It&rsquo;s often used for speech recognition and linguistic analysis, but it also works well for finding rhymes.</p><p>The CMU dictionary comes as a simple text file where each line contains a word followed by its phonetic transcription. The original file comes with a word &ldquo;Déjà&rdquo; which breaks all unicode parsers, so we should either remove it or replace with a proper unicode spelling.</p><p>To extract rhymes, we should reverse the pronunciation syllables and compare the ending sounds of words. This allows us to find exact rhymes like &ldquo;house&rdquo; and &ldquo;mouse&rdquo; but not false matches like &ldquo;moose.&rdquo;</p><p>Of course, there are many more types of rhymes: we can only compare vowels, or we can compare beginning of the words (alliteration), or half-rhymes where final consonants match.</p><p>We will be only looking for perfect rhymes. CMU dictionary marks stressed syllables with a number. Syllables ending with &ldquo;0&rdquo; are not stressed. Syllables ending with &ldquo;1&rdquo; indicate the primary stress. Syllables ending with &ldquo;2&rdquo; are secondary stresses. We will ignore unstressed syllables and secondary stresses, leaving only primary stressed syllables in place (so that a stressed &ldquo;OH1&rdquo; would match another stressed syllable, but will not match an unstressed &ldquo;OH&rdquo;).</p><p>Here’s how our rhyming approach can be done:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>import sys
+
+cmu = [] # a list of tuples (word, reversed syllables)
+
+with open(&#39;cmudict-0.7b&#39;) as f:
+    for line in f:
+        if line.startswith(&#39;;;;&#39;): continue # skip metadata
+        word, *pron = line.split()
+        # remove markers from words (some words have multiple pronunciations)
+        word = word.rstrip(&#34;()123456789&#34;)
+        # reverse and clean up pronunciation
+        rpron = list(reversed([p.rstrip(&#34;02&#34;) for p in pron]))
+        cmu.append((word, rpron))
+
+# return the part of the pronunciation until the primary stress (including it)
+def base(x):
+    out = []
+    for i in x:
+        out.append(i)
+        if i.endswith(&#39;1&#39;):  # stop at the stressed syllable
+            break
+    return out
+
+for w, p in cmu:
+    if w.lower() != sys.argv[1].lower(): continue
+    # once the word is found: look for rhymes
+    p = base(p)
+    for u, q in cmu:
+        q = base(q)
+        # if the &#34;tails&#34; of the pronunciation match and the words are not
+        # identical: print a rhyme!
+        if p == q and u != w:
+            print(u.lower())
+</code></pre></div><p>Running the script looks like this:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>$ python3 rhymes.py house | head
+blouse
+boathouse
+bouse
+brouse
+...
+
+$ python3 rhymes.py format
+doormat
+
+$ python rhymes.py orange
+(no output)
+</code></pre></div><p>For a few lines of code we&rsquo;ve written our dictionaries provide fairly good results. Of course we&rsquo;ve doing a very naive search, while a proper dictionary tool would have to deal with much larger databases and would have to optimise the lookup.</p><p>For that one can use a sorted index, where all words in the dictionary are stored with their offsets in the main dictionary file. Then using a binary search one can find the right word immediately.</p><p>Or an index may only contain first two letters of a word, acting like a hashmap: we find the offset in the main dictionary by the first two letters of the word and then linearly scan the records until we find the one we are looking for.</p><p>Also could build an inverted index for synonyms so that you can quickly find words related to any given synonym. For a rhyming dictionary, an inverted index of phonemes could help quickly locate words that end with similar sounds.</p><p>Tries are also a helpful data structure for dictionaries, we can use it for auto-completing words or to look up the rhymes by storing the reverse pronunciation in a trie.</p><p>And of course there are useful algorithms for language processing, such as stemming (to cut the word to its stem, base or root form). With stemming, if you look for &ldquo;zebras&rdquo; it would find an article about &ldquo;zebra&rdquo;, which with our simplistic solution would not be found.</p><p>Linguistic programming is fun and unusual. If the topic sounds appealing to you &ndash; you may find inspiration in building an anagram finder, crossword generator, Wordle solver, word cloud generator or even a basic spell checker. Have fun!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Sep 18, 2024</em></p><p>See also:
+<a href=/posts/android-widget-for-geeks/>textizer: hack your android widgets</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2024 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
