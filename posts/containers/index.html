@@ -1,0 +1,118 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Linux containers in a few lines of code</title><meta name=description content="Trying to figure out how Linux containers work by implementing them from scratch in C."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/containers/><meta property="og:title" content="Linux containers in a few lines of code"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/containers/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Trying to figure out how Linux containers work by implementing them from scratch in C."><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2020-05-10T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Linux containers in a few lines of code","description":"Trying to figure out how Linux containers work by implementing them from scratch in C.","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/containers/","datePublished":"2020-05-10","dateModified":"2020-05-10","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/containers/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Linux containers in a few lines of code</h1><p>This post is meant to be a counterpart to the previous <a href=/posts/kvm/>KVM</a> post, but about containers instead. The idea is to show how exactly containers work by running a busybox Docker image in our own small container runner.</p><p>Unlike a VM, container is very vague term. Normally, we call containers a self-contained bundle of code and its dependencies, that can be shipped together and run in an isolated environment inside some host operating system. If it still sounds similar to a VM, let&rsquo;s dive deeper and see how containers are implemented.</p><h2 id=busybox-docker>busybox docker</h2><p>Our end goal would be to run a common busybox Docker image, but without docker. Docker uses btrfs as a filesystem format for its images. Let&rsquo;s try pulling the image and unpack it into a directory:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>mkdir rootfs
+docker export $(docker create busybox) | tar -C rootfs -xvf -
+</code></pre></div><p>Now we got busybox image filesystem unpacked into the <code>rootfs</code> folder. Surely, we can run <code>./rootfs/bin/sh</code> and get a working shell, but if we look at the list of the processes there, or files, or network interfaces - we will see that we have access to our whole OS.</p><p>So, let&rsquo;s try to create an isolated environment somehow.</p><h2 id=clone>clone</h2><p>Since we want to control what a child process can see, we will be using clone(2) instead of fork(2). Clone does pretty much the same, but allows you to pass flags, defining which resources you would want to share.</p><p>The following flags are allowed:</p><ul><li><code>CLONE_NEWNET</code> – isolate network devices</li><li><code>CLONE_NEWUTS</code> – host and domain names (UNIX Timesharing System)</li><li><code>CLONE_NEWIPC</code> – IPC objects</li><li><code>CLONE_NEWPID</code> – PIDs</li><li><code>CLONE_NEWNS</code> – mount points (file systems)</li><li><code>CLONE_NEWUSER</code> – users and groups</li></ul><p>In our experiment we will try to isolate processes, IPC, network and file systems, so here we go:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=k>static</span> <span class=kt>char</span> <span class=n>child_stack</span><span class=p>[</span><span class=mi>1024</span> <span class=o>*</span> <span class=mi>1024</span><span class=p>];</span>
+
+<span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+  <span class=n>printf</span><span class=p>(</span><span class=s>&#34;Hello from child! PID=%d</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>getpid</span><span class=p>());</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kt>int</span> <span class=nf>main</span><span class=p>(</span><span class=kt>int</span> <span class=n>argc</span><span class=p>,</span> <span class=kt>char</span> <span class=o>*</span><span class=n>argv</span><span class=p>[])</span> <span class=p>{</span>
+  <span class=kt>int</span> <span class=n>flags</span> <span class=o>=</span>
+      <span class=n>CLONE_NEWNS</span> <span class=o>|</span> <span class=n>CLONE_NEWUTS</span> <span class=o>|</span> <span class=n>CLONE_NEWPID</span> <span class=o>|</span> <span class=n>CLONE_NEWIPC</span> <span class=o>|</span> <span class=n>CLONE_NEWNET</span><span class=p>;</span>
+  <span class=kt>int</span> <span class=n>pid</span> <span class=o>=</span> <span class=n>clone</span><span class=p>(</span><span class=n>child_main</span><span class=p>,</span> <span class=n>child_stack</span> <span class=o>+</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>child_stack</span><span class=p>),</span>
+                  <span class=n>flags</span> <span class=o>|</span> <span class=n>SIGCHLD</span><span class=p>,</span> <span class=n>argv</span> <span class=o>+</span> <span class=mi>1</span><span class=p>);</span>
+  <span class=k>if</span> <span class=p>(</span><span class=n>pid</span> <span class=o>&lt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+    <span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span> <span class=s>&#34;clone failed: %d</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>errno</span><span class=p>);</span>
+    <span class=k>return</span> <span class=mi>1</span><span class=p>;</span>
+  <span class=p>}</span>
+  <span class=n>waitpid</span><span class=p>(</span><span class=n>pid</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>It has be run with superuser privileges, otherwise clone would fail.</p><p>This gives an already interesting result: child PID is 1. We all know that PID 1 is normally <code>init</code>, but in this case we see that child process got its own isolated list of processes, where it has become the first process.</p><h2 id=running-shell>running shell</h2><p>To easier play around the new environment, let&rsquo;s run a shell in the child process. Actually, let&rsquo;s run arbitrary commands, much like <code>docker run</code>:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+  <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span> <span class=o>=</span> <span class=p>(</span><span class=kt>char</span> <span class=o>**</span><span class=p>)</span><span class=n>arg</span><span class=p>;</span>
+  <span class=n>execvp</span><span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>argv</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>Now, running our app with &ldquo;/bin/sh&rdquo; argument opens a real shell, where we can type commands. This shows how wrong we were about the isolation:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback># echo $$
+1
+# ps
+  PID TTY          TIME CMD
+ 5998 pts/31   00:00:00 sudo
+ 5999 pts/31   00:00:00 main
+ 6001 pts/31   00:00:00 sh
+ 6004 pts/31   00:00:00 ps
+</code></pre></div><p>As we see, the shell process itself has a PID of 1, but actually can see and access all the other processes from the host OS. The reason is that the list of processes is read from procfs, which is still inherited.</p><p>So, let&rsquo;s unmount procfs:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>umount2(&#34;/proc&#34;, MNT_DETACH);
+</code></pre></div><p>Now, running the shell breaks ps, mount, and other command, because no procfs is mounted. Still better than leaking the parent&rsquo;s procfs.</p><h2 id=chroot>chroot</h2><p>In the old days chroot was a &ldquo;good enough&rdquo; isolation for most use cases, but here let&rsquo;s use a <code>pivot_root</code> instead. This system call moves and existing rootfs into some subdirectory, and make a another directory a new root:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+  <span class=cm>/* Unmount procfs */</span>
+  <span class=n>umount2</span><span class=p>(</span><span class=s>&#34;/proc&#34;</span><span class=p>,</span> <span class=n>MNT_DETACH</span><span class=p>);</span>
+  <span class=cm>/* Pivot root */</span>
+  <span class=n>mount</span><span class=p>(</span><span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;bind&#34;</span><span class=p>,</span> <span class=n>MS_BIND</span> <span class=o>|</span> <span class=n>MS_REC</span><span class=p>,</span> <span class=s>&#34;&#34;</span><span class=p>);</span>
+  <span class=n>mkdir</span><span class=p>(</span><span class=s>&#34;./rootfs/oldrootfs&#34;</span><span class=p>,</span> <span class=mo>0755</span><span class=p>);</span>
+  <span class=n>syscall</span><span class=p>(</span><span class=n>SYS_pivot_root</span><span class=p>,</span> <span class=s>&#34;./rootfs&#34;</span><span class=p>,</span> <span class=s>&#34;./rootfs/oldrootfs&#34;</span><span class=p>);</span>
+  <span class=n>chdir</span><span class=p>(</span><span class=s>&#34;/&#34;</span><span class=p>);</span>
+  <span class=n>umount2</span><span class=p>(</span><span class=s>&#34;/oldrootfs&#34;</span><span class=p>,</span> <span class=n>MNT_DETACH</span><span class=p>);</span>
+  <span class=n>rmdir</span><span class=p>(</span><span class=s>&#34;/oldrootfs&#34;</span><span class=p>);</span>
+  <span class=cm>/* Re-mount procfs */</span>
+  <span class=n>mount</span><span class=p>(</span><span class=s>&#34;proc&#34;</span><span class=p>,</span> <span class=s>&#34;/proc&#34;</span><span class=p>,</span> <span class=s>&#34;proc&#34;</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>);</span>
+  <span class=cm>/* Run the process */</span>
+  <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span> <span class=o>=</span> <span class=p>(</span><span class=kt>char</span> <span class=o>**</span><span class=p>)</span><span class=n>arg</span><span class=p>;</span>
+  <span class=n>execvp</span><span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>argv</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>It would make sense to mount tmpfs into /tmp, sysfs into /sys and create a valid /dev filesystem, but to keep things short I&rsquo;ll skip it.</p><p>Anyway, now we only see the files from busybox image rootfs, as if we chrooted into it:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>/ # ls
+bin   dev   etc   home  proc  root  sys   tmp   usr   var
+
+/ # mount
+/dev/sda2 on / type ext4 (rw,relatime,data=ordered)
+proc on /proc type proc (rw,relatime)
+
+/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 /bin/sh
+    4 root      0:00 ps
+
+/ # ps ax
+PID   USER     TIME  COMMAND
+    1 root      0:00 /bin/sh
+    5 root      0:00 ps ax
+</code></pre></div><p>At this point it looks more or less isolated, perhaps, too isolated - we can not ping anything and the network does not seem to work at all.</p><h2 id=network>network</h2><p>Creating a new network namespace was only the start. We need to assign network interfaces to it and set them up to do proper packet forwarding.</p><p>If you don&rsquo;t have a br0 interface, let&rsquo;s create it manually (brctl is part of bridge-utils package on Ubuntu):</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>brctl addbr br0
+ip addr add dev br0 172.16.0.100/24
+ip link set br0 up
+sudo iptables -A FORWARD -i wlp3s0  -o br0 -j ACCEPT
+sudo iptables -A FORWARD -o wlp3s0 -i br0 -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -s 172.16.0.0/16 -j MASQUERADE
+</code></pre></div><p>In my case, wlp3s0 was my primary WiFi network interface and 172.16.x.x was a network for the container.</p><p>What our container launcher should do is to create a pair of peer interfaces, veth0 and veth1, link them to the br0 and set up routing within the container.</p><p>In the main() function we will run these commands before clone:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link add veth0 type veth peer name veth1&#34;</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link set veth0 up&#34;</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=s>&#34;brctl addif br0 veth0&#34;</span><span class=p>);</span>
+</code></pre></div><p>After clone() is complete, we will add veth1 to the new child namespace:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>char</span> <span class=n>ip_link_set</span><span class=p>[</span><span class=mi>4096</span><span class=p>];</span>
+<span class=n>snprintf</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span><span class=p>,</span> <span class=s>&#34;ip link set veth1 netns %d&#34;</span><span class=p>,</span>
+         <span class=n>pid</span><span class=p>);</span>
+<span class=n>system</span><span class=p>(</span><span class=n>ip_link_set</span><span class=p>);</span>
+</code></pre></div><p>Now if we run &ldquo;ip link&rdquo; in the container shell we will see a loopback interface, and some veth1@xxxx interface. But the network still doesn&rsquo;t work. Let&rsquo;s set a unique hostname in the container and configure the routes:</p><div class=highlight><pre class=chroma><code class=language-c data-lang=c><span class=kt>int</span> <span class=nf>child_main</span><span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=n>arg</span><span class=p>)</span> <span class=p>{</span>
+
+  <span class=p>....</span>
+
+  <span class=n>sethostname</span><span class=p>(</span><span class=s>&#34;example&#34;</span><span class=p>,</span> <span class=mi>7</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=s>&#34;ip link set veth1 up&#34;</span><span class=p>);</span>
+
+  <span class=kt>char</span> <span class=n>ip_addr_add</span><span class=p>[</span><span class=mi>4096</span><span class=p>];</span>
+  <span class=n>snprintf</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>),</span>
+           <span class=s>&#34;ip addr add 172.16.0.101/24 dev veth1&#34;</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=n>ip_addr_add</span><span class=p>);</span>
+  <span class=n>system</span><span class=p>(</span><span class=s>&#34;route add default gw 172.16.0.100 veth1&#34;</span><span class=p>);</span>
+
+  <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span> <span class=o>=</span> <span class=p>(</span><span class=kt>char</span> <span class=o>**</span><span class=p>)</span><span class=n>arg</span><span class=p>;</span>
+  <span class=n>execvp</span><span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>argv</span><span class=p>);</span>
+  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>Let&rsquo;s see how it looks like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>/ # ip link
+1: lo: &lt;LOOPBACK&gt; mtu 65536 qdisc noop qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+47: veth1@if48: &lt;BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN&gt; mtu 1500 qdisc noqueue qlen 1000
+    link/ether 72:0a:f0:91:d5:11 brd ff:ff:ff:ff:ff:ff
+
+/ # hostname
+example
+
+/ # ping 1.1.1.1
+PING 1.1.1.1 (1.1.1.1): 56 data bytes
+64 bytes from 1.1.1.1: seq=0 ttl=57 time=27.161 ms
+64 bytes from 1.1.1.1: seq=1 ttl=57 time=26.048 ms
+64 bytes from 1.1.1.1: seq=2 ttl=57 time=26.980 ms
+...
+</code></pre></div><p>It works!</p><h2 id=summary>summary</h2><p>The full source code is available at <a href=https://gist.github.com/zserge/4ce3c1ca837b96d58cc5bdcf8befb80e>https://gist.github.com/zserge/4ce3c1ca837b96d58cc5bdcf8befb80e</a>. If you found a mistake or got a suggestion - please leave a comment there!</p><p>Obviously, Docker does much more than this. But it&rsquo;s amazing how many convenient APIs Linux kernel has and easy it is to use them to achieve OS-level virtualization.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>May 10, 2020</em></p><p>See also:
+<a href=/posts/kvm/>KVM host in a few lines of code</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

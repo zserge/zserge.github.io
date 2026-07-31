@@ -1,0 +1,140 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>The Stockholm syndrome of Android XML</title><meta name=description content="We love XMLs, but there might be a better way"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-xml-support/><meta property="og:title" content="The Stockholm syndrome of Android XML"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-xml-support/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="We love XMLs, but there might be a better way"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2016-03-29T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"The Stockholm syndrome of Android XML","description":"We love XMLs, but there might be a better way","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-xml-support/","datePublished":"2016-03-29","dateModified":"2016-03-29","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-xml-support/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>The Stockholm syndrome of Android XML</h1><p>When people first hear about <a href=https://github.com/zserge/anvil>Anvil</a> they
+don&rsquo;t trust it because at first glance Anvil seems to be just a replacement for
+XML layouts. It&rsquo;s not. It&rsquo;s a library to build predictable reactive views.</p><p>There are many known disadvantages of XMLs (poor code reuse, no type-safety, no
+variables, very limited styling support etc etc). Yet the developers are so
+much used to XMLs that they started liking them!</p><p>Let&rsquo;s see how one can use Anvil in all its power and still have XMLs in their
+projects.</p><h2 id=xml-layouts>XML layouts</h2><p>Anvil has a Java/Kotlin DSL to describe layouts in code and many people find it
+really convenient. But you may still use XML layouts. If you have an existing
+XML layout - you may &ldquo;inject&rdquo; it into Anvil to bind data or override certain
+attributes.</p><p>XMLs are injected with an <code>xml()</code> call, and you may customize nested view using
+<code>withId()</code> function.</p><div class=highlight><pre class=chroma><code class=language-xml data-lang=xml><span class=c>&lt;!-- my_layout.xml --&gt;</span>
+<span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=nt>&lt;LinearLayout</span> <span class=na>xmlns:android=</span><span class=s>&#34;http://schemas.android.com/apk/res/android&#34;</span>
+  <span class=na>android:layout_width=</span><span class=s>&#34;match_parent&#34;</span>
+  <span class=na>android:layout_height=</span><span class=s>&#34;match_parent&#34;</span><span class=nt>&gt;</span>
+  <span class=nt>&lt;TextView</span> <span class=na>android:id=</span><span class=s>&#34;@+id/text&#34;</span>
+    <span class=na>android:layout_width=</span><span class=s>&#34;wrap_content&#34;</span>
+    <span class=na>android:layout_height=</span><span class=s>&#34;wrap_conent&#34;</span> <span class=nt>/&gt;</span>
+  <span class=nt>&lt;Button</span> <span class=na>android:id=</span><span class=s>&#34;@+id/button&#34;</span>
+    <span class=na>android:layout_width=</span><span class=s>&#34;wrap_content&#34;</span>
+    <span class=na>android:layout_height=</span><span class=s>&#34;wrap_conent&#34;</span> <span class=nt>/&gt;</span>
+<span class=nt>&lt;/LinearLayout&gt;</span>
+</code></pre></div><p>The above XML layout can be injected like this:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>xml</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>layout</span><span class=o>.</span><span class=na>my_layout</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>withId</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>id</span><span class=o>.</span><span class=na>text</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>text</span><span class=o>(</span><span class=n>mText</span><span class=o>);</span>
+  <span class=o>});</span>
+  <span class=n>withId</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>id</span><span class=o>.</span><span class=na>button</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>onClick</span><span class=o>(</span><span class=n>v</span> <span class=o>-&gt;</span> <span class=o>{</span>
+      <span class=c1>// handle click
+</span><span class=c1></span>    <span class=o>});</span>
+    <span class=n>typeface</span><span class=o>(</span><span class=s>&#34;MyFont.ttf&#34;</span><span class=o>);</span>
+  <span class=o>});</span>
+<span class=o>});</span>
+</code></pre></div><p>That&rsquo;s how you may use XMLs for UI, styles etc, while using Anvil DSL for data
+binding to keeping UI in sync with the data model. This approach is especially
+useful if you&rsquo;re moving an existing code base to Anvil.</p><h2 id=other-xml-resources>Other XML resources</h2><p>I personally don&rsquo;t use XML layouts anymore, but I still use other XMLs a lot.
+Since Anvil is just a thin library that deals with normal android views - you
+can still bind values from the XML resources:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=c1>// Strings
+</span><span class=c1></span><span class=n>text</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>string</span><span class=o>.</span><span class=na>some_text</span><span class=o>);</span>
+
+<span class=c1>// Colors and color state lists
+</span><span class=c1></span><span class=n>backgroundColor</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>color</span><span class=o>.</span><span class=na>my_background</span><span class=o>);</span>
+<span class=n>textColor</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>color</span><span class=o>.</span><span class=na>my_color_list</span><span class=o>);</span>
+
+<span class=c1>// Drawables (and VectorDrawables)
+</span><span class=c1></span><span class=n>backgroundResource</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>drawable</span><span class=o>.</span><span class=na>my_background_drawable</span><span class=o>);</span>
+<span class=n>imageResource</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>drawable</span><span class=o>.</span><span class=na>my_image</span><span class=o>);</span>
+
+<span class=c1>// Pre-defined IDs (e.g. for RelativeLayouts)
+</span><span class=c1></span><span class=n>id</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>id</span><span class=o>.</span><span class=na>foo</span><span class=o>);</span>
+</code></pre></div><p>You may still use Animation resources:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>Animation</span> <span class=n>a</span> <span class=o>=</span> <span class=n>AnimationUtils</span><span class=o>.</span><span class=na>loadAnimation</span><span class=o>(</span><span class=n>getContext</span><span class=o>(),</span> <span class=n>android</span><span class=o>.</span><span class=na>R</span><span class=o>.</span><span class=na>anim</span><span class=o>.</span><span class=na>slide_out_right</span><span class=o>);</span>
+<span class=n>viewFlipper</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>inAnimation</span><span class=o>(</span><span class=n>a</span><span class=o>);</span>
+<span class=o>});</span>
+</code></pre></div><p>You may extract values from styles as you would normally do in Java with the
+TypedArray class:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>TypedArray</span> <span class=n>a</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=na>obtainStyledAttributes</span><span class=o>(</span><span class=n>attrs</span><span class=o>,</span> <span class=n>R</span><span class=o>.</span><span class=na>styleable</span><span class=o>.</span><span class=na>TileView</span><span class=o>);</span>
+<span class=n>mTileSize</span> <span class=o>=</span> <span class=n>a</span><span class=o>.</span><span class=na>getInt</span><span class=o>(</span><span class=n>R</span><span class=o>.</span><span class=na>styleable</span><span class=o>.</span><span class=na>TileView_tileSize</span><span class=o>,</span> <span class=n>12</span><span class=o>);</span>
+<span class=n>v</span><span class=o>(</span><span class=n>TileView</span><span class=o>.</span><span class=na>class</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+	<span class=n>size</span><span class=o>(</span><span class=n>mTileSize</span><span class=o>,</span> <span class=n>mTileSize</span><span class=o>);</span>
+<span class=o>});</span>
+</code></pre></div><p>Basically, all XML resources are supported in Anvil much like they are in
+normal Android Java.</p><h2 id=multiple-screens-support>Multiple screens support</h2><p>All dimensions in your app are likely to be specified in DIP, that&rsquo;s why Anvil
+has <code>dip</code> and <code>sip</code> helper methods. They convert density-intependent values
+into pixel dimensions.</p><p>In most cases you would want to customize your layouts depending on the screen
+geometry or size. Normally you would use layout resource suffices like &ldquo;-large&rdquo;
+or &ldquo;-long&rdquo;. With Anvil you have a real programming language so if you want to
+use one set of attributes in portrait and another in landscape orientation -
+that&rsquo;s a perfect example of the if/else statement:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>linearLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>size</span><span class=o>(</span><span class=n>FILL</span><span class=o>,</span> <span class=n>FILL</span><span class=o>);</span>
+  <span class=k>if</span> <span class=o>(</span><span class=n>isPortrait</span><span class=o>())</span> <span class=o>{</span>
+    <span class=n>orientation</span><span class=o>(</span><span class=n>LinearLayout</span><span class=o>.</span><span class=na>HORIZONTAL</span><span class=o>);</span>
+  <span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+    <span class=n>orientation</span><span class=o>(</span><span class=n>LinearLayout</span><span class=o>.</span><span class=na>VERTICAL</span><span class=o>);</span>
+  <span class=o>}</span>
+<span class=o>});</span>
+</code></pre></div><p>You may also do other checks on <code>Configuration</code> object to
+include, exclude or customize your layout. It&rsquo;s really easy to tweak the layout
+a little depending on the screen configuration (with XMLs you would likely
+end up with two separate but very similar layouts or with a style that is not
+reusable).</p><p>Finally, with Anvil you may calculate dimensions of your views depending on the
+actual screen size in pixels detected in runtime. There will be no practical
+performance loss comparing to XMLs.</p><h2 id=references-to-real-views>References to real views</h2><p>Many Anvil users wonder how to get a real view object. As you may know, layout
+described in Anvil is just a set of instructions for view construction, but not
+the pointers to the real views.</p><p>To get a real view object in Anvil you may simply call <code>Anvil.currentView()</code>
+inside your virtual layout code. You may keep that reference if needed. It&rsquo;s
+recommended to do such things inside the <code>init</code> block to ensure that
+non-reactive code is executed only once.</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>Button</span> <span class=n>mButton</span><span class=o>;</span>
+<span class=o>...</span>
+<span class=n>linearLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>button</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>init</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+      <span class=n>mButton</span> <span class=o>=</span> <span class=n>Anvil</span><span class=o>.</span><span class=na>currentView</span><span class=o>();</span>
+    <span class=o>});</span>
+  <span class=o>})</span>
+<span class=o>});</span>
+</code></pre></div><p>Using init + currentView is a nice way to call methods directly on the custom
+views that do not have DSL helpers.</p><h2 id=how-to-use-relativelayout-in-anvil>How to use RelativeLayout in Anvil?</h2><p>Anvil has wrapper for RelativeLayout parameters such as &ldquo;centerInParent&rdquo;,
+&ldquo;below&rdquo;, &ldquo;leftOf&rdquo; etc. You only need to assign view IDs manually.</p><p>In older Android versions this means using pre-allocated R.id constants. Since
+API level 17 you may use <code>View.generateViewId()</code> for the same purpose:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>private</span> <span class=kd>final</span> <span class=kt>int</span> <span class=n>ID_BUTTON</span> <span class=o>=</span> <span class=n>View</span><span class=o>.</span><span class=na>generateViewId</span><span class=o>();</span>
+<span class=kd>private</span> <span class=kd>final</span> <span class=kt>int</span> <span class=n>ID_TEXT</span> <span class=o>=</span> <span class=n>View</span><span class=o>.</span><span class=na>generateViewId</span><span class=o>();</span>
+<span class=o>...</span>
+<span class=n>relativeLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>id</span><span class=o>(</span><span class=n>ID_TEXT</span><span class=o>);</span>
+  <span class=o>});</span>
+  <span class=n>button</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>id</span><span class=o>(</span><span class=n>ID_BUTTON</span><span class=o>);</span>
+    <span class=n>rightOf</span><span class=o>(</span><span class=n>ID_TEXT</span><span class=o>);</span>
+    <span class=n>alignParentButton</span><span class=o>();</span>
+  <span class=o>});</span>
+<span class=o>});</span>
+</code></pre></div><h2 id=can-i-use-fragments>Can I use fragments?</h2><p>You may wonder how to use reactive views inside fragments. Since each fragment
+has an <code>onCreateView</code> method where the layout can be inflated it becomes no
+different from using RenderableViews inside activities:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>class</span> <span class=nc>ArticleFragment</span> <span class=kd>extends</span> <span class=n>Fragment</span> <span class=o>{</span>
+  <span class=kd>public</span> <span class=n>View</span> <span class=nf>onCreateView</span><span class=o>(</span><span class=n>LayoutInflater</span> <span class=n>inflater</span><span class=o>,</span> <span class=n>ViewGroup</span> <span class=n>container</span><span class=o>,</span> <span class=n>Bundle</span> <span class=n>b</span><span class=o>)</span> <span class=o>{</span>
+    <span class=k>return</span> <span class=k>new</span> <span class=n>RenderableView</span><span class=o>(</span><span class=n>container</span><span class=o>.</span><span class=na>getContext</span><span class=o>())</span> <span class=o>{</span>
+      <span class=kd>public</span> <span class=kt>void</span> <span class=nf>view</span><span class=o>()</span> <span class=o>{</span>
+        <span class=n>linearLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+          <span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+            <span class=n>text</span><span class=o>(</span><span class=s>&#34;Hello&#34;</span><span class=o>);</span>
+          <span class=o>});</span>
+          <span class=c1>// etc
+</span><span class=c1></span>        <span class=o>});</span>
+      <span class=o>}</span>
+    <span class=o>};</span>
+  <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><p>Basically you return a renderable view that becomes a fragment layout. You
+should not use Anvil.mount() here because that would actually add the view to
+the container, while fragment manager prefers to do it in its own manner.</p><p>If you want to inject a fragment into some Anvil layout (e.g. if you do tabs
+with Anvil) you may use any of the techniques described above - you may use XML
+layouts with &lt;fragment> tags inside or you may create a container layout
+and use fragment manager to add/remove fragments dynamically using
+transactions.</p><p>See <a href=https://github.com/zserge/anvil-examples/tree/master/fragments>https://github.com/zserge/anvil-examples/tree/master/fragments</a> for more
+details.</p><p>To my personal opinion it&rsquo;s much easier to use custom view for modular UI than
+fragments. But as you see Anvil doesn&rsquo;t force you to change technologies, use
+whatever you are more comfortable with.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Mar 29, 2016</em></p><p>See also:
+<a href=/posts/anvil-2/>Anvil: big progress for a small library</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

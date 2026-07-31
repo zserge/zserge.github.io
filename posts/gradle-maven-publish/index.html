@@ -1,0 +1,191 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>simple library publishing with Gradle</title><meta name=description content="quick guide to maven central library publishing with gradle"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/gradle-maven-publish/><meta property="og:title" content="simple library publishing with Gradle"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/gradle-maven-publish/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="quick guide to maven central library publishing with gradle"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2014-08-10T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"simple library publishing with Gradle","description":"quick guide to maven central library publishing with gradle","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/gradle-maven-publish/","datePublished":"2014-08-10","dateModified":"2014-08-10","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/gradle-maven-publish/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>simple library publishing with Gradle</h1><p>So, you switched to Gradle and just finished you new shiny Android library (or
+java library). And of course you want to share it with the community.</p><p>Here&rsquo;s a quick guide for those who never published their libraries before.</p><h2 id=what-is-maven-central>What is maven central?</h2><p>In java world libraries are usually stored in a big repository called Maven
+Central. You may think of it as of the NPM repository for Node.js or as of
+PyPI for Python.</p><p>It lets you quickly find a library at
+<a href=http://search.maven.org>http://search.maven.org</a>. It is also used by other
+tools like <a href=http://gradleplease.appspot.com/>Gradle, Please</a>. Finally, gradle
+uses this repo if you included <code>mavenCentral()</code> into your repositories section.</p><h2 id=registration>Registration</h2><p>First, you will have to register. No, don&rsquo;t try to find a &lsquo;Register&rsquo; link on
+the Maven Central website. Instead, you should register on the Sonatype
+website.</p><p>What is Sonatype? They are the guys who created Maven back in 2002. But don&rsquo;t
+try to find a registration link on their site either, instead go to their <a href=https://issues.sonatype.org/secure/Signup!default.jspa>issue
+tracker</a>. (well-known
+JIRA) and register there:</p><p>Next, <a href="https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&pid=10134">create a new
+issue</a>.</p><p>In the issue details fill in your library description and summary, specify
+project URL if any and version control URL (like bitbucket or github link).
+Ensure you have a valid group id. It&rsquo;s should be somehow related to your
+package and should contain at least one dot in it. So, names like &lsquo;johndoe&rsquo; are
+invalid, but &lsquo;com.johndoe&rsquo; are ok if you own the &lsquo;johndoe.com&rsquo; website. If you
+don&rsquo;t own any website - you may use your version control hosting name, e.g.
+com.bitbucket.johndoe or com.github.johndoe.</p><p>Then - relax and wait. It may take up to 2 business days to process your ticket
+manually.</p><p>After that you will receive a confirmation that your configuration has been
+prepared and you can publish your library.</p><h2 id=gradle-setup>Gradle setup</h2><p>There are many possible ways of how to set up your gradle for maven publishing.
+I used a file I found in some other repository and I like it&rsquo;s separated from
+the main build.gradle.</p><p>Here it is:</p><pre><code>/*
+ * Copyright 2013 Chris Banes
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def isReleaseBuild() {
+        return VERSION_NAME.contains(&quot;SNAPSHOT&quot;) == false
+}
+
+def getReleaseRepositoryUrl() {
+        return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+                        : &quot;https://oss.sonatype.org/service/local/staging/deploy/maven2/&quot;
+}
+
+def getSnapshotRepositoryUrl() {
+        return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+                        : &quot;https://oss.sonatype.org/content/repositories/snapshots/&quot;
+}
+
+def getRepositoryUsername() {
+        return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : &quot;&quot;
+}
+
+def getRepositoryPassword() {
+        return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : &quot;&quot;
+}
+
+afterEvaluate { project -&gt;
+        uploadArchives {
+                repositories {
+                        mavenDeployer {
+                                beforeDeployment { MavenDeployment deployment -&gt; signing.signPom(deployment) }
+
+                                pom.groupId = GROUP
+                                pom.artifactId = POM_ARTIFACT_ID
+                                pom.version = VERSION_NAME
+
+                                repository(url: getReleaseRepositoryUrl()) {
+                                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                                }
+                                snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                                }
+
+                                pom.project {
+                                        name POM_NAME
+                                        packaging POM_PACKAGING
+                                        description POM_DESCRIPTION
+                                        url POM_URL
+
+                                        scm {
+                                                url POM_SCM_URL
+                                                connection POM_SCM_CONNECTION
+                                                developerConnection POM_SCM_DEV_CONNECTION
+                                        }
+
+                                        licenses {
+                                                license {
+                                                        name POM_LICENCE_NAME
+                                                        url POM_LICENCE_URL
+                                                        distribution POM_LICENCE_DIST
+                                                }
+                                        }
+
+                                        developers {
+                                                developer {
+                                                        id POM_DEVELOPER_ID
+                                                        name POM_DEVELOPER_NAME
+                                                }
+                                        }
+                                }
+                        }
+                }
+        }
+
+        signing {
+                required { isReleaseBuild() &amp;&amp; gradle.taskGraph.hasTask(&quot;uploadArchives&quot;) }
+                sign configurations.archives
+        }
+
+        //task androidJavadocs(type: Javadoc) {
+                //source = android.sourceSets.main.allJava
+        //}
+
+        //task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+                //classifier = 'javadoc'
+                //from androidJavadocs.destinationDir
+        //}
+
+        task androidSourcesJar(type: Jar) {
+                classifier = 'sources'
+                from android.sourceSets.main.java.sourceFiles
+        }
+
+        artifacts {
+                archives androidSourcesJar
+        }
+}
+</code></pre><p>You may also download it from <a href=https://gist.github.com/zserge/fef8a67d7c58131fbbc6>here</a>.</p><p>Put this file next to your <code>build.gradle</code> and create a <code>gradle.properties</code> file
+in the same directory:</p><pre><code>POM_NAME=Foo
+POM_ARTIFACT_ID=foo
+POM_PACKAGING=aar
+VERSION_NAME=1.0.0
+VERSION_CODE=1
+GROUP=com.bitbucket.johndoe
+
+POM_DESCRIPTION=Foo library
+POM_URL=https://bitbucket.org/johndoe/foo
+POM_SCM_URL=https://bitbucket.org/johndoe/foo
+POM_SCM_CONNECTION=scm:hg:https://bitbucket.org/johndoe/foo
+POM_SCM_DEV_CONNECTION=scm:hg:https://bitbucket.org/johndoe/foo
+POM_LICENCE_NAME=MIT License
+POM_LICENCE_URL=http://www.opensource.org/licenses/mit-license.php
+POM_LICENCE_DIST=repo
+POM_DEVELOPER_ID=johndoe
+POM_DEVELOPER_NAME=johndoe
+
+NEXUS_USERNAME=johndoe
+NEXUS_PASSWORD=1234567890
+
+SNAPSHOT_REPOSITORY_URL=https://oss.sonatype.org/content/repositories/snapshots
+RELEASE_REPOSITORY_URL=https://oss.sonatype.org/service/local/staging/deploy/maven2
+
+signing.keyId=YYYYYYYY
+signing.password=1234567890
+signing.secretKeyRingFile=/home/johndoe/.gnupg/secring.gpg
+</code></pre><p>This <code>gradle.properties</code> should not be added to the version control as it
+contains some private information.</p><p>Finally, in your build.gradle just add this line somewhere at the end:</p><pre><code>apply from: 'maven-push.gradle'
+</code></pre><p>Now you&rsquo;re almost ready to publish.</p><h2 id=ensure-you-have-gpg-set-up>Ensure you have gpg set up</h2><p>You should sign your package with GPG. If you never used it - first create the
+GPG keys:</p><pre><code>$ gpg --gen-key
+</code></pre><p>Next, find your key ID:</p><pre><code>$ gpg --list-keys
+</code></pre><p>There the first line will be like <code>pub XXXXX/YYYYYYYY &lt;date></code>. Remember that
+&lsquo;YYYYYYYY&rsquo; part, it&rsquo;s you key ID.</p><p>Now, publish your keys:</p><pre><code>$ gpg --keyserver hkp://keyserver.ubuntu.com --send-keys YYYYYYYY
+$ gpg --keyserver hkp://pgp.mit.edu --send-keys YYYYYYYY
+</code></pre><p>You may use other key servers as well. You may also want to ensure your keys
+were published:</p><pre><code>$ gpg --keyserver hkp://pgp.mit.edu --search-keys johndoe@example.com # Use your email
+</code></pre><h2 id=pushing-the-archives>Pushing the archives</h2><p>Now you can do:</p><pre><code>$ gradle uploadArchives
+</code></pre><p>Your library will be built, signed and pushed to the sonatype repo. Please,
+ensure that &lsquo;signing&rsquo; stage was not skipped. It is skipped if your library name
+is ending with &ldquo;-SNAPSHOT&rdquo;, but for releases signing is mandatory.</p><p>If all went fine - go to the <a href=https://oss.sonatype.org/#stagingRepositories>OSSRH web
+UI</a> and look for your &lsquo;staging&rsquo;
+library. It should be somewhere at the end of the list. Select it, and press
+&lsquo;Close&rsquo; button. Closing a library actually means that you&rsquo;re ready to release
+it. Another option is &lsquo;dropping&rsquo; a library, which means removing it from the
+list. If closing went fine - you should see a &lsquo;Release&rsquo; button active. Press it
+and then get back to JIRA and post a comment there that you promoted you
+library.</p><p>After that you should get a response from Sonatype that your library will be
+available in ~10 minutes and it will be synced with the Maven Central in the
+next few hours.</p><p>To me that meant that I could use my library in other projects in a few minutes
+after I released it (e.g. using in gradle like &lsquo;compile groupID:name:version&rsquo;),
+but the search.maven.org found it only next morning.</p><p>So, that&rsquo;s it, and if you still have any problems - ask Sonatype support, I
+found them to be very helpful. Happy coding!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Aug 10, 2014</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

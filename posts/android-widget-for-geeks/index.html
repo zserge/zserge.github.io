@@ -1,0 +1,114 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>textizer: hack your android widgets</title><meta name=description content="Never thought of writing your own android widget?"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/android-widget-for-geeks/><meta property="og:title" content="textizer: hack your android widgets"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/android-widget-for-geeks/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Never thought of writing your own android widget?"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2012-08-25T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"textizer: hack your android widgets","description":"Never thought of writing your own android widget?","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/android-widget-for-geeks/","datePublished":"2012-08-25","dateModified":"2012-08-25","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/android-widget-for-geeks/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>textizer: hack your android widgets</h1><p>I like the idea of Android home screen widgets. I like to visualize
+information, to get it quickly and perform common tasks in a single tap.
+Even though Android market is flooded with useful and not-so-useful widgets of
+any type and price, I was looking for a <em>geeky</em> way to make my own widgets.</p><h2 id=why>why?</h2><p>Normally, I need either very simple widgets (like clock, calendar, weather,
+battery level) or very specific ones (say, a calendar that draws a date in red
+if it&rsquo;s a holiday in my country). And I want to have a single app to deal with
+all those widgets.</p><p>Next, I&rsquo;d like to share my widget settings with others and backup widgets
+in a simple way - in other words, I want my widget settings to be stored in a
+file. Preferably, a <a href=http://c2.com/cgi/wiki?PowerOfPlainText>plain text file</a>.</p><p>Finally, for my very custom widgets I&rsquo;d like to customize everything: colors,
+fonts, layout etc. So, I&rsquo;ll need some kind of a programming language and maybe a
+simple markup language to do that.</p><p>In other words, all I need is a &ldquo;DIY widget for geeks&rdquo;. And all I have for now
+is an early prototype with bugs and limited functionality. I&rsquo;ll describe it
+below and you will be able to try it out by yourself.</p><h2 id=how-it-works>how it works?</h2><p>You install a single app. Then you add a widget and give it a name. This name is
+a name of the widget&rsquo;s configuration file (widget script).</p><p>Then you open that script with any text editor right on your phone/tablet, or
+on the PC if you don&rsquo;t like on-screen keyboards (don&rsquo;t forget to copy the file
+back to the device after you&rsquo;ve modified it). It&rsquo;s just a text file, so that
+should be easy.</p><p>The configuration language must be simple yet powerful. I was thinking of using
+embeddable languages, and my final choice is - <a href=http://en.wikipedia.org/wiki/Scheme_(programming_language)>Scheme</a>. I use
+<a href=http://norvig.com/jscheme.html>Peter Norvig&rsquo;s toy interpreter</a> written in Java. Even though it&rsquo;s
+very old, and the code is not the state-of-the-art, I still like it, because:</p><ul><li>it&rsquo;s very minimalistic</li><li>it&rsquo;s easy to learn (simple syntax, the number of standard procedures is very
+small), easy to extend, easy to integrate with Java</li><li>it&rsquo;s very lightweight - added about 40kB to my APK size</li><li>it&rsquo;s somewhat slow, but this is not critical for widgets - they are not
+frequently updated.</li><li>finally, it&rsquo;s a nice chance to learn Scheme by myself, as I have never used
+it before :)</li></ul><p>To sum up, you write a Scheme script that tells how your widget looks like and
+how it works - and that&rsquo;s all you do to set up a widget.</p><h2 id=first-steps>first steps</h2><p>If you still want to try Textizer at your own risk - let&rsquo;s start with
+downloading an <a href=https://bitbucket.org/zserge/textizer/downloads>*.apk</a> and install it on the device. Then add a new
+textizer widget to your home screen - for example, &lsquo;Textizer 1x1&rsquo;. You&rsquo;ll see a
+window asking you for a new widget name.</p><p>In this example we&rsquo;ll make a simple calendar widget showing current date, so
+let&rsquo;s name a widget - &lsquo;calendar&rsquo;. After you press &lsquo;Ok&rsquo; button, a new scheme
+script will be created at the
+<code>&lt;sdcard>/Android/data/trikita.textizer/files/calendar.scm</code>.</p><p>If you have a text editor on your device - you can directly open that file,
+otherwise - use any text editor on your PC (in this case you&rsquo;ll have to copy
+scripts to and from the device manually using <code>adb push/pull</code>, AirDroid, your
+android file manager capabilities etc).</p><p>Here&rsquo;s the initial contents of the calendar.scm file:</p><pre><code>; auto-generated template for 'calendar' widget
+(grid 1 1 &quot;80333333&quot; 60)
+(cell '(1 1 1 1) &quot;calendar&quot;)
+</code></pre><p><code>(grid ...)</code> and <code>(cell ...)</code> are the functions to create a grid-based layout.
+In the example above we&rsquo;ve created a 1x1 grid with the background color
+&ldquo;#80333333&rdquo; (semi-transparent gray) and update interval of 60 seconds. Inside
+the grid we&rsquo;ve created a single 1x1 cell at the top left corner (with
+coordinates x=1, y=1) and with text &ldquo;calendar&rdquo; on it. If you change the text
+(and copy the file back to the device if you did editing on the PC) you&rsquo;ll see
+the widget has changed, too.</p><h2 id=grid-based-layout>grid-based layout</h2><p>Grid-based layout is easy to implement, easy to understand and it should work
+for most cases. You can take a widget as a regular grid of the given
+width and height. For example, here&rsquo;s a grid of size 4x2:</p><pre><code>+--+--+--+--+
+|  |  |  |  |
++--+--+--+--+
+|  |  |  |  |
++--+--+--+--+
+</code></pre><p>Every logical cell inside a grid can take several grid cells, for example in
+the picture below you can see 3 logical cells (named A, B and C) - in the
+widget script their positions will be described as'(1 2 1 1), &lsquo;(2 1 2 2) and &lsquo;(4
+1 1 1):</p><pre><code>+  +--+--+--+
+   |     |C |
++--+  B  +--+
+| A|     |   
++--+--+--+  +
+</code></pre><p>The first two numbers in the cell rectangle are coordinates of the logical cell
+in a grid, and the last two numbers are width and height.</p><p>This layout can be produced by a script like:</p><pre><code>(grid 4 2 &quot;black&quot; 60)
+(cell '(1 2 1 1) &quot;A&quot;)
+(cell '(2 1 2 2) &quot;B&quot;)
+(cell '(4 1 1 1) &quot;C&quot;)
+</code></pre><p>Every logical cell has its own content, font style, alignment etc. For now the
+only things common for the whole grid (the whole widget) are background color
+and update interval.</p><p>The sample script above is pretty much useless as it displays just static plain
+text content. How can we make cell content dynamic?</p><h2 id=cell-providers>cell providers</h2><p>Every cell has a provider. A provider can be a string (we&rsquo;ve seen above), a
+function or a lambda (an unnamed function). Provider function is being executed
+every time the widget is updated. Provider function sets cell style and returns
+a text to be written inside the cell.</p><p>Before going to the textizer internals, I&rsquo;d like to remind you the basics of
+Scheme syntax. To call a function instead of <code>func(arg1, arg2, arg3) you are to write </code>(func arg1 arg2 arg3)`. Normally, arguments are evaluated before passing
+to the function. If you want something not to be evaluated - use a quote
+symbol, for example:</p><pre><code>(write (+ 1 2))     ; will print &quot;3&quot;
+(write '(+ 1 2))    ; will print &quot;(+ 1 2)&quot;
+</code></pre><p>So, the second argument of the <code>(cell '(x y w h) ...)</code> function is a content
+provider. If it&rsquo;s a name of the function - quote it. Otherwise it will be
+evaluated only once (when the cell is created), but not every time the widget
+is updated. You can pass an arbitrary number of arguments to the provider
+function - just write them one after another after the provider name.</p><p>Here&rsquo;s a sample usage of a simple clock provider:</p><pre><code>(cell '(1 1 1 1) 'clock &quot;HH:mm&quot;)
+</code></pre><p>Here we assign a clock provider with the format string of &ldquo;HH:mm&rdquo; to the cell.</p><p>We can create our own providers easily. Here&rsquo;s the sources of our calendar
+widget script:</p><pre><code>(grid 1 4 &quot;#ff333745&quot; 60)
+
+(define (string-upcase s)
+    (list-&gt;string (map char-upcase (string-&gt;list s))))
+
+(cell '(1 1 1 1) 
+    (lambda ()
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;sans&quot; 18))
+        (string-upcase (clock &quot;MMM&quot;))))
+		
+(cell '(1 2 1 2) 
+    (lambda ()
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;bold&quot; 36))
+        (clock &quot;dd&quot;)))
+				
+(cell '(1 4 1 1)
+    (lambda ()
+        (style '(color &quot;#fff6f792&quot;) '(font &quot;bold&quot; 18))
+        (string-upcase (clock &quot;EEE&quot;))))
+</code></pre><p>And the result is:</p><p><img src=/images/textizer-calendar-1x1.png alt="Widget 1x1"></p><p>Here&rsquo;s an example of another widget created with textizer (converting time to
+text and pretty-printing is done purely in Scheme):</p><p><img src=/images/textizer-widget-4x1.png alt="Widget 0x1"></p><p>Here&rsquo;s a list of functions you can use to customize your textizer widgets:</p><ul><li><code>(grid width height color interval)</code> - creates a grid layout</li><li><code>(cell rect provider provider-args ...)</code> - defines a new cell inside a grid.
+<code>rect</code> is a list of 4 numbers - <code>(x y width height)</code>.</li><li><code>(clock format)</code> - returns a string representing current time according to the
+<code>format</code> string. <code>format</code> is the same as in <a href=http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html>SimpleDateFormat</a> class
+documentation.</li><li><code>(style '(param value) ...)</code> - defines new painting style. <code>param</code> can be one
+of:<ul><li><code>'(color color-string)</code> - defines font color.</li><li><code>'(font name size)</code> - defines font style and size. <code>name</code> is one of &ldquo;sans&rdquo;,
+&ldquo;serif&rdquo;, &ldquo;mono&rdquo; or &ldquo;bold&rdquo;.</li><li><code>'(align horiz-align vert-align)</code> - defines an alignment. Can be &ldquo;left&rdquo;,
+&ldquo;right&rdquo;, &ldquo;top&rdquo;, &ldquo;bottom&rdquo; or &ldquo;center&rdquo;.</li></ul></li></ul><p>As it&rsquo;s just a proof-of-concept the customization is very limited. In future I
+think of extending it.</p><h2 id=is-there-any-future-for-textizer>is there any future for textizer?</h2><p>Textizer is still in its early stage. What&rsquo;s to be implemented
+next?</p><ul><li>more providers (battery, wifi, gps&mldr;)</li><li>add actions to the grid, e.g. what to do when the widget is tapped</li><li>add more style options, like padding, drawing primitives (e.g. lines), custom
+font support</li><li>add support for global variables, that are stored between provider function
+calls (there is a chance that the application will be stopped and re-started
+between the widget updates)</li><li>add support for networking to fetch provider content from web services</li><li>create more examples and maybe a repository with useful widget scripts</li></ul><p>So, what do you think? Is there any sense in such a widget for geeks?</p><p>P.S. Textizer is open source, free and with no ads. The sources are <a href=https://bitbucket.org/zserge/textizer/>hosted on
+bitbucket</a>.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Aug 25, 2012</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

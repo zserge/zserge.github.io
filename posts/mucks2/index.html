@@ -1,0 +1,61 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>mucks: now with the dvtm flavor!</title><meta name=description content="mucks - a tiny session manager for tmux, screen and dvtm"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/mucks2/><meta property="og:title" content="mucks: now with the dvtm flavor!"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/mucks2/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="mucks - a tiny session manager for tmux, screen and dvtm"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2014-06-07T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"mucks: now with the dvtm flavor!","description":"mucks - a tiny session manager for tmux, screen and dvtm","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/mucks2/","datePublished":"2014-06-07","dateModified":"2014-06-07","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/mucks2/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>mucks: now with the dvtm flavor!</h1><p>Somehow refactoring turned info rewriting from scratch&mldr; So, meet the new
+shiny <a href=https://github.com/zserge/mucks>mucks app</a> written in AWK language
+(instead of UNIX Shell).</p><p>I played with quotes in tmux &ldquo;send-keys&rdquo; command, and it turned out that
+different shells treat quotes in the &ldquo;read&rdquo; command very differently, and I found
+no easy way to overcome it.</p><p>That&rsquo;s how AWK came to the rescue. A more mature, yet much simpler language
+made my code cleaner and shorter.</p><p>Users would not notice it, since the configuration file syntax remains the
+same.</p><h2 id=previously-on-mucks>Previously on &ldquo;Mucks&rdquo;</h2><p>For those who missed the <a href=/posts/mucks/>first part</a> - the
+session configuration file is normally called <code>.mucksrc</code> and stays in the
+directory you call mucks from (e.g. <code>cd myproject && mucks</code>).</p><p>File has two parts: header and layout declaration.</p><p>Header may declare some session-wide variables, e.g.:</p><ul><li><code>mux: &lt;tmux|screen|dvtm></code> - the default muxer. If not specified - it will be
+takes from the <code>$MUCKS</code> variable or defaulted to &ldquo;tmux&rdquo; if that is empty,
+too.</li><li><code>name: &lt;string></code> - any string to use as the terminal title (warning: tmux may override it if <code>set-titles</code> option is set).</li><li><code>dir: &lt;path></code> - project working directory used by default for all panes. May contain &ldquo;~&rdquo; or be a relative path.</li><li><code>pre: &lt;command></code> - shell command to be executed before launching the muxer. Executed once on mucks start.</li><li><code>prewnd: &lt;command></code> - Similar, but executed inside every window pane.</li></ul><p>Below the pane layout is described. Section names are panes and content in
+between is just typed into the pane, e.g. this will open vim and type &ldquo;hello&rdquo;
+in it:</p><pre><code>[vim]
+vim
+ihello^M
+</code></pre><h2 id=hooks>Hooks</h2><p>Since mucks is targeted to many popular muxers - I decided to leave the
+unification of them up to you. I believe people don&rsquo;t often use two different
+muxers on the same project.</p><p>Anyway, now you can insert <strong>any</strong> internal muxer commands anywhere in the
+layout. Only those that match the current muxer will be executed. For example:</p><pre><code>[vim]
+vim
+- tmux split-window -v
+- screen -X split
+</code></pre><p>This will execute <code>split-window</code> command if run with MUCKS=tmux and <code>split</code>
+command if run with MUCKS=screen</p><p>A special case for the hook is a shell hook starting with &ldquo;sh&rdquo;. That&rsquo;s
+extremely helpful for controlling ncurses apps and I think I beat the
+Tmuxinator here (last time I checked it - it could not change the colorscheme of my vim):</p><pre><code>[vim]
+vim
+- sh sleep 0.2
+:colorscheme less
+</code></pre><p>Here the <code>colorscheme</code> command will be executed 200ms after the vim has
+started and it works fine. But if you type it immediately - most like it will
+not be interpreted by vim at all.</p><h2 id=dvtm>DVTM</h2><p>I think that <a href=http://www.brain-dump.org/projects/dvtm/>DVTM</a> is a very nice app. Even
+though I prefer tmux - I really like the simplicity of the DVTM and the look.</p><p>With a tiny modification it can be controlled with mucks as well! You will need
+to enable &ldquo;send&rdquo; command in your config.h so you could send actual commands to
+the named pipe when the DVTM is in the background:</p><pre><code>--- config.h	2014-07-07 17:33:44.777186966 +0300
++++ config.def.h	2014-07-07 16:44:34.265263378 +0300
+@@ -147,7 +147,6 @@
+ 
+ static Cmd commands[] = {
+    { &quot;create&quot;, { create,	{ NULL } } },
+-	{ &quot;send&quot;, { send,	{ NULL } } },
+ };
+ 
+ /* gets executed when dvtm is started */
+</code></pre><p>Also, you should use it in pair with
+<a href=http://www.brain-dump.org/projects/abduco/>abduco</a> (which a believe you already do
+if you picked DVTM).</p><p>So here&rsquo;s how these three great muxers look when controlled by mucks with the same environment:</p><pre><code>dir: /tmp
+
+[vim]
+vim
+- sh sleep 0.1
+iint main() { printf(&quot;Hello!\n&quot;); }
+																	 
+[foo]
+
+[bash]
+man 3 printf
+</code></pre><p><code>MUCKS=tmux mucks</code>:</p><p><img src=/images/mucks3.png alt=Tmux></p><p><code>MUCKS=screen mucks</code>:</p><p><img src=/images/mucks4.png alt=Screen></p><p><code>MUCKS=dvtm mucks</code>:</p><p><img src=/images/mucks5.png alt=DVTM></p><p>So, what&rsquo;s your favourite terminal multiplexor?</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jun 07, 2014</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

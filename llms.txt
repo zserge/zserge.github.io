@@ -1,0 +1,108 @@
+# zserge.com
+
+> Personal blog by Serge Zaitsev — a software developer exploring how things work by building them from scratch in minimal code.
+
+## About
+
+This blog focuses on systems programming, minimalism, and understanding software fundamentals through implementation. Topics include operating systems internals, programming languages, AI/ML from scratch, graphics programming, retro computing, and web technologies. Most posts include working code in C, Go, or JavaScript.
+
+Author: Serge Zaitsev
+- Website: https://zserge.com
+- GitHub: https://github.com/zserge
+- Mastodon: https://mastodon.social/@zserge
+- Email: hello@zserge.com
+
+## Posts
+
+- [Let's make the worst htmx ever!](https://zserge.com/posts/worst-htmx-ever/): Learning how htmx works by building one from scratch.
+- [Tensor is the might](https://zserge.com/posts/tensor/): From a small 1D array of floats to a proper autograd capable of training tinyML models, explaining every step.
+- [A non-coding coding agent](https://zserge.com/posts/socreates/): Building a minimal coding agent in Go, the one that reviews your code and your decisions but never writes code itself.
+- [VisiCalc reconstructed](https://zserge.com/posts/visicalc/): Building a minimal VisiCalc clone from scratch in C to understand how spreadsheets work.
+- [By the power of grayscale!](https://zserge.com/posts/grayskull/): A brief introduction into computer vision and image processing using Grayskull library.
+- [Pennybase: a Pound-Shop BaaS](https://zserge.com/posts/pennybase/): Building yet another single-file backend as a service. As always, we focus on simplicity, but nevertheless we try to implement as many features as we can without making it too complex.
+- [Emulating 6502](https://zserge.com/posts/6502/): My journey into retrocomputing, 8-bit home computers, Apple I and of course MOS 6502 assembly.
+- [On Music Tabs](https://zserge.com/posts/tab/): Random thoughts about plain text music notation, tablatures, amateur musicians and pocket zines. Vaguely related to programming, too.
+- [Tiny Great Languages: PL/0](https://zserge.com/posts/langs-pl0/): Explore PL/0, a simplified subset of Pascal, and learn how to build a lexer, a parser and an interpreter from scratch.
+- [Tiny Great Languages: APL](https://zserge.com/posts/langs-apl/): Hey, life ← {⊃1 ⍵ ∨.∧ 3 4 = +/ +⌿ ¯1 0 1 ∘.⊖ ¯1 0 1 ⌽¨ ⊂⍵} and no, your browser encoding is correct, it's just 'A Game of Life' in APL.
+- [Tiny Great Languages: Lisp](https://zserge.com/posts/langs-lisp/): From RPN languages to (lots (of (irritating) superfluous) parenthesis), or (Lisp (is (simply (prefect))))!
+- [Tiny Great Languages: MOUSE](https://zserge.com/posts/langs-mouse/): From "2+2=4" to "2 2 + 4 =", reverse Polish notation, concatenative languages, Forth and its smaller siblings.
+- [Tiny Great Languages: BASIC](https://zserge.com/posts/langs-basic/): Entering the microcomputer era and attempting to create a programming language that dominated home computers in the 1970s
+- [Tiny Great Languages: Assembly](https://zserge.com/posts/langs-asm/): Summing up years of building interpreters and compilers for various programming languages. The first chapter is about assembly language. We will try to implement a tiny two-pass assembler for CPython VM.
+- [AI or ain't: LLMs](https://zserge.com/posts/ai-llm/): Finally, building a simple GPT model that would finish our sentences.
+- [AI or ain't: Neural Networks](https://zserge.com/posts/ai-nn/): Neural network and deep learning introduction for those who skipped the math class but wants to follow the trend
+- [AI or ain't: Eliza](https://zserge.com/posts/ai-eliza/): Explore the intriguing history of Eliza, a pioneering chatbot, and learn how to implement a basic version in Go, unraveling the roots of conversational AI.
+- [Minimal cross-platform graphics](https://zserge.com/posts/fenster/): Exploring how to use 2D graphics in various desktop operating systems, the old-school way. In this part we learn how to create an empty window under Linux, macOS and Windows.
+- [What is Git made of?](https://zserge.com/posts/git/): Build your own tiny Git from scratch to learn the internals of Git version control system.
+- [Post-apocalyptic programming](https://zserge.com/posts/post-apocalyptic-programming/): In a post-apocalyptic future with no internet or stackoverflow, let's try to build a programming environment from scratch.
+- [On Transpilers](https://zserge.com/posts/transpilers/): Exploring various transpilers from C to "better C" and how they can help replacing C in existing project.
+- [Zig, the small language](https://zserge.com/posts/zig-the-small-language/): Zig programming language is new, but it's getting a well deserved attention. Can it be a good fit for small-and-simple programming tasks?
+- [How do One-Time passwords work?](https://zserge.com/posts/one-time-passwords/): Many of us use one-time passwords (OTP) regularly to log into different services. Most probably rely on Google Authenticator and similar tools. But what about building one by ourselves?
+- [Poor Man's Web](https://zserge.com/posts/small-web/): The Small Web Renaissance, Finger, Gopher and Gemini. How they work and what makes them different from the modern Big Web.
+- [Ray tracer for those who skipped the math class](https://zserge.com/posts/raytracer/): A tiny ray tracer, only useful for people who never written one themselves, but would like to. It lacks features, but provides a foundation to build your own, featureful ray tracer upon.
+- [How do ones and zeros sound?](https://zserge.com/posts/1-bit-music/): A brief introduction into 1-bit buzzer music, perhaps the most limiting and challenging genre of electronic computer music.
+- [CSS-in-JS in 200 bytes](https://zserge.com/posts/css-in-js/): Learning how CSS-in-JS works by building one from scratch and squeezing it into a barely noticeable size.
+- [Let's make the worst VueJS ever!](https://zserge.com/posts/worst-vuejs-ever/): Learning how VueJS works by building one from scratch.
+- [The old way to the modern web services](https://zserge.com/posts/go-web-services/): Using Go to build webservices in a boring, predictable, yet productive way.
+- [Beep, beep, I'm a sheep](https://zserge.com/posts/beep/): Let's build a tiny cross-platform audio library for playing beeps to understand how low-level audio works across the platforms
+- [Étude in C minor](https://zserge.com/posts/etude-in-c/): Making music with low-level C code, from a simple saw wave to playing melodies
+- [Nokia Composer in 512 bytes](https://zserge.com/posts/nokia/): Making a tiny oldschool music composer inspired by RTTTL and Nokia Composer
+- [World smallest office suite](https://zserge.com/posts/awfice/): Let's build a tiny browser-based office suite - a text editor, a speadsheet, a drawing app and a presentation maker - all in four lines of code.
+- [Minimal code editor in JavaScript](https://zserge.com/posts/js-editor/): How to write a small extensible code editor in pure javascript, with syntax highlighting and a few other nice features in 1KB. Absolutely no dependencies, a bit of contenteditable magic, with a strong focus on keeping it small and simple.
+- [Making a tiny 2x3 bitmap font](https://zserge.com/posts/tiny-font/): A playful experiment in making the most minimal bitmap font.
+- [Java agent - Bond or Smith?](https://zserge.com/posts/javaagent/): Writing a toy Java agent to monitor and modify the behavior of Java classes in runtime.
+- [How to write a (toy) JVM](https://zserge.com/posts/jvm/): Exploring JVM specification and trying to write a little code to interpret a Java class like a real JVM.
+- [Linux containers in a few lines of code](https://zserge.com/posts/containers/): Trying to figure out how Linux containers work by implementing them from scratch in C.
+- [KVM host in a few lines of code](https://zserge.com/posts/kvm/): Trying to figure out how KVM-based virtual machine hosts work by implementing one from scratch.
+- [Tmux for mere mortals](https://zserge.com/posts/tmux/): Tmux is great. Tmux defaults are not. How to make use of a brilliant tool without breaking your fingers?
+- [Ode to J](https://zserge.com/posts/j/): From a confusing page of old C code to APL/J praise.
+- [RSS is dead](https://zserge.com/posts/rss/): My last attempt to keep RSS as a part of my life.
+- [Let's write a tiny chess engine in Go](https://zserge.com/posts/carnatus/): How to write a simple chess playing program in one day with a few lines of code
+- [Let's make the worst React ever!](https://zserge.com/posts/worst-react-ever/): Learning how React works by building one from scratch.
+- [Distraction free writing in Vim](https://zserge.com/posts/vim-distraction-free/): Ultra-simple distraction free mode for vim
+- [Implementing metrics in Go](https://zserge.com/posts/metrics/): The easiest way to add metrics to your web service in Go
+- [How to configure zsh](https://zserge.com/posts/terminal/): A brief tutorial on how to make your terminal environment look modern but is still remain very minimal and performant.
+- [Cross-platform web UI for C and Go](https://zserge.com/posts/webview/): Tiny single-header webview wrapper for Gtk/WinAPI/Cocoa with Golang bindings
+- [Syntactic sugar in C - (ab)using "for" loops](https://zserge.com/posts/c-for-loop-tricks/): C metaprogramming with loops and commas, pretending that it's a good idea
+- [Partcl - a tiny command language](https://zserge.com/posts/tcl-interpreter/): Tcl intepreter in six hundred lines of code, customizable, extendable, covered with tests
+- [My experience with asm.js](https://zserge.com/posts/my-experience-with-asmjs/): Rewriting parts of the app in C to improve performance
+- [Anvil 0.4.0 + support libraries](https://zserge.com/posts/anvil-support-libraries/): For a long time Anvil worked only with normal SDK views, but now you may use support library views as well
+- [The Stockholm syndrome of Android XML](https://zserge.com/posts/anvil-xml-support/): We love XMLs, but there might be a better way
+- [How to architect Anvil apps](https://zserge.com/posts/anvil-app-architecture/): Anvil simplifies your UI code, but what about your controllers and models?
+- [The evolution of Android architecture](https://zserge.com/posts/android-mvp-mvvm-redux-history/): Android history: from no architecture to MVP to MVVM to Redux
+- [Anvil howto: view styling](https://zserge.com/posts/anvil-howto-style-views/): How to use view styles in Anvil: traditional XML approach and more flexible styling with code
+- [Two way data bindings in Anvil](https://zserge.com/posts/anvil-two-way-bindings/): How to register callbacks in your views to change data bound to the same views
+- [painless publishing of android libraries](https://zserge.com/posts/jitpack/): from mavenCentral to jcenter to jitpack.io
+- [Anvil: time for a change](https://zserge.com/posts/anvil-forge-merged/): I merged anvil-forge branch back to master and published a new version.
+- [Anvil: move fast and break things](https://zserge.com/posts/anvil-breaking-changes/): I have to break backwards-compatibility a lot and I'm sorry about it
+- [Benchmarking Go in the cloud](https://zserge.com/posts/go-cloud-benchmark/): Compare performance of a simple Go web app running on Heroku, OpenShift, Digital Ocean and AWS
+- [lua-sh: calling shell commands as functions](https://zserge.com/posts/luash/): Subprocess interface for Lua, inspired by Python 'sh' module
+- [How to sign release apk with gradle](https://zserge.com/posts/android-signing/): Signing apks without boilerplate code
+- [How Palette was made](https://zserge.com/posts/palette/): clean minimal color scheme picker for traditional palettes: material, flatui, ios, metro, solarized, tango
+- [Anvil: Double O Seven](https://zserge.com/posts/anvil-0.0.7/): A preferred way to prepare your android apps. Shaken, not stirred.
+- [log - a drop-in replacement for android Log class](https://zserge.com/posts/log/): another logger for Android, tiny, easy-to-use, smart and flexible
+- [Buck - life is too short to spend a minute for each build](https://zserge.com/posts/buck-build-system/): Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it.
+- [Where Anvil meets Kotlin](https://zserge.com/posts/anvil-kotlin/): A minimal extension to add Kotlin support to Anvil
+- [Anvil: big progress for a small library](https://zserge.com/posts/anvil-2/): Summing up the progress of anvil development
+- [Anvil: the story of automatic rendering](https://zserge.com/posts/anvil-1/): How to render your view automatically and stop worrying about UI state
+- [android UI development made easy](https://zserge.com/posts/android-mvx/): Bringing the ideas from Mithril, React, Bloop to Android
+- [moved to new static site generator (again)](https://zserge.com/posts/new-site-generator2/): there's always room for improvement
+- [ultimately minimal unit testing](https://zserge.com/posts/minimal-testing/): a tiny libraries for testing in JS, Lua and Bash
+- [simple library publishing with Gradle](https://zserge.com/posts/gradle-maven-publish/): quick guide to maven central library publishing with gradle
+- [mucks: now with the dvtm flavor!](https://zserge.com/posts/mucks2/): mucks - a tiny session manager for tmux, screen and dvtm
+- [mucks: automating screen and tmux](https://zserge.com/posts/mucks/): mucks - a session manager for screen and tmux
+- [lambda support for Android](https://zserge.com/posts/android-lambda/): Bringing java 8 features to android platform
+- [kotlin - a new hope](https://zserge.com/posts/kotlin/): A new language for Android coding
+- [moved to new static site generator](https://zserge.com/posts/new-site-generator/): self done is well done
+- [logdog - a colorized Android logcat](https://zserge.com/posts/logdog/): logdog is a better logcat
+- [AAML - another android markup language](https://zserge.com/posts/aaml/): writing android XMLs is easy now
+- [new project: jknav](https://zserge.com/posts/update-jknav/): my attempt to jk-navigation in browsers
+- [cucu: a compiler you can understand (3/3)](https://zserge.com/posts/cucu-part3/): Compilers is fun. Want to write your own one? Part 3 - code generator.
+- [cucu: a compiler you can understand (2/3)](https://zserge.com/posts/cucu-part2/): Compilers is fun. Want to write your own one? Part 2 - parser.
+- [cucu: a compiler you can understand (1/3)](https://zserge.com/posts/cucu-part1/): Compilers is fun. Want to write your own one? Part 1 - lexer.
+- [textizer: hack your android widgets](https://zserge.com/posts/android-widget-for-geeks/): Never thought of writing your own android widget?
+- [my minimalistic agile issue tracker](https://zserge.com/posts/agile-issue-tracker/): Ever been frustrated by monstrous issue trackers?
+- [the first post](https://zserge.com/posts/hello/): I'm just saying "Hi!"
+
+## RSS Feed
+
+https://zserge.com/rss.xml

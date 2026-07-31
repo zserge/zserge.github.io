@@ -1,0 +1,144 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>How to architect Anvil apps</title><meta name=description content="Anvil simplifies your UI code, but what about your controllers and models?"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-app-architecture/><meta property="og:title" content="How to architect Anvil apps"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-app-architecture/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Anvil simplifies your UI code, but what about your controllers and models?"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2016-03-29T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"How to architect Anvil apps","description":"Anvil simplifies your UI code, but what about your controllers and models?","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-app-architecture/","datePublished":"2016-03-29","dateModified":"2016-03-29","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-app-architecture/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>How to architect Anvil apps</h1><p>If you only have a few UI elements, a small data class and your controllers
+have only a few actions to perform - you may consider using no architecture at
+all.</p><p>Just make a global &ldquo;controller&rdquo; object and/or a global data object. By &ldquo;global&rdquo;
+I mean you may use dependency injection, or propagate the instance from the
+root activity to its child views, or make it a singleton.</p><p>Simply bind data to your views and call controller methods from your event
+listeners. Here&rsquo;s an example of a counter app where Counter object is
+propagated from the Activity to its child views:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>class</span> <span class=nc>Counter</span> <span class=o>{</span>
+  <span class=c1>// If your model is more than one variable - you might want to move it to a
+</span><span class=c1></span>  <span class=c1>// separate class
+</span><span class=c1></span>  <span class=kd>private</span> <span class=kt>int</span> <span class=n>count</span> <span class=o>=</span> <span class=n>0</span><span class=o>;</span>
+  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>incr</span><span class=o>()</span> <span class=o>{</span> <span class=k>this</span><span class=o>.</span><span class=na>count</span><span class=o>++;</span> <span class=o>}</span>
+  <span class=kd>public</span> <span class=kt>int</span> <span class=nf>getCount</span><span class=o>()</span> <span class=o>{</span> <span class=k>return</span> <span class=n>count</span><span class=o>;</span> <span class=o>}</span>
+<span class=o>}</span>
+
+<span class=kd>public</span> <span class=kd>class</span> <span class=nc>MainActivity</span> <span class=kd>extends</span> <span class=n>Activity</span> <span class=o>{</span>
+  <span class=kd>final</span> <span class=n>Counter</span> <span class=n>counter</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Conuter</span><span class=o>();</span>
+  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>onCreate</span><span class=o>(</span><span class=n>Bundle</span> <span class=n>b</span><span class=o>)</span> <span class=o>{</span>
+    <span class=kd>super</span><span class=o>.</span><span class=na>onCreate</span><span class=o>(</span><span class=n>b</span><span class=o>);</span>
+    <span class=n>setContentView</span><span class=o>(</span><span class=k>new</span> <span class=n>CounterView</span><span class=o>(</span><span class=k>this</span><span class=o>));</span>
+  <span class=o>}</span>
+<span class=o>}</span>
+
+<span class=kd>public</span> <span class=n>CounterView</span> <span class=kd>extends</span> <span class=n>RenderableView</span> <span class=o>{</span>
+  <span class=kd>private</span> <span class=kd>final</span> <span class=n>Counter</span> <span class=n>counter</span><span class=o>;</span>
+  <span class=kd>public</span> <span class=nf>CounterView</span><span class=o>(</span><span class=n>Context</span> <span class=n>c</span><span class=o>)</span> <span class=o>{</span>
+    <span class=kd>super</span><span class=o>(</span><span class=n>c</span><span class=o>);</span>
+    <span class=k>this</span><span class=o>.</span><span class=na>counter</span> <span class=o>=</span> <span class=o>((</span><span class=n>MainActivity</span><span class=o>)</span> <span class=n>c</span><span class=o>).</span><span class=na>counter</span><span class=o>;</span>
+  <span class=o>}</span>
+  <span class=kd>public</span> <span class=kt>void</span> <span class=nf>view</span><span class=o>()</span> <span class=o>{</span>
+    <span class=n>linearLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+      <span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+        <span class=n>text</span><span class=o>(</span><span class=s>&#34;Count: &#34;</span> <span class=o>+</span> <span class=k>this</span><span class=o>.</span><span class=na>counter</span><span class=o>.</span><span class=na>getCount</span><span class=o>());</span>
+      <span class=o>});</span>
+      <span class=n>button</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+        <span class=n>onClick</span><span class=o>(</span><span class=n>v</span> <span class=o>-&gt;</span> <span class=k>this</span><span class=o>.</span><span class=na>counter</span><span class=o>.</span><span class=na>incr</span><span class=o>());</span>
+      <span class=o>});</span>
+    <span class=o>});</span>
+  <span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><p>Of course this approach doesn&rsquo;t scale well. If your app grows or your
+requirements are too flexible - consider using Redux.</p><h2 id=redux>Redux</h2><p>Anvil guarantees that your views always reflect your most recent data. Redux
+guarantees that your data is always in the predictable state.</p><p>Together they allow you to write consistent apps that behave and look exactly
+as planned, they are easy to develop, to test and to debug.</p><p><a href=http://redux.js.org>Redux</a> itself is a pattern and there is a number of
+Redux implementations for Android. I will focus on
+<a href=https://github.com/trikita/jedux>Jedux</a> here, but
+<a href=https://github.com/glung/redux-java>redux-java</a> and
+<a href=https://github.com/brianegan/bansa>bansa</a> are also worth checking.</p><p>Redux defines three main parts: state (your data model), actions (small
+messages that are emitted to trigger some state changes) and a reducer (a pure
+function that takes an incoming action and returns an updated state).</p><p>To tie it all together you will need a global <code>Store</code> object. That&rsquo;s the only
+class you have to learn in Redux and it has two major methods:</p><ul><li>Store.dispatch(action): State - post an action message and get an updated state</li><li>Store.getState(): State - get current state</li></ul><p>It is highly recommended to keep your State class immutable, e.g. when you
+modify it - you get a new object. This will save you from synchronization
+problems and will simplify your code a lot. If you don&rsquo;t like writing immutable
+builders manually - I recommend to use
+<a href=http://immutables.github.io>Immutables</a> library.</p><h2 id=redux-counter>Redux counter</h2><p>Let&rsquo;s start with a State. For a counter app it will just hold a number. I&rsquo;m
+using Immutables here, but you may write it manually (especially if you use
+Kotlin with its great data classes):</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=nd>@Value.Immutable</span>
+<span class=kd>public</span> <span class=n>inteface</span> <span class=n>State</span> <span class=o>{</span>
+  <span class=kt>int</span> <span class=nf>count</span><span class=o>();</span>
+<span class=o>}</span>
+</code></pre></div><p>Now, define your action types:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>enum</span> <span class=n>Action</span> <span class=o>{</span> <span class=n>INCR</span><span class=o>,</span> <span class=n>DECR</span> <span class=o>}</span>
+</code></pre></div><p>Create a store:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=c1>// Create an initial state object
+</span><span class=c1></span><span class=n>State</span> <span class=n>initialState</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>builder</span><span class=o>.</span><span class=na>count</span><span class=o>(</span><span class=n>0</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+<span class=c1>// Create reducer (can be a lambda)
+</span><span class=c1></span><span class=n>Store</span><span class=o>.</span><span class=na>Renderer</span><span class=o>&lt;</span><span class=n>Action</span><span class=o>,</span> <span class=n>State</span><span class=o>&gt;</span> <span class=n>reducer</span> <span class=o>=</span> <span class=o>(</span><span class=n>action</span><span class=o>,</span> <span class=n>state</span><span class=o>)</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=k>switch</span> <span class=o>(</span><span class=n>action</span><span class=o>)</span> <span class=o>{</span>
+    <span class=k>case</span> <span class=n>INCR</span><span class=o>:</span>
+      <span class=k>return</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>copyOf</span><span class=o>(</span><span class=n>state</span><span class=o>).</span><span class=na>withCount</span><span class=o>(</span><span class=n>state</span><span class=o>.</span><span class=na>count</span><span class=o>()</span> <span class=o>+</span> <span class=n>1</span><span class=o>);</span>
+    <span class=k>case</span> <span class=n>DECR</span><span class=o>:</span>
+      <span class=k>return</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>copyOf</span><span class=o>(</span><span class=n>state</span><span class=o>).</span><span class=na>withCount</span><span class=o>(</span><span class=n>state</span><span class=o>.</span><span class=na>count</span><span class=o>()</span> <span class=o>-</span> <span class=n>1</span><span class=o>);</span>
+  <span class=o>}</span>
+  <span class=c1>// If we can&#39;t handle an action - we should return current state
+</span><span class=c1></span>  <span class=k>return</span> <span class=n>state</span><span class=o>;</span>
+<span class=o>};</span>
+<span class=c1>// Create a store with the given reducer and initial state
+</span><span class=c1></span><span class=n>Store</span><span class=o>&lt;</span><span class=n>Action</span><span class=o>,</span> <span class=n>State</span><span class=o>&gt;</span> <span class=n>store</span> <span class=o>=</span> <span class=k>new</span> <span class=n>Store</span><span class=o>(</span><span class=n>reducer</span><span class=o>,</span> <span class=n>initialState</span><span class=o>);</span>
+</code></pre></div><p>Finally bind your views to the state and emit actions inside the listeners:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>text</span><span class=o>(</span><span class=s>&#34;Count: &#34;</span> <span class=o>+</span> <span class=n>store</span><span class=o>.</span><span class=na>getState</span><span class=o>().</span><span class=na>count</span><span class=o>());</span>
+<span class=o>});</span>
+<span class=n>button</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>onClick</span><span class=o>(</span><span class=n>v</span> <span class=o>-&gt;</span> <span class=n>store</span><span class=o>.</span><span class=na>dispatch</span><span class=o>(</span><span class=n>INCR</span><span class=o>));</span>
+<span class=o>});</span>
+</code></pre></div><h2 id=redux-middleware>Redux Middleware</h2><p>Your reducer is a pure function that must have no side effects. It&rsquo;s probably
+the most boring part of the Redux app.</p><p>Now, what if you have to do some <em>real</em> job in your app? Like starting some
+threads, running network operations or dealing with other android APIs?</p><p>That&rsquo;s what middlewares are for. Middleware is a simple way to hook into an
+action stream, intercept actions, run side-effect tasks and either propagate
+the action further, or skip it, or emit another action instead.</p><p>Each middleware knows about the incoming message, the current state, the next
+middleware in the chain, and it has a reference to the global store object so
+it can emit other actions if needed.</p><p>Example: you need to download a file when the button is clicked.</p><p>On button click you emit <code>START_DOWNLOAD</code> action. <code>Downloader</code> middleware
+receives that action, starts a downloading thread (or service). A thread may
+emit <code>UPDATE_PROGRESS</code> actions periodically and <code>DOWNLOAD_FINISHED</code> once it&rsquo;s
+done. All actions are passed into the store, where a reducer could update the
+state (e.g. toggle the &ldquo;isDownloading&rdquo; flag or &ldquo;progress&rdquo; value).</p><p>Reducer function does the following:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=k>switch</span> <span class=o>(</span><span class=n>action</span><span class=o>)</span> <span class=o>{</span>
+  <span class=k>case</span> <span class=n>START_DOWNLOAD</span><span class=o>:</span>
+    <span class=k>return</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>copyOf</span><span class=o>(</span><span class=n>state</span><span class=o>)</span>
+      <span class=o>.</span><span class=na>isDownloading</span><span class=o>(</span><span class=kc>true</span><span class=o>).</span><span class=na>progress</span><span class=o>(</span><span class=n>0</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+  <span class=k>case</span> <span class=n>UPDATE_PROGRESS</span><span class=o>:</span>
+    <span class=k>return</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>copyOf</span><span class=o>(</span><span class=n>state</span><span class=o>)</span>
+      <span class=o>.</span><span class=na>progress</span><span class=o>(</span><span class=n>actionValue</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+  <span class=k>case</span> <span class=n>FINISH_DOWNLOAD</span><span class=o>:</span>
+    <span class=k>return</span> <span class=n>ImmutableState</span><span class=o>.</span><span class=na>copyOf</span><span class=o>(</span><span class=n>state</span><span class=o>)</span>
+      <span class=o>.</span><span class=na>isDownloading</span><span class=o>(</span><span class=kc>false</span><span class=o>).</span><span class=na>build</span><span class=o>();</span>
+<span class=o>}</span>
+</code></pre></div><p>State is bound to certain views, for example:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>button</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=c1>// Let user click the button only if no download happens at the moment
+</span><span class=c1></span>  <span class=n>enabled</span><span class=o>(</span><span class=n>store</span><span class=o>.</span><span class=na>getState</span><span class=o>().</span><span class=na>isDownloading</span><span class=o>()</span> <span class=o>==</span> <span class=kc>false</span><span class=o>);</span>
+  <span class=n>onClick</span><span class=o>(</span><span class=n>v</span> <span class=o>-&gt;</span> <span class=n>store</span><span class=o>.</span><span class=na>dispatch</span><span class=o>(</span><span class=k>new</span> <span class=n>Action</span><span class=o>&lt;&gt;(</span><span class=n>START_DOWNLOAD</span><span class=o>,</span> <span class=n>someUrl</span><span class=o>)));</span>
+<span class=o>});</span>
+<span class=n>progressBar</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>max</span><span class=o>(</span><span class=n>100</span><span class=o>);</span>
+  <span class=c1>// Show progress only if something is downloading
+</span><span class=c1></span>  <span class=n>visibility</span><span class=o>(</span><span class=n>store</span><span class=o>.</span><span class=na>getState</span><span class=o>().</span><span class=na>isDownloading</span><span class=o>());</span>
+  <span class=n>progress</span><span class=o>(</span><span class=n>store</span><span class=o>.</span><span class=na>getState</span><span class=o>().</span><span class=na>progress</span><span class=o>());</span>
+<span class=o>});</span>
+</code></pre></div><p>You middleware can be any custom class implementing the following interface:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>interface</span> <span class=nc>Middleware</span><span class=o>&lt;</span><span class=n>A</span><span class=o>,</span> <span class=n>S</span><span class=o>&gt;</span> <span class=o>{</span>
+		<span class=kt>void</span> <span class=nf>dispatch</span><span class=o>(</span><span class=n>Store</span><span class=o>&lt;</span><span class=n>A</span><span class=o>,</span> <span class=n>S</span><span class=o>&gt;</span> <span class=n>store</span><span class=o>,</span> <span class=n>A</span> <span class=n>action</span><span class=o>,</span> <span class=n>NextDispatcher</span><span class=o>&lt;</span><span class=n>A</span><span class=o>&gt;</span> <span class=n>next</span><span class=o>);</span>
+<span class=o>}</span>
+</code></pre></div><p>See the
+<a href=https://github.com/trikita/jedux/blob/master/library/src/main/java/trikita/jedux/Logger.java>Logger</a>
+middleware for an example of how middleware can be written.</p><p>Middlewares are passed as variadic arguments into the store constructor:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=k>new</span> <span class=n>Store</span><span class=o>(</span><span class=n>reducer</span><span class=o>,</span> <span class=n>initialState</span><span class=o>,</span>
+	<span class=k>new</span> <span class=n>Logger</span><span class=o>(</span><span class=s>&#34;myApp&#34;</span><span class=o>),</span>
+	<span class=k>new</span> <span class=n>Downloader</span><span class=o>(</span><span class=n>context</span><span class=o>,</span> <span class=n>cacheDir</span><span class=o>));</span>
+</code></pre></div><p>Middlewares are usually small and focused. Each middleware reacts on a certain
+group of action types, so you can use different Enums and use instanceof to see
+if an action belongs to your middleware.</p><h2 id=build-your-own-architecture>Build your own architecture</h2><p>Jedux doesn&rsquo;t force you to implement certain interface or to use certain data
+types.</p><p>Your state can be of any type and it can have any nested sub-states (e.g. for
+authorization there might be one set of state variables, for user profile
+another and so on).</p><p>Your action can be on any type, from raw strings or integer constants to enums
+and data classes.</p><p>Your reducer must be pure, but you may split it into smaller functions, each
+handling a subset of actions (and most likely - a sub-state). Since reducers by
+default return the current state - you can easily combine reducer functions.
+The ones that could not handle the message will return the current sub-state,
+join them together and you will get a new state object without producing much
+garbage.</p><p>Your middlewares are now your controllers. Pass the context into their
+constructors if needed, let them control the services and other APIs.
+But keep them small and isolated. Each middleware should do one thing.</p><p>The only place where your isolated and self-contained parts meet is your custom
+Application class (or any other place where you create a global store). You may
+even live without dependency injection, and still be able to test each part of
+your app individually.</p><p>Here are the <a href=https://github.com/trikita/jedux>sources of Jedux</a> - it&rsquo;s only
+about 100 lines of code to read. Try it in some simple projects and see how it
+feels. You will like it.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Mar 29, 2016</em></p><p>See also:
+<a href=/posts/anvil-xml-support/>The Stockholm syndrome of Android XML</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

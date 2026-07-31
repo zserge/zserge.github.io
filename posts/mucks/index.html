@@ -1,0 +1,63 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>mucks: automating screen and tmux</title><meta name=description content="mucks - a session manager for screen and tmux"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/mucks/><meta property="og:title" content="mucks: automating screen and tmux"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/mucks/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="mucks - a session manager for screen and tmux"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2014-04-25T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"mucks: automating screen and tmux","description":"mucks - a session manager for screen and tmux","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/mucks/","datePublished":"2014-04-25","dateModified":"2014-04-25","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/mucks/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>mucks: automating screen and tmux</h1><p>I can&rsquo;t imagine my daily work in terminal without multiplexers.
+I used to use GNU Screen a couple of years ago, then I switched to Tmux.</p><p>There has been a lot of talks about screen vs tmux, and then vs byubu. I still
+use both, and I still like both. What I was really missing is session
+management.</p><p>Since my laptop&rsquo;s uptime is normally more than a month - I just created windows
+manually and started programs manually and then just attached/detached until
+the next reboot. Honestly, I never heard about session management tools until
+yesterday. Then I stumbled upon tmuxinator&mldr;</p><p>Install ruby to just manage terminal sessions?! What&rsquo;s wrong with this world?!</p><p>So, I quickly googled for other alternatives, and found that most of them are
+tmux-oriented, and it seems like nobody cares about the good old GNU Screen.</p><p>That&rsquo;s how I started my own session manager for both, tmux and screen.</p><h2 id=mucks>mucks</h2><p>Mucks (btw, it also means &ldquo;protest&rdquo; in German) is written in UNIX Shell, and I
+hope has no bashisms. Seems like the only external program it uses (other than
+screen and tmux) is sed, so in theory it should be highly portable.</p><p>It&rsquo;s also just one file of ~100LOC, so it should not be hard to read or to
+install it. I also tried to do some tests at least for the configuration parser
+(right, there are test frameworks for UNIX Shell as well).</p><p>So, just download the sources (or at least one <a href=https://raw.githubusercontent.com/zserge/mucks/master/mucks>mucks</a> file) - and you&rsquo;re ready to use it:</p><pre><code>git clone https://github.com/zserge/mucks
+</code></pre><p>Now let&rsquo;s create a simple session</p><h2 id=sessions>sessions</h2><p>Each session is described in a separate configuration file. You may store all your session files in your home directory and run them as:</p><pre><code>$ mucks ~/myproject.mucksrc
+</code></pre><p>Or you may store session configurations inside the project directories:</p><pre><code>$ cd ~/myproject # There should be a file called .mucksrc
+$ mucks          # It picks .mucksrc automatically
+</code></pre><p>Here&rsquo;s an example of such a mucksrc file I just used:</p><pre><code>#
+# Mucks project
+#
+name: mucks
+dir: /home/serge/src/serge/mucks
+mux: tmux
+
+[vim]
+vim mucks test.sh mucksrc.example -p
+
+[shell]
+
+[man]
+man tmux
+- vsplit
+man screen
+</code></pre><p>Here&rsquo;s how it looks in my tmux and screen:</p><p><img src=/images/mucks1.png alt=Screen></p><p><img src=/images/mucks2.png alt=Tmux></p><p>You may see on tmux the screen is split in two for man pages, while in screen
+these are still two separate windows (not panes). This is because of the
+different nature of how screen and tmux handle panes - in screen panes are not
+parts of the window, but are rather global for the whole session (each pane
+contains all of the windows). Also, in screen splits disappear during the
+detach, so I decided to create new windows for screen splits, so user still
+could manually organize them if he wants.</p><h2 id=language>language</h2><p>There are two sections in each session config - a header with global session
+settings and a layout section with the list of windows.</p><p>Header is just a list of variables and their values separated by a colon:</p><pre><code>name: My project
+foo: bar
+</code></pre><p>At the moment only the following variables are supported:</p><ul><li>name - name of the session, it is used for the terminal window title</li><li>dir - a working directory of the session. Handy if you want to run mucks from any directory outside of the project</li><li>mux - which multiplexor to use. Possible values are &ldquo;tmux&rdquo; or &ldquo;screen&rdquo;</li></ul><p>Layout section looks like an INI file, each window title is a section and
+below is text to be typed into the window and some internal commands to be
+performed:</p><pre><code># This opens a window called &quot;code editor&quot;
+# running vim with list of files shown
+[code editor]
+vim
+ihello^[
+</code></pre><p>Yes, section body is not a shell command, but exact keys to be typed into the
+window. It allows to run some vim commands like &lsquo;gt&rsquo; or to open certain web
+pages in w3m, or open ssh sessions and do something remotely.</p><p>Every line that starts with a dash ("-") is an internal command. These are now
+used to set up pane layout, but probably later they will be more powerful. At
+the moment only &ldquo;hsplit&rdquo; and &ldquo;vsplit&rdquo; commands are supported - they split
+current window horizontally or vertically (sorry, that works only in tmux, as
+mentioned above).</p><p>As you can see, session configuration file is extremely simple, yet it can
+save a lot of typing for complex sessions.</p><h2 id=whats-next>what&rsquo;s next?</h2><p>For my humble needs even the current version of mucks is usable. Adding more
+features? I can think of more complex layouts, proportional splits etc. Also
+I&rsquo;d like to have automatic detection of tmux and screen depending on which one
+is available.</p><p>Probably I should add the support of byubu and wemux.</p><p>I would be happy to add the support of dvtm, they have added a fifo to send
+internal commands to a running dvtm instance recently, but I&rsquo;m not sure how
+flexible it is now.</p><p>And how do you use terminal multiplexor sessions?</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Apr 25, 2014</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

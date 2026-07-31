@@ -1,0 +1,102 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil 0.4.0 + support libraries</title><meta name=description content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-support-libraries/><meta property="og:title" content="Anvil 0.4.0 + support libraries"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-support-libraries/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="For a long time Anvil worked only with normal SDK views, but now you may use support library views as well"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2016-05-11T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Anvil 0.4.0 + support libraries","description":"For a long time Anvil worked only with normal SDK views, but now you may use support library views as well","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-support-libraries/","datePublished":"2016-05-11","dateModified":"2016-05-11","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-support-libraries/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Anvil 0.4.0 + support libraries</h1><p>Previously on <a href=https://github.com/zserge/anvil>Anvil</a>: version 0.1 was the
+first one to use incremental rendering approach instead of virtual tree
+diff&rsquo;ing. Version 0.2 added support for XML layouts and binding data to
+existing views. Version 0.3 was about two-way data bindings - most views got
+simplified lambas for handling user input and many related bugs have been fixed.</p><p>Today&rsquo;s version 0.4 takes care of support libraries.</p><p>I personally rarely use support libraries (at work we don&rsquo;t target regular
+consumer devices so material niceties or fragments or action bars are not used
+a lot). But the urgency of bringing them to Anvil has been clear.</p><p>Thanks to <a href=https://github.com/tilal6991>Lalit Maganti</a> who rewrote Anvil DSL
+generator, it finally got the ability to produce DSL from the support classes
+as well.</p><p>Here are the new build artifacts that should be added if you are going to use
+support libraries with Anvil (you may only add the ones you actually need, they
+are all independent):</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>compile &#39;co.trikita:anvil-support-v4:0.4.0&#39;
+compile &#39;co.trikita:anvil-recyclerview-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-cardview-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-appcompat-v7:0.4.0&#39;
+compile &#39;co.trikita:anvil-design:0.4.0&#39;
+</code></pre></div><p>Each one has its own DSL class, so let&rsquo;s quickly jump though all of them.</p><h2 id=support-v4>Support v4</h2><p>Here the most notable view functions are <code>drawerLayout</code>, <code>viewPager</code>,
+<code>pagerTabStrip</code> and <code>swipeRefreshLayout</code>. Most of them can be used like normal Anvil views.</p><p>Here&rsquo;s an example of using drawer layout with Anvil:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>drawerLayout</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+  <span class=n>init</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=c1>// The following is needed if you want actionbar to toggle the drawer, too
+</span><span class=c1></span>    <span class=n>drawer</span> <span class=o>=</span> <span class=n>Anvil</span><span class=o>.</span><span class=na>currentView</span><span class=o>();</span>
+    <span class=n>drawerToggle</span> <span class=o>=</span> <span class=k>new</span> <span class=n>ActionBarDrawerToggle</span><span class=o>(</span><span class=n>activity</span><span class=o>,</span> <span class=n>drawer</span><span class=o>,</span> <span class=n>R</span><span class=o>.</span><span class=na>string</span><span class=o>.</span><span class=na>drawer_open</span><span class=o>,</span> <span class=n>R</span><span class=o>.</span><span class=na>string</span><span class=o>.</span><span class=na>drawer_close</span><span class=o>);</span>
+    <span class=n>drawer</span><span class=o>.</span><span class=na>addDrawerListener</span><span class=o>(</span><span class=n>drawerToggle</span><span class=o>);</span>
+    <span class=n>activity</span><span class=o>.</span><span class=na>getSupportActionBar</span><span class=o>().</span><span class=na>setDisplayHomeAsUpEnabled</span><span class=o>(</span><span class=kc>true</span><span class=o>);</span>
+    <span class=n>activity</span><span class=o>.</span><span class=na>getSupportActionBar</span><span class=o>().</span><span class=na>setHomeButtonEnabled</span><span class=o>(</span><span class=kc>true</span><span class=o>);</span>
+    <span class=n>drawerToggle</span><span class=o>.</span><span class=na>syncState</span><span class=o>();</span>
+  <span class=o>});</span>
+
+  <span class=n>size</span><span class=o>(</span><span class=n>FILL</span><span class=o>,</span> <span class=n>FILL</span><span class=o>);</span>
+
+  <span class=c1>// Main content, often is a custom renderable
+</span><span class=c1></span>  <span class=c1>// You may use if/else or switch/case to toggle between different content views
+</span><span class=c1></span>  <span class=n>v</span><span class=o>(</span><span class=n>SomeContentView</span><span class=o>.</span><span class=na>class</span><span class=o>,</span> <span class=o>()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>size</span><span class=o>(</span><span class=n>FILL</span><span class=o>,</span> <span class=n>FILL</span><span class=o>);</span>
+  <span class=o>});</span>
+
+  <span class=c1>// Drawer menu
+</span><span class=c1></span>  <span class=n>listView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+    <span class=n>size</span><span class=o>(</span><span class=n>dip</span><span class=o>(</span><span class=n>240</span><span class=o>),</span> <span class=n>FILL</span><span class=o>);</span>
+    <span class=n>layoutGravity</span><span class=o>(</span><span class=n>START</span><span class=o>);</span>
+    <span class=n>adapter</span><span class=o>(</span><span class=n>drawerAdapter</span><span class=o>);</span>
+    <span class=n>onItemClick</span><span class=o>((</span><span class=n>av</span><span class=o>,</span> <span class=n>v</span><span class=o>,</span> <span class=n>pos</span><span class=o>,</span> <span class=n>id</span><span class=o>)</span> <span class=o>-&gt;</span> <span class=o>{</span>
+      <span class=n>drawer</span><span class=o>.</span><span class=na>closeDrawer</span><span class=o>(</span><span class=n>av</span><span class=o>);</span>
+      <span class=c1>// handle navigation here
+</span><span class=c1></span>    <span class=o>});</span>
+  <span class=o>});</span>
+<span class=o>});</span>
+</code></pre></div><h2 id=recyclerview-and-cardview>RecyclerView and CardView</h2><p>Prior to Anvil 0.4 we made a separate library that handled RecyclerView. Now
+once RecyclerView is part of Anvil libraries you may use it out-of-the-box like:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>// Simple adapters are created like for ListView
+// But one may extend RenderableRecyclerViewAdapter to get more control
+someAdapter = RenderableRecyclerViewAdapter.withItems(items, (i, item) -&gt; {
+  textView(() -&gt; {
+    text(item.text + &#34; at position &#34; + i);
+  });
+});
+
+recyclerView(() -&gt; {
+  linearLayoutManager();
+  // If you want grid layout:
+  // gridLayoutManager(spanCount)
+  adapter(someAdapter);
+});
+</code></pre></div><p>Unlike RecyclerView, CardView is a pretty boring library, all you can do is
+create a card view and control its corner radius, elevation etc:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>cardView(() -&gt; {
+  cardElevation(1);
+  radius(dip(4));
+});
+</code></pre></div><p>One potential caveat is using animated views (like switches) inside the
+recycler view. You can&rsquo;t modify such views during the layout phase, so if you
+are calling <code>notifyDataSetChanged</code> on your recycler adapter from inside the
+<code>view()</code> method - better delay the adapter change with <code>post()</code>. It would fix a
+potential crash.</p><h2 id=appcompat>AppCompat</h2><p>Due to the programming language semantics, Anvil is unable to replace regular
+views with appCompat versions on-the-fly like XML inflater does. Probably it&rsquo;s
+for the best - explicit is often better than implicit:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>appCompatButton(() -&gt; ...);
+appCompatCheckBox(() -&gt; ...);
+</code></pre></div><h2 id=design>Design</h2><p>Design library is often being used to get the floating action buttons, so
+here&rsquo;s an example:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>floatingActionButton(() -&gt; {
+  compatElevation(dip(4));
+  layoutGravity(BOTTOM | END);
+  onClick(v -&gt; ...);
+});
+</code></pre></div><p>Of course all these libraries are not limited to the examples above, all view
+classes and view attributes have been wrapped into DSL. If some of them are
+still missing - please report an
+<a href=https://github.com/zserge/anvil/issues>issue</a>.</p><h2 id=caveats>Caveats</h2><p>Since Java has no mixins - there now may be some name collisions if you import
+all DSLs statically with a wildcard.</p><p>There is no simple fix for that, not at least in Java, so whenever you get a
+name conflict - specify DSL class explicitly, e.g. <code>CardViewv7DSL.cardView(() -> ...)</code> instead of <code>cardView(() -> ...)</code>.</p><p>Some support DSLs modify attributes of the support views which are not
+inherited from the common SDK views yet have the same setter names. Likewise,
+specify DSL name explicitly in such a case.</p><p>Another potential problem could be LayoutParams. If you put your view inside a
+support layout - you must set the specific support layout params class. As a
+workaround, you may do it explicitly:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>someSupportLayout(() -&gt; {
+  yourView(() -&gt; {
+    layoutParams(someSupportLayoutParams);
+  });
+});
+</code></pre></div><p>For layout params such as <code>weight</code> and <code>gravity</code> you may use normal Anvil
+attribute setters, otherwise either use support DSL setters, or pass the
+LayoutParams object manually.</p><p>Hope this doesn&rsquo;t stop you from using Anvil, moreover, I hope the adoption of
+the support libraries will encourage you to try Anvil in your next project!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>May 11, 2016</em></p><p>See also:
+<a href=/posts/anvil-app-architecture/>How to architect Anvil apps</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

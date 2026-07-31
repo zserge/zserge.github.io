@@ -1,0 +1,104 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Where Anvil meets Kotlin</title><meta name=description content="A minimal extension to add Kotlin support to Anvil"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-kotlin/><meta property="og:title" content="Where Anvil meets Kotlin"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-kotlin/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="A minimal extension to add Kotlin support to Anvil"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2015-04-16T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Where Anvil meets Kotlin","description":"A minimal extension to add Kotlin support to Anvil","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-kotlin/","datePublished":"2015-04-16","dateModified":"2015-04-16","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-kotlin/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Where Anvil meets Kotlin</h1><p>Kotlin is a <a href=http://kotlinlang.org/>very nice language for JVM</a>. I <a href=/posts/kotlin/>wrote</a> about it in the past.<br><a href=/posts/anvil-2/>Anvil</a> is a very nice UI library for Android. How do these two play together?</p><h2 id=the-first-attempt>The first attempt</h2><p>My favourite example to demonstrate Anvil syntax is a simple click counter. It demonstrates the use of layouts, views, data binding and event binding. In Java it looks like this:</p><pre><code>public ViewNode view() {
+    return
+        v(LinearLayout.class,
+                orientation(LinearLayout.VERTICAL),
+
+                v(TextView.class,
+                    text(&quot;Count is &quot; + this.count)),
+
+                v(Button.class,
+                    text(&quot;Click me&quot;),
+                    onClick(this::onCounterButtonClicked)));
+}
+</code></pre><p>When we try to translate this literaly - we get something like this in Kotlin:</p><pre><code>class MyView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        v(javaClass&lt;LinearLayout&gt;(),
+            size(FILL, FILL),
+            orientation(LinearLayout.VERTICAL),
+
+            v(javaClass&lt;TextView&gt;(),
+                text(&quot;Count: &quot; + count)),
+
+            v(javaClass&lt;Button&gt;(),
+                onClick({ count++ }),
+                text(&quot;Click me&quot;)))
+}
+</code></pre><p>Good parts:</p><ul><li>Return type is inferred automatically</li><li>Lambdas are very compact</li></ul><ul><li>javaClass&lt;TextView>() is less readable than TextView.class</li><li>static imports are not working well. I had to import the whole hierarchy of classes
+to get syntax sugar for attributes working</li></ul><h2 id=type-safe-builders>Type-safe builders</h2><p>In Kotlin the cool way to make DSLs is <a href=http://kotlinlang.org/docs/reference/type-safe-builders.html>type-safe builders</a>. Here is how I would imagine this to look like:</p><pre><code>class MyView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        linearLayout {
+            size(FILL, FILL)
+            orientation(LinearLayout.VERTICAL)
+            textView {
+                text(&quot;Count: &quot; + count)
+            }
+            button {
+                onClick({ count++ })
+                text(&quot;Click me&quot;))
+            }
+        }
+}
+</code></pre><p>Here linearLayout() is a function that takes some other function, and that&rsquo;s why the parens will be omitted:</p><pre><code>linearLayout({
+    ...
+})
+// same as:
+linearLayout {
+    ...
+}
+</code></pre><p>But after some quick thoughts I found how complex will it be to make Anvil compatible to this syntax. Basically it would be easier to rewrite it all from scratch rather than adjust it.</p><p>The worst part was attribute generators, like text(). In Anvil they return AttrNode instrances, while in Kotlin they should assign AttrNode instances to the parent ViewNode object.</p><p>Any ideas?</p><h2 id=minimally-sweetened-anvil>Minimally sweetened Anvil</h2><p>Luckily, Kotlin has <em>lots</em> of syntax sugar. And it also has operator
+overloading (oh, I know how bad it can be). We can keep the stack of nested
+views and abuse some of the operators to assign AttrNode to the topmost
+ViewNode.</p><p>This only requires an extra few lines of code:</p><pre><code>// The stack of views
+val stack = ArrayDeque&lt;ViewNode&gt;()
+
+// A function to build a new view node and put it onto the stack
+inline fun v&lt;reified T: View&gt;(f: () -&gt; Unit): ViewNode {
+    val node = ViewNode(javaClass&lt;T&gt;())
+    if (!stack.empty) {
+        stack.peek().addViews(node)
+    }
+    stack.push(node)
+    f()
+    return stack.pop()
+}
+
+// Overloading &quot;-&quot;
+fun AttrNode.minus() = stack.peek().addAttrs(this);
+
+// Overloading &quot;+&quot;
+fun AttrNode.plus() = stack.peek().addAttrs(this);
+</code></pre><p>Can you imagine how nicely Anvil code looks now with this little hack? I use
+minus here because it resembles me of markdown lists. People can use &ldquo;+size()&rdquo;
+as well instead of &ldquo;-size()":</p><pre><code>class MySugarView(c: Context) : RenderableView(c) {
+
+    var count = 0
+
+    public override fun view() =
+        v&lt;LinearLayout&gt; {
+            - size(FILL, FILL)
+            - orientation(LinearLayout.VERTICAL)
+
+            v&lt;TextView&gt; {
+                - text(&quot;Clicked: &quot; + count)
+            }
+            v&lt;Button&gt; {
+                - text(&quot;Click me&quot;)
+                - onClick {
+                    println(&quot;Button clicked&quot;)
+                    count++
+                }
+            }
+        }
+}
+</code></pre><p>It&rsquo;s clean, it&rsquo;s readable, it&rsquo;s reactive, it&rsquo;s only extra 200K of code for
+Kotlin standard library.</p><p>Now I wonder why would I still use Java for Android development&mldr;</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Apr 16, 2015</em></p><p>See also:
+<a href=/posts/anvil-2/>Anvil: big progress for a small library</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

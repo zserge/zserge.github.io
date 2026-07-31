@@ -1,0 +1,111 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>lambda support for Android</title><meta name=description content="Bringing java 8 features to android platform"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/android-lambda/><meta property="og:title" content="lambda support for Android"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/android-lambda/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Bringing java 8 features to android platform"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2014-01-09T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"lambda support for Android","description":"Bringing java 8 features to android platform","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/android-lambda/","datePublished":"2014-01-09","dateModified":"2014-01-09","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/android-lambda/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>lambda support for Android</h1><h1 id=lambda-support-for-android>Lambda support for Android</h1><p><em>Note: big thanks to orfjackal (Esko Luontola), the author of
+<a href=https://github.com/orfjackal/retrolambda>Retrolambda</a>, for making it
+possible. I just used his tool to produce Android apk.</em></p><p>So, you&rsquo;re jealous about new JDK8 upcoming to most Java developers except for
+you, Android coders? Then I have good news - there is a way to use lambdas in
+Android right now (<em>warning: it&rsquo;s still a hack</em>)!</p><h2 id=but-i-already-have-local-classes>But I already have local classes!</h2><p>Lambdas are very similar to local classes you had since early days of Java.</p><p>The code below looks familiar to every Android developer:</p><pre><code>// defined in the SDK
+interface OnClickListener {
+    public void onClick(View v);
+}
+
+// your code
+mButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // do something here
+    }
+});
+</code></pre><p>That&rsquo;s a bit annoying to write such a bloated code for every single
+asynchronous action (especially if you&rsquo;re using a plain text editor instead of
+an IDE).</p><p>Now with Java 8 they introduce
+<a href=http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html>lambdas</a>
+that can be treated as syntax sugar for functional interfaces (interfaces with
+just one abstract method, in Java 8 interfaces may contain non-abstract
+methods as well).</p><p>The code above can be rewritten with lambdas:</p><pre><code>mButton.setOnClickListener((View v) -&gt; {
+    // do something here
+});
+</code></pre><p>If there is just one statement inside the method then the braces can be omitted.
+Also, if you refer to some variables outside the functional method - no need to
+mark them as <code>final</code> anymore.</p><h2 id=but-android-supports-only-java-67>but android supports only Java 6/7</h2><p>Java 7 support was added in the KitKat SDK (well, still no support
+for <code>invokedynamic</code> instruction in Dalvik and ART). So, to achieve Java 8
+support we need to backport our code at least to Java 7.</p><p>We&rsquo;ll use retrolambda tool to convert our Java 8 compiled classes into Java 7
+bytecode that <code>dx</code> can correctly process.</p><h2 id=setup-jdk>setup JDK</h2><p>If you&rsquo;re already running JDK8 - you can skip this part. Otherwise, download the
+latest <a href=https://jdk8.java.net/download.html>JDK8</a> and unpack it somewhere.</p><p>Modify your Java environment variables to point to the new JDK (e.g.
+<code>$JAVA_HOME</code>, <code>$JDK_HOME</code> etc) and add <code>bin</code> directory to <code>$PATH</code>.</p><p>Ensure you&rsquo;re running Java 8:</p><pre><code>$ java -version
+$ javac -version
+</code></pre><p>Next, install Ant of version 1.9.1 or newer (with added support of JDK8). You
+may install it into separate folder and add <code>bin</code> subdirectory to <code>$PATH</code>.</p><p>Download <a href=https://oss.sonatype.org/content/groups/public/net/orfjackal/retrolambda/retrolambda/1.1.2/>retrolambda-1.1.2.jar</a>
+or newer.</p><p>Copy some useful classes from JRE8 runtime. I don&rsquo;t know if that can be done
+automatically somehow. I unpacked them to a directory and packed it back into
+jar. These files are needed only at the compilation stage, they are not
+included into the final apk:</p><pre><code>$ unzip -x &lt;path to JDK8&gt;/jre/lib/rt.jar java/lang/invoke/\*
+$ jar cvf rt8.jar java
+</code></pre><p>Put <code>rt8.jar</code> and <code>retrolambda.jar</code> into your android project directory.</p><p>Modify <code>ant.properties</code> file inside your android project adding these lines:</p><pre><code>java.target=1.8
+java.source=1.8
+java.compiler.classpath=rt8.jar
+</code></pre><p>Here we tell to produce Java 8 code and to include rt8.jar into the classpath.</p><p>Create <code>custom_rules.xml</code>:</p><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project&gt;
+    &lt;target name=&quot;-post-compile&quot;&gt;
+        &lt;exec executable=&quot;java&quot;&gt;
+            &lt;arg value=&quot;-Dretrolambda.inputDir=${out.classes.absolute.dir}&quot; /&gt;
+            &lt;arg value=&quot;-Dretrolambda.classpath=${out.classes.absolute.dir}:${project.target.android.jar}&quot; /&gt;
+            &lt;arg value=&quot;-Dretrolambda.bytecodeVersion=50&quot; /&gt;
+            &lt;arg value=&quot;-javaagent:retrolambda.jar&quot; /&gt;
+            &lt;arg value=&quot;-jar&quot; /&gt;
+            &lt;arg value=&quot;retrolambda.jar&quot; /&gt;
+        &lt;/exec&gt;
+    &lt;/target&gt;
+&lt;/project&gt;
+</code></pre><p>Here we add retrolambda processing of the compiled classes before <code>dx</code>-ing
+them.</p><p>I used <code>&lt;exec></code> task, because <code>&lt;java></code> task put <code>-jar</code> option in the first
+place, but retrolambda requires it to be last argument. Maybe that can be fixed
+somehow, I&rsquo;m pretty bad at Ant.</p><p>Try using lambdas in your code. By the way, I got some other cool things
+working, too:</p><pre><code>package com.example.lambda;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class MainActivity extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        int x = 42;
+        runOnUiThread(() -&gt; {
+            Log.d(&quot;MainActivity&quot;, &quot;Hello from lambda! x = &quot; + x);
+        });
+
+        try {
+            if (false) {
+                throw new NullPointerException();
+            } else { 
+                throw new InterruptedException();
+            }
+        } catch (NullPointerException|InterruptedException e) {
+            // Multiple exceptions work!
+            Log.e(&quot;MainActivity&quot;, &quot;Exception: &quot;, e);
+        }
+
+        String s = &quot;fo&quot; + &quot;o&quot;;
+
+        // Switch/case for strings works!
+        switch (s) {
+            case &quot;foo&quot;:
+                Log.d(&quot;MainActivity&quot;, &quot;s = foo&quot;);
+                break;
+            case &quot;bar&quot;:
+                Log.d(&quot;MainActivity&quot;, &quot;s = bar&quot;);
+                break;
+        }
+    }
+}
+</code></pre><p>Finally, do <code>ant debug</code> and see if it works.</p><p>For those who is using AIDE there is a <a href=https://github.com/evant/gradle-retrolambda>gradle plugin</a>
+that does pretty much the same.</p><p>Also, there was another <a href=https://bitbucket.org/tvernum/syntactic/wiki/ConvertingJava8To7>tool</a>
+to convert Java 8 sources, but lambdas are supported only in variable
+declaration. Maybe that can be improved somehow to support lambdas properly.</p><p>Anyway, I hope you find it useful and I hope that one day Android will get official
+support for many Java niceties, like <code>invokedynamic</code> or Java 8 features.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jan 09, 2014</em></p><p>See also:
+<a href=/posts/kotlin/>kotlin - a new hope</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
