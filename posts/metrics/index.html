@@ -1,0 +1,145 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Implementing metrics in Go</title><meta name=description content="The easiest way to add metrics to your web service in Go"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/metrics/><meta property="og:title" content="Implementing metrics in Go"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/metrics/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="The easiest way to add metrics to your web service in Go"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2018-06-10T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Implementing metrics in Go","description":"The easiest way to add metrics to your web service in Go","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/metrics/","datePublished":"2018-06-10","dateModified":"2018-06-10","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/metrics/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Implementing metrics in Go</h1><p>Metrics are data points representing your system behaviour over time. People
+instrument their long-running apps with metrics to see if there are or were any
+problems and if the system behaves as expected.</p><p>There are various metric types, but most common ones are counters, gauges and
+histograms.</p><h2 id=metric-types>Metric types</h2><p>Counter is simply an increasing number. You may use counters to track the
+number of served requests, number of errors, and so on. If you are only
+interested to see how many times a certain event has happened during the given
+time frame - use a counter.</p><p>Counters are probably the simplest metrics and the only information they
+provide is a single number - counter value.</p><p>Gauge is also a number, but it may go up and down. You may use gauges to
+track the memory usage, CPU load, temperature and other measured values.</p><p>Unlike counters, gauges often track not only their current value, but also
+their mean, minimum and maximum values for each time interval.</p><p>However, mean is not always the right characteristic to look at. In practice
+there are many cases when percentiles are more meaningful that a mean. To track
+percentiles histogram metrics are used.</p><p>For those who are unaware of percentiles - it is a number such that a certain
+percentage of values fall below that number. Here&rsquo;s a <a href=https://www.dynatrace.com/news/blog/why-averages-suck-and-percentiles-are-great/>good
+explanation</a> when percentiles could be more useful than averages.</p><p>The most typical use case is tracking response times. For example, 95th
+percentile of the response times shows the maximum response time of the 95% of
+the requests.</p><h2 id=implementation>Implementation</h2><p>I like explaining things by showing how they work. All the code below is
+simplified and the real implementation is slightly different (here we don&rsquo;t
+focus on thread safety, division by zero errors etc).</p><p>Let&rsquo;s consider a generic meter. What can it do? It can accept an incoming
+numerical value, one at a time, or it can be reset back to its zero state.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Metric</span> <span class=kd>interface</span> <span class=p>{</span>
+	<span class=nf>Add</span><span class=p>(</span><span class=nx>n</span> <span class=kt>float64</span><span class=p>)</span>
+	<span class=nf>Reset</span><span class=p>()</span>
+<span class=p>}</span>
+</code></pre></div><p>There are two approaches to do metircs. One is to record every single event and
+run queries each time to calculate the metrics. It&rsquo;s the most precise and
+flexible approach, although it&rsquo;s time-consuming and needs more storage. Another
+is to calculate metric values on the fly. It often uses less memory and is good
+enough for most use cases, so we will go this way.</p><p>Let&rsquo;s start with the counter, since it is probably the easiest metric to
+implement:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Counter</span> <span class=kt>float64</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Counter</span><span class=p>)</span> <span class=nf>Add</span><span class=p>(</span><span class=nx>n</span> <span class=kt>float64</span><span class=p>)</span> <span class=p>{</span> <span class=o>*</span><span class=nx>c</span> <span class=p>=</span> <span class=o>*</span><span class=nx>c</span> <span class=o>+</span> <span class=nf>Counter</span><span class=p>(</span><span class=nx>n</span><span class=p>)</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Counter</span><span class=p>)</span> <span class=nf>Reset</span><span class=p>()</span> <span class=p>{</span> <span class=o>*</span><span class=nx>c</span> <span class=p>=</span> <span class=mi>0</span> <span class=p>}</span>
+</code></pre></div><p>Gauge needs to track mean, min and max values. To calculate rolling mean we
+need to count the number of events and their sum value:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Gauge</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>count</span> <span class=kt>int</span>
+	<span class=nx>sum</span>   <span class=kt>float64</span>
+	<span class=nx>min</span>   <span class=kt>float64</span>
+	<span class=nx>max</span>   <span class=kt>float64</span>
+<span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>g</span> <span class=o>*</span><span class=nx>Gauge</span><span class=p>)</span> <span class=nf>Reset</span><span class=p>()</span> <span class=p>{</span> <span class=nx>g</span><span class=p>.</span><span class=nx>count</span><span class=p>,</span> <span class=nx>g</span><span class=p>.</span><span class=nx>sum</span><span class=p>,</span> <span class=nx>g</span><span class=p>.</span><span class=nx>min</span><span class=p>,</span> <span class=nx>g</span><span class=p>.</span><span class=nx>max</span> <span class=p>=</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>0</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>g</span> <span class=o>*</span><span class=nx>Gauge</span><span class=p>)</span> <span class=nf>mean</span><span class=p>()</span> <span class=kt>float64</span> <span class=p>{</span> <span class=k>return</span> <span class=nx>g</span><span class=p>.</span><span class=nx>sum</span> <span class=o>/</span> <span class=nx>g</span><span class=p>.</span><span class=nx>count</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>g</span> <span class=o>*</span><span class=nx>Gauge</span><span class=p>)</span> <span class=nf>Add</span><span class=p>(</span><span class=nx>n</span> <span class=kt>float64</span><span class=p>)</span> <span class=p>{</span>
+	<span class=k>if</span> <span class=nx>n</span> <span class=p>&lt;</span> <span class=nx>g</span><span class=p>.</span><span class=nx>min</span> <span class=p>{</span> <span class=nx>g</span><span class=p>.</span><span class=nx>min</span> <span class=p>=</span> <span class=nx>n</span> <span class=p>}</span>
+	<span class=k>if</span> <span class=nx>n</span> <span class=p>&gt;</span> <span class=nx>g</span><span class=p>.</span><span class=nx>max</span> <span class=p>{</span> <span class=nx>g</span><span class=p>.</span><span class=nx>max</span> <span class=p>=</span> <span class=nx>n</span> <span class=p>}</span>
+	<span class=nx>g</span><span class=p>.</span><span class=nx>count</span><span class=o>++</span>
+	<span class=nx>g</span><span class=p>.</span><span class=nx>sum</span> <span class=p>=</span> <span class=nx>g</span><span class=p>.</span><span class=nx>sum</span> <span class=o>+</span> <span class=nx>n</span>
+<span class=p>}</span>
+</code></pre></div><p>Finally, histograms. There seems to be no easy way to build precise histograms
+without remembering all the data entries. However there are some algorithms to
+construct approximate histograms on the fly.</p><p>One such algorithm has a fixed number of bins, puts a new incoming value into
+an individual bin and when there are too many bins - it merges two most similar
+ones.</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>bin</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>value</span> <span class=kt>float64</span>
+	<span class=nx>count</span> <span class=kt>float64</span>
+<span class=p>}</span>
+<span class=kd>type</span> <span class=nx>Histogram</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>bins</span>  <span class=p>[]</span><span class=nx>bin</span>
+	<span class=nx>total</span> <span class=kt>uint64</span>
+<span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>h</span> <span class=o>*</span><span class=nx>Histogram</span><span class=p>)</span> <span class=nf>Reset</span><span class=p>()</span> <span class=p>{</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>,</span> <span class=nx>h</span><span class=p>.</span><span class=nx>total</span> <span class=p>=</span> <span class=mi>0</span><span class=p>,</span> <span class=kc>nil</span> <span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>h</span> <span class=o>*</span><span class=nx>Histogram</span><span class=p>)</span> <span class=nf>Add</span><span class=p>(</span><span class=nx>n</span> <span class=kt>float64</span><span class=p>)</span> <span class=p>{</span>
+	<span class=k>defer</span> <span class=nx>h</span><span class=p>.</span><span class=nf>trim</span><span class=p>()</span>
+	<span class=nx>h</span><span class=p>.</span><span class=nx>total</span><span class=o>++</span>
+	<span class=nx>newbin</span> <span class=o>:=</span> <span class=nx>bin</span><span class=p>{</span><span class=nx>value</span><span class=p>:</span> <span class=nx>n</span><span class=p>,</span> <span class=nx>count</span><span class=p>:</span> <span class=mi>1</span><span class=p>}</span>
+	<span class=c1>// Insert new bin with a single value into the sorted array of bins
+</span><span class=c1></span>	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span> <span class=p>{</span>
+		<span class=k>if</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>].</span><span class=nx>value</span> <span class=p>&gt;</span> <span class=nx>n</span> <span class=p>{</span>
+			<span class=nx>h</span><span class=p>.</span><span class=nx>bins</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[:</span><span class=nx>i</span><span class=p>],</span> <span class=nb>append</span><span class=p>([]</span><span class=nx>bin</span><span class=p>{</span><span class=nx>newbin</span><span class=p>},</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>:]</span><span class=o>...</span><span class=p>)</span><span class=o>...</span><span class=p>)</span>
+			<span class=k>return</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+	<span class=nx>h</span><span class=p>.</span><span class=nx>bins</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>,</span> <span class=nx>newbin</span><span class=p>)</span>
+<span class=p>}</span>
+<span class=kd>func</span> <span class=p>(</span><span class=nx>h</span> <span class=o>*</span><span class=nx>Histogram</span><span class=p>)</span> <span class=nf>trim</span><span class=p>()</span> <span class=p>{</span>
+	<span class=k>for</span> <span class=nb>len</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>)</span> <span class=p>&gt;</span> <span class=nx>maxBins</span> <span class=p>{</span>
+		<span class=c1>// Find two adjacent bins with the closest values
+</span><span class=c1></span>		<span class=nx>d</span> <span class=o>:=</span> <span class=nb>float64</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+		<span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span>
+		<span class=k>for</span> <span class=nx>j</span> <span class=o>:=</span> <span class=mi>1</span><span class=p>;</span> <span class=nx>j</span> <span class=p>&lt;</span> <span class=nb>len</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>);</span> <span class=nx>j</span><span class=o>++</span> <span class=p>{</span>
+			<span class=k>if</span> <span class=nx>delta</span> <span class=o>:=</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>j</span><span class=p>].</span><span class=nx>value</span> <span class=o>-</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>j</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>value</span><span class=p>;</span> <span class=nx>delta</span> <span class=p>&lt;</span> <span class=nx>d</span> <span class=o>||</span> <span class=nx>j</span> <span class=o>==</span> <span class=mi>1</span> <span class=p>{</span>
+				<span class=nx>d</span> <span class=p>=</span> <span class=nx>delta</span>
+				<span class=nx>i</span> <span class=p>=</span> <span class=nx>j</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+		<span class=c1>// Merge bins
+</span><span class=c1></span>		<span class=nx>count</span> <span class=o>:=</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>count</span> <span class=o>+</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>].</span><span class=nx>count</span>
+		<span class=nx>merged</span> <span class=o>:=</span> <span class=nx>bin</span><span class=p>{</span>
+			<span class=nx>value</span><span class=p>:</span> <span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>value</span><span class=o>*</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>].</span><span class=nx>count</span> <span class=o>+</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>].</span><span class=nx>value</span><span class=o>*</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>].</span><span class=nx>count</span><span class=p>)</span> <span class=o>/</span> <span class=nx>count</span><span class=p>,</span>
+			<span class=nx>count</span><span class=p>:</span> <span class=nx>count</span><span class=p>,</span>
+		<span class=p>}</span>
+		<span class=c1>// Remove the second bin
+</span><span class=c1></span>		<span class=nx>h</span><span class=p>.</span><span class=nx>bins</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[:</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>],</span> <span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=p>:]</span><span class=o>...</span><span class=p>)</span>
+		<span class=nx>h</span><span class=p>.</span><span class=nx>bins</span><span class=p>[</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span> <span class=p>=</span> <span class=nx>merged</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>This approach may not be the most precise, but it shows the overall picture of
+how your data is distributed.</p><h2 id=timelines-and-multiple-metrics>Timelines and multiple metrics</h2><p>Once we&rsquo;ve implemented individual metrics - we can easliy build a timeline.
+Timeline is a slice of buckets, where each bucket contains metric values for
+one time slot. Timeline is rotated as time goes.</p><p>Also, it is often helpful to store timelines with multiple precisions. E.g. to
+store one month of data with hourly precision and 6 hours of data with 30
+seconds precision.</p><p>Since all metrics share a common interface - a combination of metrics can also
+implement the same interface.</p><p>I won&rsquo;t provide actual implementations here, since they are really trivial.
+To construct a metric there will be thee constructor functions: <code>NewCounter</code>,
+<code>NewGauge</code> or <code>NewHistogram</code>. If no parameters are given - you will get a
+single meter. You may also provide a number of precision strings to get
+historical timelines of the given metric type. Precision strings look like
+&ldquo;30m1s&rdquo; which means &ldquo;I want a timeline for 30 minutes of historical data with 1
+second precision&rdquo;:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=c1>// A meter that keeps gauges for 30 days, 48 hours and 15 minutes of time with
+</span><span class=c1>// different precision:
+</span><span class=c1></span><span class=nx>m</span> <span class=o>:=</span> <span class=nx>metric</span><span class=p>.</span><span class=nf>NewGauge</span><span class=p>(</span><span class=s>&#34;30d1h&#34;</span><span class=p>,</span> <span class=s>&#34;48h5m&#34;</span><span class=p>,</span> <span class=s>&#34;15m1s&#34;</span><span class=p>)</span>
+<span class=o>...</span>
+<span class=nx>m</span><span class=p>.</span><span class=nf>Add</span><span class=p>(</span><span class=nx>someValue</span><span class=p>)</span>
+</code></pre></div><h2 id=expvar-and-web-interface>expvar and web interface</h2><p>Now we can construct metrics and push data. Two questions remain: how to access
+metrics throughout your app code and how to actually read metric data.</p><p>Go provides an infamous <code>expvar</code> package to keep &ldquo;exposed&rdquo; public variables.
+This variables can be read using a builtin HTTP endpoint <code>/debug/metrics</code> as a
+JSON. I think it is a good idea not to reinvent the wheel and just integrate
+out metrics with <code>expvar</code>. It is done by simply implementing a <code>String()</code>
+method that prints metric data as a JSON string.</p><p>In addition to that, <code>expvar</code> also provides a simple API to register metric and
+to get it, although some type casting is needed:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=c1>// Register metrics
+</span><span class=c1></span><span class=nx>expvar</span><span class=p>.</span><span class=nf>Publish</span><span class=p>(</span><span class=s>&#34;num_errors&#34;</span><span class=p>,</span> <span class=nx>metric</span><span class=p>.</span><span class=nf>NewCounter</span><span class=p>(</span><span class=s>&#34;15m10s&#34;</span><span class=p>))</span>
+<span class=nx>expvar</span><span class=p>.</span><span class=nf>Publish</span><span class=p>(</span><span class=s>&#34;latency&#34;</span><span class=p>,</span> <span class=nx>metric</span><span class=p>.</span><span class=nf>NewHistogram</span><span class=p>(</span><span class=s>&#34;5m1s&#34;</span><span class=p>,</span> <span class=s>&#34;15m30s&#34;</span><span class=p>,</span> <span class=s>&#34;1h1m&#34;</span><span class=p>))</span>
+
+<span class=c1>// Measure time and update the metric
+</span><span class=c1></span><span class=nx>start</span> <span class=o>:=</span> <span class=nx>time</span><span class=p>.</span><span class=nf>Now</span><span class=p>()</span>
+<span class=o>...</span>
+<span class=nx>expvar</span><span class=p>.</span><span class=nf>Get</span><span class=p>(</span><span class=s>&#34;latency&#34;</span><span class=p>).(</span><span class=nx>metric</span><span class=p>.</span><span class=nx>Metric</span><span class=p>).</span><span class=nf>Add</span><span class=p>(</span><span class=nx>time</span><span class=p>.</span><span class=nf>Since</span><span class=p>(</span><span class=nx>start</span><span class=p>).</span><span class=nf>Seconds</span><span class=p>())</span>
+
+<span class=c1>// Update counter
+</span><span class=c1></span><span class=nx>expvar</span><span class=p>.</span><span class=nf>Get</span><span class=p>(</span><span class=s>&#34;num_errors&#34;</span><span class=p>).(</span><span class=nx>metric</span><span class=p>.</span><span class=nx>Metric</span><span class=p>).</span><span class=nf>Add</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</code></pre></div><p>I like using standard libraries as much as possible, but I also believe that
+visual representation of data is better than reading plain JSON. So this
+metrics package includes an opinionated web UI:</p><div class=highlight><pre class=chroma><code class=language-go data-lang=go><span class=nx>http</span><span class=p>.</span><span class=nf>Handle</span><span class=p>(</span><span class=s>&#34;/debug/metrics&#34;</span><span class=p>,</span> <span class=nx>metric</span><span class=p>.</span><span class=nf>Handler</span><span class=p>(</span><span class=nx>metric</span><span class=p>.</span><span class=nx>Exposed</span><span class=p>))</span>
+</code></pre></div><p>Here&rsquo;s how it looks like:</p><p><img src=/images/metrics-web-ui.png alt="Web interface"></p><p>On some graphs there are three lines. Of gauges the black line is the mean,
+while gray lines are min and max. For histograms the black line is 99th
+percentile, while gray lines are 90th and 50th percentiles.</p><p>The web UI uses no javascript and is very fast even if the number of metrics is
+high.</p><h2 id=summary>Summary</h2><p>You may find all the source code at <a href=https://github.com/zserge/metric>https://github.com/zserge/metric</a>. It&rsquo;s very
+small, a single file of ~300 lines of code and a few more lines for the user
+interface. The library has no external dependencies and it&rsquo;s really
+featherweight.</p><p>If you are building something big and it should scale well - consider using
+real tools such as Prometheus, InfluxDB or StatsD. But for smaller projects if
+you want to avoid wasting time to configure all those tools - feel free to use
+this package, the setup is no harder than just importing a package and you can
+start tracking you metrics almost immediately.</p><p>Of course, if you found an issue or have a suggestion - don&rsquo;t hesitate to drop
+me a line or open an issue!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Jun 10, 2018</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

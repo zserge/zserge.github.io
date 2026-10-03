@@ -1,0 +1,72 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Buck - life is too short to spend a minute for each build</title><meta name=description content="Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/buck-build-system/><meta property="og:title" content="Buck - life is too short to spend a minute for each build"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/buck-build-system/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it."><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2015-05-27T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Buck - life is too short to spend a minute for each build","description":"Buck is a build system made by Facebook. It fits so perfectly for my needs that I've made a project skeleton generator for it.","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/buck-build-system/","datePublished":"2015-05-27","dateModified":"2015-05-27","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/buck-build-system/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Buck - life is too short to spend a minute for each build</h1><p>Gradle is too slow, Ant is too basic. Buck is fast and super-configurable and
+I&rsquo;d like to tell you how I use it for Android development.</p><p>I own a pretty old thinkpad laptop so I don&rsquo;t expect the builds to be too fast.
+Ant used to spend 10..40 seconds for each build on my laptop depending on how
+large the project is. Gradle takes about a minute in average and that&rsquo;s too
+long for me - I just lose focus when I just sit and wait for the build results.</p><p>I had great expectations about <a href=http://bazel.io>Bazel</a>, but it doesn&rsquo;t have Android support
+yet. And then I&rsquo;ve heard about <a href=http://buckbuild.com>Buck</a>. I tried it and it was so great that
+I could not believe it.</p><h2 id=how-fast-is-this-buck>how fast is this buck?</h2><p>Let me show you some numbers for each of the build systems. It&rsquo;s not a real
+benchmark made in the vacuum, it&rsquo;s just a picture of my average workflow with
+my normal apps running in the background. I created a minimal empty project
+with a single activity, some XML resources and a few lines of code. Here&rsquo;s the
+commands I used to generate project structure:</p><p>Ant:</p><pre><code>android create project -p ant-example -k com.example.buildsystem -n BuildSystemTest -a MainActivity -t android-21
+</code></pre><p>Gradle:</p><pre><code>android create project -p gradle-example -k com.example.buildsystem -n BuildSystemTest -a MainActivity -t android-21 -g -v 1.1
+</code></pre><p>Buck (using my own wrapper, see about it below):</p><pre><code>buckbonejava com.example.buildsystem buck-example
+</code></pre><p>Then I tried a clean build, an incremental build and a no-op build. For all
+builds I used &lsquo;ant debug&rsquo;, &lsquo;gradle assembleDebug&rsquo; and &lsquo;buck build app&rsquo;
+commands, I measured time with &lsquo;time&rsquo; command (instead of using the numbers
+printed by each build system, those numbers are a bit lower).</p><ul><li>Clean build (clean everything, and build from scratch)<ul><li>Ant: 11 seconds</li><li>Gradle: 19 seconds (with parallel, configureondemand and daemon)</li><li>Buck: 4 seconds</li></ul></li><li>Incremental build (making one change in one file and re-building the app)<ul><li>Ant: 11 seconds</li><li>Gradle: 12..30 seconds (varying)</li><li>Buck: 0.8 sec</li></ul></li><li>Empty build (no changes, just re-build)<ul><li>Ant: 4 seconds</li><li>Gradle: 8 seconds</li><li>Buck: 0.1 sec</li></ul></li></ul><p>Now, let&rsquo;s try a larger project. I simply added some fake methods in five more
+source files, 3000 LOC in total. Looks like a common number for a single-person
+project. Incremental build times are (for the addition of 3000 LOC):</p><ul><li>Ant: 21 seconds</li><li>Gradle: 30 seconds</li><li>Buck: 3 seconds</li></ul><p>So Buck is ~10 times faster than other build systems for my normal workflow.
+And I actually never seen it to take more than 5 seconds for my (relatively
+simple) projects.</p><h2 id=how-can-it-be-true>how can it be true?</h2><p>Technical details of Buck are described <a href=http://buckbuild.com/concept/what_makes_buck_so_fast.html>here</a>. It optimizes everything - it
+keeps jvm running in the nailgun server, it uses threads, it caches a lot,
+it uses an optimized &lsquo;dx&rsquo; utility etc etc. They even seem to have a separate
+app that updates your code in the &lsquo;live&rsquo; mode, so you don&rsquo;t have to pack the
+APK and install it (in fact, now &lsquo;adb install&rsquo; is one of the longest build
+steps I have now!).</p><h2 id=wheres-the-catch>where&rsquo;s the catch?</h2><p>Buck has outdated documentation. You have to spend time reading the issue
+trackers and looking for the ansers.</p><p>Buck seems to have a small community. Not so many Stackoverflow answers, not so
+many articles, not so many tutorials.</p><p>Buck &lsquo;quickstart&rsquo; command is far from what you expect from the app
+skeleton generator.</p><p>In Buck you have to write most of the build scripts manually. It gives you
+power, but it takes away the convenience. E.g. for your dependencies you have
+to download them, put into some folder, create rules that point to the JARs,
+include those rules as a dependency.</p><p>Ah, Buck seems to have no support for Windows, but well, I don&rsquo;t care about
+Windows.</p><p>So Buck can be a problem for newcomers, but if you learn it - you get a very
+fast build system you can totally control. No magic behing the scenes.</p><h2 id=finally-whats-that-buckbonejava-command>finally, what&rsquo;s that buckbonejava command?</h2><p>Since I often play with app ideas - I want to start a new app quickly, write
+some code and see the results as quickly as possible. Buck fits perfectly here.</p><p>So I spent some time to make a tiny Bash script that generates the Buck android
+project. Just give it a package name and tell where to put the generated
+sources.</p><p>Buckbone is available at <a href=https://github.com/zserge/buckbone>https://github.com/zserge/buckbone</a></p><p>In your project the sources will be at <code>java/my/package/name/</code>, and resources
+will be at <code>res/my/package/name/res/values/strings.xml</code> etc. Just go edit those
+and run &lsquo;buck install app&rsquo; or &lsquo;buck build app&rsquo;.</p><p>As a nice bonus I&rsquo;ve added the <code>maven</code> macro so you can include the dependencies like:</p><pre><code>maven('com.squareup:otto:1.3.7') # that's how you define your maven library
+maven('com.squareup.okhttp:okhttp:2.4.0') # that's how you define your maven library
+
+android_library(
+    ...
+    deps = [
+        ':otto',   # this matches the library name 
+        ':okhttp',
+    ]
+)
+</code></pre><p>AARs and JARs are supported. You can run &lsquo;buck fetch app&rsquo; to download those
+dependencies. Or it will download them on the next &lsquo;buck build&rsquo; cycle. Similar
+to Gradle, huh?</p><p>Next, I like <a href=http://kotlinlang.org>Kotlin language</a> <a href=/posts/anvil-kotlin/>a lot</a> and I want it to become my primary
+language for Android development. So far I only used Kotlin with Gradle and it
+was painful. The language speeds up my code writing, but each build took over
+one minute. I tried Kotlin with Buck and got my build times reduced to 15
+seconds, which is the best I could have expected from Java+Ant in the past.
+Kotlin generator is still experimental, but you may try it using
+<code>buckbonekotlin</code> instead of <code>buckbonejava</code> to start your Kotlin android
+projects right now.</p><p>I also tried to manually run nailgun for the Kotlin compiler and got the app
+built in about 5 seconds, I could not even dream about such a small number. But
+this approach uses too many hardcoded paths that I can&rsquo;t recommend it yet for
+normal usage and I can&rsquo;t make a generic wrapper.</p><h2 id=extending-buck>extending Buck</h2><p>At the moment Buck is very hard to extend and it&rsquo;s not documented. So no Buck
+plugins yet (and that&rsquo;s why it seems so hard for me to add Kotlin support).</p><p>Also I&rsquo;m not sure how the top-level Buck configuration can be accessed from
+within the Buck script, but if that&rsquo;s possible - it could simplify things a lot.
+E.g. compiler paths could be defined in the top-level config, and other build
+scripts would reuse those.</p><p>I&rsquo;m still very new to Buck, but if you have any suggestions how to create a
+Buck project that would use Kotlin or any other compiler (Scala, Groovy,
+Clojure) with nailgun and Buck - please share your thoughts. Also if you have
+an idea to improve my buckbone scripts - send me pull requests.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>May 27, 2015</em></p><p>See also:
+<a href=/posts/kotlin/>kotlin - a new hope</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

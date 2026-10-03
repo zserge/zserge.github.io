@@ -1,0 +1,130 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil: time for a change</title><meta name=description content="I merged anvil-forge branch back to master and published a new version."><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-forge-merged/><meta property="og:title" content="Anvil: time for a change"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-forge-merged/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="I merged anvil-forge branch back to master and published a new version."><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2015-10-01T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Anvil: time for a change","description":"I merged anvil-forge branch back to master and published a new version.","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-forge-merged/","datePublished":"2015-10-01","dateModified":"2015-10-01","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-forge-merged/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Anvil: time for a change</h1><p>Those of you who regularly check my blog may remember that I was going to
+<a href=/posts/anvil-breaking-changes/>redesign Anvil from scratch</a>. Unfortunately, it was an unavoidable step. We
+had performance issues and it turned out that blindly copying modern web
+metaphors to Android doesn&rsquo;t work well.</p><p>I am sorry, I had to change a lot of Anvil APIs since then. Those of you who
+have their apps written with Anvil 0.0.12 most likely would prefer to stick
+with the older version.</p><p>But please, don&rsquo;t be too conservative. New Anvil has a lot to offer.</p><h2 id=performance>Performance</h2><p>As being said, old Anvil turned out to be slow. The reason was a lot of lists
+and other collections that have been created during each rendering cycle, even
+if no data has been changed. New Anvil fixes it and brings you <strong>5-7 times
+faster rendering</strong>!</p><p>Also, I&rsquo;ve measured the cost of lambdas. It turns out Retrolambda is doing its
+job very well, it caches lambdas when they don&rsquo;t depend on the outer
+environment turning them into singletons.</p><p>But even if your lambdas are not cached - in practice you won&rsquo;t even notice the
+loss of performance! In the tests I&rsquo;ve made the rendering time with cached Java
+6 listeners was at most 1% faster than with Java 8 lambdas. But if you really
+want to get that 1% performance boost - you may still cache lambdas manually.</p><p>New Anvil also produces almost no garbage while rendering, so there is no
+noticeable GC delays, even if you update your UI while scrolling the views or
+animating them.</p><p>Let me show you some numbers. If you render a layout of 100 views, about 10
+attributes each - <strong>you still can do about 4000 render cycles per second</strong>! And
+it grows linearly, so simple layouts of 10 views would be rendered 10 times
+faster.</p><h2 id=diffing-in-the-pipeline>Diff&rsquo;ing in the pipeline</h2><p>The key concept of Anvil is a virtual layout. Anvil keeps lightweight
+representations of your views and their attributes and compares them before
+applying the changes to the actual views.</p><p>For the old Anvil is was absolutely true. Now it keeps only one virtual layout
+tree and traverses it during the next rendering cycle, &ldquo;patching&rdquo; it in-place.</p><p>This gives dramatic speed improvement for the most typical uses cases (when the
+layout remains the same, but the views change their properties). There is some
+regression when the new views are added or removed dynamically, but that never
+has been a fast operation anyway. So if really have to add/remove views in
+runtime - you might want to use adapters or maybe toggle view visibility
+instead.</p><h2 id=first-class-support-of-kotlin-and-java-8>First-class support of Kotlin and Java 8</h2><p>So, lambdas are fast, rendering is fast. Why not to make it the default syntax
+then? Now Kotlin and Java 8 are supported out of box (yes, no need for
+<code>Sugat.kt</code> anymore!):</p><pre><code>linearLayout {
+    textView {
+        text(&quot;Hello&quot;)
+    }
+    button {
+        onClick(listener)
+    }
+}
+</code></pre><p>Java 6 is still supported, using syntax that resembles the old Anvil:</p><pre><code>o (linearLayout(),
+    o (textView(),
+        text(&quot;Hello&quot;)),
+    o (button(),
+        onClick(listener));
+</code></pre><h2 id=imperative-statements-not-return-values>Imperative statements, not return values</h2><p>Most functions now return <code>Void</code> - it&rsquo;s not important what the property setter
+function returns, because the main job is already done when it&rsquo;s been called.</p><p>You can use the full power of Java without whining about poor support of
+functional data processing techniques - you can use <code>for</code> loops instead of
+(missing) function map method on collection. You can use normal
+<code>if/else/switch</code> conditionals instead of ternary operations. You can append
+views in a loop and style your views easily.</p><p>Here&rsquo;s an example of the new syntax in Kotlin:</p><div class=highlight><pre class=chroma><code class=language-kotlin data-lang=kotlin><span class=k>public</span> <span class=k>override</span> <span class=k>fun</span> <span class=nf>view</span> <span class=p>{</span>
+	<span class=n>linearLayout</span> <span class=p>{</span>
+		<span class=n>orientation</span><span class=p>(</span><span class=n>LinearLayout</span><span class=p>.</span><span class=n>VERTICAL</span><span class=p>)</span>
+
+		<span class=c1>// If certain group of views is in every activity -
+</span><span class=c1></span>		<span class=c1>// you may move it to a separate &#34;utility&#34; class
+</span><span class=c1></span>		<span class=n>AppStyle</span><span class=p>.</span><span class=n>headerView</span><span class=p>()</span>
+
+		<span class=n>inputField</span><span class=p>(</span><span class=n>Icon</span><span class=p>.</span><span class=n>USER</span><span class=p>,</span> <span class=n>login</span><span class=p>)</span>
+		<span class=n>inputField</span><span class=p>(</span><span class=n>Icon</span><span class=p>.</span><span class=n>PASSWORD</span><span class=p>,</span> <span class=n>passwd</span><span class=p>)</span>
+
+		<span class=n>button</span> <span class=p>{</span>
+			<span class=n>size</span><span class=p>(</span><span class=n>FILL</span><span class=p>,</span> <span class=n>WRAP</span><span class=p>)</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>R</span><span class=p>.</span><span class=n>string</span><span class=p>.</span><span class=n>login</span><span class=p>)</span>
+			<span class=n>enabled</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span> <span class=o>&amp;&amp;</span>
+				<span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>().</span><span class=n>length</span><span class=p>()</span> <span class=p>&gt;</span> <span class=m>0</span><span class=p>)</span>
+			<span class=n>onClick</span> <span class=p>{</span> <span class=n>v</span> <span class=o>-&gt;</span>
+				<span class=n>performLogin</span><span class=p>(</span><span class=n>login</span><span class=p>.</span><span class=n>toString</span><span class=p>(),</span> <span class=n>passwd</span><span class=p>.</span><span class=n>toString</span><span class=p>())</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+<span class=c1>// If a certain group of views is repeated in the layout - 
+</span><span class=c1>// move it to a separate method
+</span><span class=c1></span><span class=k>fun</span> <span class=nf>inputField</span><span class=p>(</span><span class=n>iconText</span><span class=p>,</span> <span class=n>input</span><span class=p>)</span> <span class=p>{</span>
+	<span class=n>linearLayout</span> <span class=p>{</span>
+		<span class=n>orientation</span><span class=p>(</span><span class=n>LinearLayout</span><span class=p>.</span><span class=n>HORIZONTAL</span><span class=p>)</span>
+
+		<span class=n>textView</span> <span class=p>{</span>
+			<span class=n>fontAwesomeIconStyle</span><span class=p>()</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>iconText</span><span class=p>)</span>
+		<span class=p>}</span>
+		<span class=n>editText</span> <span class=p>{</span>
+			<span class=n>size</span><span class=p>(</span><span class=m>0</span><span class=p>,</span> <span class=n>FILL</span><span class=p>)</span>
+			<span class=n>text</span><span class=p>(</span><span class=n>input</span><span class=p>)</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1>// If the same style is applied many times - move it to a separate method
+</span><span class=c1></span><span class=k>fun</span> <span class=nf>fontAwesomeIconStyle</span><span class=p>()</span> <span class=p>{</span>
+	<span class=c1>// Here you can define properties common for all FontAwesome icons
+</span><span class=c1></span>	<span class=n>size</span><span class=p>(</span><span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>),</span> <span class=n>dip</span><span class=p>(</span><span class=m>48</span><span class=p>))</span>
+	<span class=n>gravity</span><span class=p>(</span><span class=n>CENTER</span><span class=p>)</span>
+	<span class=n>typeface</span><span class=p>(</span><span class=s2>&#34;fontawesome.ttf&#34;</span><span class=p>)</span>
+	<span class=c1>// You may use different styles depending on the app theme, orientation,
+</span><span class=c1></span>	<span class=c1>// screen size or user preferences
+</span><span class=c1></span>	<span class=k>if</span> <span class=n>nightMode</span><span class=p>()</span> <span class=p>{</span>
+		<span class=o>..</span><span class=p>.</span>
+	<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+		<span class=o>..</span><span class=p>.</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>As you can see the rules of refactoring (like &ldquo;don&rsquo;t repeat yourself&rdquo;) still
+apply here. You already know them, so you&rsquo;re ready to write maintainable code
+with Anvil. Use the full power of your programming language.</p><h2 id=separation-of-api-levels>Separation of API levels</h2><p>As any other library, Anvil has certain impact on your APK size. Previously we
+included generated bindings for the two API levels - Android 2.3.3 and Android
+4.0.3. That added roughly 500KB to the APK size.</p><p>It&rsquo;s not so important nowadays, but I really wanted to ship different builds of
+Anvil for different minSdk levels. And new Anvil solves this as well.</p><p>Instead of publishing <code>co.trikita:anvil</code> we now publish
+<code>co.trikita:anvil-sdk10</code>, <code>co.trikita:anvil-sdk15</code> and
+<code>co.trikita:anvil-sdk19</code>. This results in smaller APKs, faster build times and
+cleaner architecture of Anvil itself. We now have standalone Anvil core, which
+can be tested separately, and generated property setters that may not be tested
+at all (yet), since they are all dead simple.</p><h2 id=reactive-adapters>Reactive adapters</h2><p>Old Anvil provided its own Adapter implementation, but one had to call
+notifyDataSetChanged to force it to redraw.</p><p>New Anvil uses ViewHolder pattern, new adapters are faster, and list items are
+now reactive as well, which means they are automatically updated when you call
+Anvil.render(). Calling notifyDataSetChanged() might still be needed when you
+add or remove items (so the adapter would create more reactive item views), but
+existing and currently shown Views will be updated without
+notifyDataSetChanged().</p><h2 id=less-is-more>Less is more</h2><p>New Anvil has 25% less code in it. API contains the following classes:</p><ul><li>Anvil: use it to mount, unmount and re-render your components (only 3 methods)</li><li>RenderableView: extend it to make a component (override 1 method)</li><li>RenderableAdapter: extend it to make a reactive adapter (override 3 methods)</li><li>DSL: use it intuitively to create views and set up their properties.</li></ul><p>So learning ~10 methods and understanding the general idea of how Anvil works
+is enough to write even complex Android apps with Anvil.</p><h2 id=roadmap>Roadmap</h2><p>I&rsquo;ve published Anvil 0.1.0 recently to <code>mavenCentral</code> and <code>jcenter</code>, and merged
+the development &ldquo;forge&rdquo; branch back to the master branch. You may already start
+playing with it. Sources are on <a href=https://github.com/zserge/anvil>github</a>, as usual.</p><p>I&rsquo;ve ported all examples to the new Anvil, you may find them at
+<a href=https://github.com/zserge/anvil-examples>https://github.com/zserge/anvil-examples</a>. You may also use them to see how one
+can port Anvil 0.0.12 application to Anvil 0.1.0.</p><p>Anvil is now actively developed. Next step would be to prepare and publish
+documentation to help new users start with Anvil.</p><p>Also, you may notice that I&rsquo;ve removed Backstack class from the new Anvil.
+That&rsquo;s because I&rsquo;m thinking about making it its own library (but more
+powerful).</p><p>Finally, the State + Animations is something that mostly remained unchanged,
+but there are a few misconception in those modules. I&rsquo;m afraid the animations
+API is likely to be changed again soon.</p><p>Please let me know what you think of this update, and don&rsquo;t hesitate to spread
+the word about Anvil if you like it!</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Oct 01, 2015</em></p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

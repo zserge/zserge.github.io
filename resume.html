@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+      * {margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto'; color: rgba(0,0,0,0.8); line-height: 1.3em; }
+      @media print { @page { margin: 1.6cm; } }
+      .material-icons { color: rgb(52, 152, 219); font-size: 19px; vertical-align: bottom; }
+      body { font-size: 15px; }
+      ul, li { list-style-position: inside; }
+      li:before {
+        content: "";
+        display: inline-block;
+        height: 1em; 
+        margin-left: -0.5em;  
+      }
+      .list-none, .list-none li { list-style: none; }
+      .list-none li:before { margin-left: 0; }
+      a { text-decoration: none; font-weight: 600; color: rgb(52, 152, 219); }
+      .container {
+        max-width: 800px; margin: 0 auto; display: grid;
+        grid-template-columns: auto 2px 1fr 1fr;
+        grid-template-rows: auto auto auto auto auto;
+        grid-column-gap: 1em; 
+        grid-row-gap: 1em; 
+      }
+
+      .photo { grid-area: 1 / 1 / 1 / 1; width: 10em; height: 10em; margin: 0 1em 1em 0; }
+      .me { grid-area: 1 / 3 / 1 / 3; }
+      .contact { grid-area: 1 / 4 / 1 / 4; justify-self: end; }
+
+      .work-experience { grid-area: 2 / 1 / 2 / 1; }
+      .work-experience-list { grid-area: 2 / 3 / 2 / 5; }
+      .side-projects { grid-area: 3 / 1 / 3 / 1; }
+      .side-projects-list { grid-area: 3 / 3 / 3 / 5; }
+      .education { grid-area: 4 / 1 / 4 / 1; }
+      .education-list { grid-area: 4 / 3 / 4 / 5; }
+      .skills { grid-area: 5 / 1 / 5 / 1; }
+      .skills-list { grid-area: 5 / 3 / 5 / 5; }
+
+      .name { text-transform: uppercase; font-size: 2em; font-weight: 400 !important; color: rgba(0,0,0,0.5); }
+      .role { text-transform: uppercase; font-weight: 400 !important; color: rgba(0,0,0,0.5); }
+      .title { font-size: 1em; justify-self: end; }
+      .border { background-color: rgb(52, 152, 219); grid-area: 2 / 2 / 6 / 2; }
+
+      .work-experience-job { margin-bottom: 1em; }
+
+      .highlight {color: rgb(52, 152, 219); text-transform: uppercase; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <section class="container">
+      <div class="border"></div>
+      <img class="photo" src="photo.jpg">
+      <section class="me">
+          <h1 class="name">Sergii Zaitsev</h1>
+          <p class="role">Software Developer</p>
+          <br/>
+          <p><a href="https://zserge.com"><i class="material-icons">link</i> zserge.com</a></p>
+          <p><a href="https://github.com/zserge"><i class="material-icons">link</i> github.com/zserge</a></p>
+      </section>
+
+      <section class="contact">
+        <p>zaitsev.serge@gmail.com</p>
+        <p>+4915757733314</p>
+        <p>Munich, Germany</p>
+      </section>
+
+      <h2 class="work-experience title highlight">Work experience</h2>
+
+      <section class="work-experience-list">
+          <section class="work-experience-job">
+            <p class="highlight company">2018 Platform Engineer (Go/Java), Sixt</p>
+            <p>
+              Worked on a platform for customer-facing distributed systems.
+              <ul>
+                <li>Created a build system for Go micro services.</li>
+                <li>Designed and developed a telemetry library.</li>
+                <li>Designed and implemented a CI/CD pipeline.</li>
+              </ul>
+            </p>
+          </section>
+
+          <section class="work-experience-job">
+            <p class="highlight company">2017-2018 Software Developer (C/Go), Cesanta</p>
+            <p>
+              Designed and developed software for embedded systems, connected devices and IoT.
+
+              <ul>
+                <li>Implemented SOCKS5 TLS support in Mongoose framework.</li>
+                <li>Developed Bluetooth-to-WiFi bridge firmware for ESP32.</li>
+                <li>Designed, developed and deployed a platform for connected device management and OTA.</li>
+                <li>Created a VSCode plugin for Mongoose OS development.</li>
+                <li>Created an interpreter with an IDE for ES6 subset.</li>
+              </ul>
+            </p>
+          </section>
+
+          <section class="work-experience-job">
+            <p class="highlight company">2009-2017 Independent Contractor (C/Go/Android)</p>
+            <p>
+              Worked with EU- and US-based customers, offering services
+              related to embedded and systems software design and development.
+
+              <ul>
+                <li>Created firmware for embedded devices such as a streaming
+                  audio player/speaker (C/FreeRTOS/ARM).</li>
+                <li>Designed, developed and deployed a number of Android
+                  applications based on the customer concepts (Java/C).</li>
+                <li>Architected and developed Android software with necessary infrastructure such as RESTful web services that creates customizable panels and dashboards for different home automation platforms (Android, Java, Lua, Node.js, Mongo).</li>
+                <li>Implemented a platform for managing and provisioning cable modems and CMTS (Go, SNMP, IPDR, TFTP, DOCSIS).</li>
+              </ul>
+
+            </p>
+          </section>
+
+          <section class="work-experience-job">
+            <p class="highlight company">2011-2016 Software Engineer (Android/Embedded/Linux), Lynx Innovation</p>
+            <p>
+              Worked with an international team of developers building software
+              for retail displays and digital signage.
+
+              Had great experience with a wide range of technologies from
+              low-end MCUs to complex distributed web services.
+
+
+              <li>Developed reusable code libraries for common tasks on memory-constrained MCUs (file system drivers, peripherals HAL, multitasking, configuration handling).</li>
+              <li>Created software and firmware for high quality digital audio headphone displays used by major brands in the headphone market.</li>
+              <li>Developed Linux and Android based media players and tablets used for interactive shop retail displays used by major US retail chains.</li>
+              <li>Designed and built a tool for generating android apps from hand-drawn prototypes and pixel-perfect graphics.</li>
+              <li>Customized Android firmware (AOSP) for retail needs.</li>
+              <li>Created a web platform for real-time monitoring and managing of the connected retail displays. This included OTA or offline firmware and content updates, instant device health reports, remote troubleshooting and maintenance tools, and a scalable business-specific analytics engine (AWS, Go, MQTT).</li>
+
+            </p> 
+          </section>
+
+          <section class="work-experience-job">
+            <p class="highlight company">2008-2011 Software Developer (Linux), Fabulatech</p>
+            <p>
+              Built a number of high-quality solutions for redirecting hardware
+              over network and to the remote desktop sessions.
+
+              Worked on all levels and aspects of the projects including
+              research, design and specification, development, technical
+              reviews and mentoring.
+
+              <li>Developed system software for Linux/Solaris/MacOS, including kernel drivers.</li>
+              <li>Designed and implemented a tool for USB packet inspection for Linux/Solaris.</li>
+              <li>Created a utility to generate self-contained installers for various Linux distributions.</li>
+            </p>
+          </section>
+
+          <section class="work-experience-job">
+            <p class="highlight company">2007 Software Developer (Windows), IDEGroup</p>
+            <p>Worked on Windows NT system services and kernel drivers,
+              performed software development of a virtual USB host controller
+              driver using Kernel Mode Driver Framework.</p>
+          </section>
+
+        </section>
+
+        <h2 class="side-projects title highlight">Side projects</h2>
+
+        <ul class="side-projects-list list-none">
+          <li><a href="https://github.com/zserge/jsmn"><i class="material-icons">link</i> jsmn</a>:
+            world fastest JSON parser/tokenizer (ANSI C)</li>
+
+          <li><a href="https://github.com/zserge/partcl"><i class="material-icons">link</i> partcl</a>:
+            small TCL implementation for embedded systems (C99)</li>
+
+          <li><a href="https://github.com/zserge/o"><i class="material-icons">link</i> o!</a>:
+            ReactJS clone in under 1KB of code (ES6)</li>
+
+          <li><a href="https://github.com/zserge/webview"><i class="material-icons">link</i> webview</a>:
+            lightweight Electron alternative (C/Go)</li>
+
+          <li><a href="https://github.com/naivesound/glitch"><i class="material-icons">link</i> glitch</a>:
+            music programming language (C/Go)</li>
+
+          <li><a href="https://github.com/zserge/anvil"><i class="material-icons">link</i> anvil</a>:
+            fast UI framework in the spirit of ReactJS (Java/Android)</li>
+        </ul>
+
+        <h2 class="education title highlight">Education</h2>
+
+        <ul class="education-list list-none">
+          <li>2013 Ph. D. in Artifical Intelligence, Kharkiv National University of Radioelectronics</li>
+          <li>2009 M. Sc. in Computer Science, Zaporizhzhya National Technical University</li>
+          <li>2008 B. Sc. in Computer Science, Zaporizhzhya National Technical University</li>
+          <br />
+          <li>2019 Deep Learning (Coursera Specialization, deeplearning.ai)</li>
+          <li>2019 Computer Vision (Coursera Specialization, The State University of New York)</li>
+          <li>2013 Compilers (Coursera, Stanford University)</li>
+        </ul>
+
+        <h2 class="skills title highlight">Technical Skills</h2>
+
+        <section class="skills-list">
+          <p>C/C++, Go, Java/Kotlin, JavaScript, Python, Lua, Tcl, UNIX Shell.</p>
+          <p>Linux, Android, RTOS (FreeRTOS, LK), baremetal (AVR, ARM).</p>
+          <p>AWS, Docker, Node.js, REST, MongoDB, Redis, ReactJS/Mithril.js/Redux.</p>
+        </section>
+    </section>
+  </body>
+</html>

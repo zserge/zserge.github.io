@@ -1,0 +1,143 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil howto: view styling</title><meta name=description content="How to use view styles in Anvil: traditional XML approach and more flexible styling with code"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-howto-style-views/><meta property="og:title" content="Anvil howto: view styling"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-howto-style-views/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="How to use view styles in Anvil: traditional XML approach and more flexible styling with code"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2016-03-28T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Anvil howto: view styling","description":"How to use view styles in Anvil: traditional XML approach and more flexible styling with code","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-howto-style-views/","datePublished":"2016-03-28","dateModified":"2016-03-28","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-howto-style-views/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Anvil howto: view styling</h1><p>A common question I hear about <a href=https://github.com/zserge/anvil>Anvil</a> is how
+to style views.</p><p>Let&rsquo;s recall how it&rsquo;s been traditionally done in Android. Here&rsquo;s an example
+from the Android Developers website:</p><div class=highlight><pre class=chroma><code class=language-xml data-lang=xml><span class=nt>&lt;TextView</span>
+    <span class=na>android:layout_width=</span><span class=s>&#34;fill_parent&#34;</span>
+    <span class=na>android:layout_height=</span><span class=s>&#34;wrap_content&#34;</span>
+    <span class=na>android:textColor=</span><span class=s>&#34;#00FF00&#34;</span>
+    <span class=na>android:typeface=</span><span class=s>&#34;monospace&#34;</span>
+    <span class=na>android:text=</span><span class=s>&#34;@string/hello&#34;</span> <span class=nt>/&gt;</span>
+</code></pre></div><p>If you have a lot of views like this - most likely you would like to move
+repetitive code into a single place and just keep a reference to them in the
+layout. That&rsquo;s what we call a style - a reusable set of view attributes.</p><p>Android styles are normally written as XMLs:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;
+&lt;resources&gt;
+    &lt;style name=&#34;CodeFont&#34; parent=&#34;@android:style/TextAppearance.Medium&#34;&gt;
+        &lt;item name=&#34;android:layout_width&#34;&gt;fill_parent&lt;/item&gt;
+        &lt;item name=&#34;android:layout_height&#34;&gt;wrap_content&lt;/item&gt;
+        &lt;item name=&#34;android:textColor&#34;&gt;#00FF00&lt;/item&gt;
+        &lt;item name=&#34;android:typeface&#34;&gt;monospace&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;
+</code></pre></div><p>While Anvil doesn&rsquo;t support such styles as a first-class citizen - it still
+supports them by using XML layouts or by sub-classing a view with the default
+style overridden:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>// In XML:
+&lt;TextView id=&#34;@+id/my_text&#34; style=&#34;@style/CodeFont&#34; /&gt;
+// In Java inject your XML layout and bind data to the views
+xml(R.layout.my_text_layout, () -&gt; {
+	withId(R.id.my_text, () -&gt; {
+		text(R.string.hello);
+	});
+});
+
+// Subclass ProgressBar
+public class MyProgressBar extends ProgressBar {
+	public MyProgressBar(Context c) {
+		super(c, null, android.R.attr.progressBarStyleSmall);
+	}
+}
+v(MyProgressBar.class, () -&gt; {
+	...
+});
+</code></pre></div><p>This is still only a fallback option if you really have to use XML styles,
+because for most cases Anvil offers a much better solution to styling than XML.</p><h2 id=custom-style-class>Custom Style class</h2><p>You may create a custom <code>Style</code> utility class (e.g. a final class with just
+static methods or constant fields):</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>final</span> <span class=kd>class</span> <span class=nc>Style</span> <span class=o>{</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kd>class</span> <span class=nc>CodeFont</span> <span class=o>{</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>width</span> <span class=o>=</span> <span class=n>FILL</span><span class=o>;</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>height</span> <span class=o>=</span> <span class=n>WRAP</span><span class=o>;</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>textColor</span> <span class=o>=</span> <span class=n>Color</span><span class=o>.</span><span class=na>BLUE</span><span class=o>;</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=n>Typeface</span> <span class=n>typeface</span> <span class=o>=</span> <span class=n>Typeface</span><span class=o>.</span><span class=na>MONOSPACE</span><span class=o>;</span>
+	<span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><p>Now you may use this style in Anvil layouts:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+	<span class=n>size</span><span class=o>(</span><span class=n>Style</span><span class=o>.</span><span class=na>CodeFont</span><span class=o>.</span><span class=na>width</span><span class=o>,</span> <span class=n>Style</span><span class=o>.</span><span class=na>CodeFont</span><span class=o>.</span><span class=na>height</span><span class=o>);</span>
+	<span class=n>textColor</span><span class=o>(</span><span class=n>Style</span><span class=o>.</span><span class=na>CodeFont</span><span class=o>.</span><span class=na>textColor</span><span class=o>);</span>
+	<span class=n>typeface</span><span class=o>(</span><span class=n>Style</span><span class=o>.</span><span class=na>CodeFont</span><span class=o>.</span><span class=na>typeface</span><span class=o>);</span>
+<span class=o>});</span>
+</code></pre></div><p>So far it&rsquo;s very similar to XMLs, but let&rsquo;s see how it can be developed further.</p><h2 id=calculated-values>Calculated values</h2><p>Since we have the full power of a real programming language - we can describe
+dependencies between the values. For example if our text color is 20% darker
+than some common accent color - we can write it as an expression. It also
+applies to other values like sizes, margins, weights etc - they may be derived
+from some base style.</p><p>Now if you want to change you app accent color from blue to red - you only need
+to change it in one place.</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>final</span> <span class=kd>class</span> <span class=nc>Style</span> <span class=o>{</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kd>class</span> <span class=nc>Base</span> <span class=o>{</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>accentColor</span> <span class=o>=</span> <span class=n>Color</span><span class=o>.</span><span class=na>BLUE</span><span class=o>;</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>textSize</span> <span class=o>=</span> <span class=n>sip</span><span class=o>(</span><span class=n>16</span><span class=o>);</span>
+	<span class=o>}</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kd>class</span> <span class=nc>CodeFont</span> <span class=o>{</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>textSize</span> <span class=o>=</span> <span class=n>Base</span><span class=o>.</span><span class=na>textSize</span> <span class=o>*</span> <span class=n>0</span><span class=o>.</span><span class=na>8</span><span class=o>;</span>
+		<span class=kd>public</span> <span class=kd>final</span> <span class=kd>static</span> <span class=kt>int</span> <span class=n>textColor</span> <span class=o>=</span> <span class=n>darken</span><span class=o>(</span><span class=n>Base</span><span class=o>.</span><span class=na>accentColor</span><span class=o>,</span> <span class=n>0</span><span class=o>.</span><span class=na>2</span><span class=o>);</span>
+	<span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><h2 id=functions-not-constants>Functions, not constants</h2><p>However it&rsquo;s more useful use functions instead:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>final</span> <span class=kd>class</span> <span class=nc>Style</span> <span class=o>{</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>monospaceText</span><span class=o>()</span> <span class=o>{</span>
+		<span class=n>typeface</span><span class=o>(</span><span class=n>Typeface</span><span class=o>.</span><span class=na>MONOSPACE</span><span class=o>);</span>
+	<span class=o>}</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>bigView</span><span class=o>()</span> <span class=o>{</span>
+		<span class=n>size</span><span class=o>(</span><span class=n>MATCH</span><span class=o>,</span> <span class=n>MATCH</span><span class=o>);</span>
+		<span class=n>padding</span><span class=o>(</span><span class=n>dip</span><span class=o>(</span><span class=n>20</span><span class=o>));</span>
+	<span class=o>}</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>darkCodeText</span><span class=o>()</span> <span class=o>{</span>
+		<span class=n>textSize</span><span class=o>(</span><span class=n>Base</span><span class=o>.</span><span class=na>textSize</span> <span class=o>*</span> <span class=n>0</span><span class=o>.</span><span class=na>8</span><span class=o>);</span>
+		<span class=n>textColor</span><span class=o>(</span><span class=n>darken</span><span class=o>(</span><span class=n>Base</span><span class=o>.</span><span class=na>accentColor</span><span class=o>*</span> <span class=n>0</span><span class=o>.</span><span class=na>8</span><span class=o>));</span>
+	<span class=o>}</span>
+	<span class=c1>// Now we can use other style functions as mixins
+</span><span class=c1></span>	<span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>codeFont</span><span class=o>()</span> <span class=o>{</span>
+		<span class=n>bigView</span><span class=o>();</span>
+		<span class=n>monospaceText</span><span class=o>();</span>
+		<span class=n>darkCodeText</span><span class=o>();</span>
+	<span class=o>}</span>
+<span class=o>}</span>
+
+<span class=n>textView</span><span class=o>(()</span> <span class=o>-&gt;</span> <span class=o>{</span>
+	<span class=n>Style</span><span class=o>.</span><span class=na>codeFont</span><span class=o>();</span>
+	<span class=n>text</span><span class=o>(</span><span class=s>&#34;Hello&#34;</span><span class=o>);</span>
+<span class=o>});</span>
+</code></pre></div><p>The style definitions look more compact and they are very flexible - we can even
+include certain conditional constraints. For example if we want our view to be
+full-screen in landscape and have bigger font - it can be part of the style:</p><div class=highlight><pre class=chroma><code class=language-java data-lang=java><span class=kd>public</span> <span class=kd>final</span> <span class=kd>class</span> <span class=nc>Style</span> <span class=o>{</span>
+	<span class=kd>public</span> <span class=kd>static</span> <span class=kt>void</span> <span class=nf>codeFont</span><span class=o>()</span> <span class=o>{</span>
+		<span class=k>if</span> <span class=o>(</span><span class=n>isPortrait</span><span class=o>)</span> <span class=o>{</span>
+			<span class=n>size</span><span class=o>(</span><span class=n>MATCH</span><span class=o>,</span> <span class=n>WRAP</span><span class=o>);</span>
+			<span class=n>textSize</span><span class=o>(</span><span class=n>sip</span><span class=o>(</span><span class=n>18</span><span class=o>);</span>
+		<span class=o>}</span> <span class=k>else</span> <span class=o>{</span>
+			<span class=n>size</span><span class=o>(</span><span class=n>MATCH</span><span class=o>,</span> <span class=n>MATCH</span><span class=o>);</span>
+			<span class=n>textSize</span><span class=o>(</span><span class=n>sip</span><span class=o>(</span><span class=n>20</span><span class=o>);</span>
+		<span class=o>}</span>
+		<span class=n>textColor</span><span class=o>(</span><span class=n>darken</span><span class=o>(</span><span class=n>Base</span><span class=o>.</span><span class=na>accentColor</span><span class=o>*</span> <span class=n>0</span><span class=o>.</span><span class=na>8</span><span class=o>));</span>
+	<span class=o>}</span>
+<span class=o>}</span>
+</code></pre></div><h2 id=overriding-styles>Overriding styles</h2><p>My personal favourite way of making styles is passing a renderable lambda
+to override the style if needed:</p><div class=highlight><pre class=chroma><code class=language-fallback data-lang=fallback>public static void codeFontView(Anvil.Renderable r) {
+	// View class
+	textView(() -&gt; {
+		// With common style values
+		if (isPortrait) {
+			size(MATCH, WRAP);
+			textSize(Base.textSize * 0.8);
+		} else {
+			size(MATCH, MATCH);
+			textSize(Base.textSize);
+		}
+		textColor(darken(Base.accentColor* 0.8));
+		// Let the caller to override style
+		r.view();
+	});
+}
+
+// Usage:
+codeFontView(() -&gt; {
+	text(&#34;Hello&#34;); // Has default style attributes
+});
+
+codeFontView(() -&gt; {
+	text(&#34;World&#34;);
+	textColor(Color.RED); // Has default style attributes, but textColor overridden
+});
+</code></pre></div><p>It&rsquo;s useful if you want to separate how your view looks from how your view
+behaves - you may move look-and-feel styles into a utility class, but leave
+your data bindings and listeners inside your main class.</p><p>As you can see, Anvil is more flexible than XMLs and you may architect your
+styles any way you like by using constants, expressions, overriding styles or
+mixing them together.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Mar 28, 2016</em></p><p>See also:
+<a href=/posts/android-mvp-mvvm-redux-history/>The evolution of Android architecture</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>

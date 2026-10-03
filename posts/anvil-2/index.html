@@ -1,0 +1,197 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Anvil: big progress for a small library</title><meta name=description content="Summing up the progress of anvil development"><meta name=author content="Serge Zaitsev"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=data:,><link rel="shortcut icon" sizes=32x32 href=/favicon.png><link rel="shortcut icon" sizes=192x192 href=/favicon-192x192.png><link rel=apple-touch-icon href=/favicon-192x192.png><link rel=alternate type=application/rss+xml title=RSS href=/rss.xml><link rel=canonical href=https://zserge.com/posts/anvil-2/><meta property="og:title" content="Anvil: big progress for a small library"><meta property="og:type" content="article"><meta property="og:url" content="https://zserge.com/posts/anvil-2/"><meta property="og:image" content="https://zserge.com/logo.png"><meta property="og:description" content="Summing up the progress of anvil development"><meta property="og:locale" content="en_US"><meta property="og:site_name" content="zserge's blog"><meta property="article:published_time" content="2015-04-16T00:00:00Z"><meta property="article:author" content="Serge Zaitsev"><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Anvil: big progress for a small library","description":"Summing up the progress of anvil development","author":{"@type":"Person","name":"Serge Zaitsev","url":"https://zserge.com/about/"},"url":"https://zserge.com/posts/anvil-2/","datePublished":"2015-04-16","dateModified":"2015-04-16","publisher":{"@type":"Person","name":"Serge Zaitsev"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://zserge.com/posts/anvil-2/"}}</script><style type=text/css>body{padding:1rem;margin:auto;max-width:46rem;font-family:pt serif,Georgia,Cambria,times new roman,Times,serif;line-height:1.5;font-size:20px;color:rgba(0,0,0,.87);-webkit-font-smoothing:antialiased;font-weight:300}nav{display:flex;justify-content:space-between;align-items:center;margin:1em 0 3em}nav ul,nav li{display:inline-block;list-style:none;margin:0 0 0 .5rem;padding:0}nav ul{margin-right:1rem}.logo{background-color:rgba(0,0,0,.87);color:#fff;min-width:48px;min-height:48px;font-size:28px;border-radius:2px;display:flex;justify-content:center;align-items:center}.logo:hover{color:#fff}h1,h2{line-height:1.2;font-family:roboto,system-ui,segoe ui,Helvetica,Arial,sans-serif;font-weight:400;text-transform:uppercase;margin:1.34em 0 0}h1{font-size:1.95em}h2{font-size:1.25em;border-bottom:2px solid rgba(0,0,0,.87)}h1 a{color:rgba(0,0,0,.87)}p{margin:.67em 0 1em}a{color:#0076df;text-decoration:none;word-break:break-word}a:hover{color:rgba(0,0,0,.87)}ul,ol{list-style-position:outside;margin-left:1em}img{display:block;margin-left:auto;margin-right:auto;max-width:100%}pre,code{font-family:roboto mono,SFMono-Regular,Consolas,liberation mono,Menlo,monospace;font-weight:400;font-size:18px;color:rgba(0,0,0,.6);background:#eee}code{padding:.2rem .4rem;font-size:14px;border-radius:2px}pre{overflow-y:auto;line-height:20px;border-radius:2px;padding:1em}pre code{font-size:14px;padding:0;color:rgba(0,0,0,.87)}footer{font-size:12px}@media(prefers-color-scheme:dark){.logo{color:#444;background-color:#e4e4e4}.logo:hover{color:#444}body,h1 a,h2 a{background-color:#444;color:#e4e4e4}pre,pre code{background:#333;color:#e4e4e4}h2{border-bottom:1px solid #e4e4e4}code{color:#aaa;background:#333}a{color:#e39777}a:hover{color:#e4e4e4}img{filter:grayscale(30%)}}.hl{display:block;width:100%;background-color:#ffc}.ow,.gh,.gp,.gs,.gu,.nt,.nn,.ne,.ni,.nc,.kr,.kn,.kd,.kc,.k{font-weight:700}.c,.ch,.cm,.c1,.cs,.ge{color:#777}</style><link rel="shortcut icon" href=/favicon.ico></head><body><header><nav><a class=logo href=/>Z</a><ul><li><a href=/about/>about</a></li><li><a href=/posts/>posts</a></li><li><a href=https://mastodon.social/@zserge rel=me>@me</a></li><li><a href=https://github.com/zserge rel=me>&lt;/>me</a></li></ul></nav></header><div id=content><h1>Anvil: big progress for a small library</h1><h1 id=anvil-big-progress-for-a-small-library>Anvil: big progress for a small library</h1><p>I have just released <a href=https://github.com/zserge/anvil>Anvil 0.0.2</a>. So many changes have been made and now I am
+absolutely confident that Anvil has its strong points even though I&rsquo;m the only
+active user of it.</p><h2 id=what-is-anvil>What is Anvil?</h2><p>This section is for those who missed the <a href=/posts/android-mvx/>early</a> <a href=/posts/anvil-1/>steps</a> of Anvil.</p><p>Anvil is a tiny reactive UI library for Android. What does this mean? It means
+that you can declare your UI in Java, bind your data to the views, bind event
+listeners to the views and leave it running. The rest will be done by Anvil:
+once some data is changed - the UI will be updated in a smart way, so that only
+the widgets bound to that data will be modified.</p><p>This totally changes the way we design Android apps.</p><p>The core thing to understand is that Anvil uses virtual layout. Instead of
+modifying your Views and ViewGroups - it first builds a virtual tree containing
+the attributes of your views in the layout hierarchy:</p><pre><code>ViewNode for LinearLayout
+    ViewNode for TextView
+        AttrNode for text with value &quot;Hello&quot;
+    ViewNode for Button
+        AttrNode for OnClickListener with some listener object value
+</code></pre><p>Then, Anvil compares the current virtual layout tree and a previous one and
+applies the attribute changes when it finds a difference.</p><h2 id=but-i-loved-my-xmls>But I loved my XMLs</h2><p>I&rsquo;ve heard some frustration from people who used XMLs a lot. I understand
+their criticism, but we have to admit - there is no way to achieve simple,
+lightweight and declarative data binding and reactive behavior with XMLs. On
+the other hand, we can achieve declarative layouts, styling, multi-screen
+support etc with Java.</p><p>Good news is that Anvil does not force you to delete all your XMLs
+and never use them again. You can nicely mix Anvil layouts with XML layouts.</p><p>Same applies to the <a href=http://corner.squareup.com/2014/10/advocating-against-android-fragments.html>single-activity</a> approach, which I find very helpful.
+Anvil supports it and encourages it. But you still can use your Fragments and
+Activities as you did before and still have some benefits from using Anvil.</p><h2 id=show-me-the-code>Show me the code</h2><p>Here&rsquo;s a stupid counter example (using Java 8):</p><pre><code>public class MyCounterView extends RenderableView {
+
+    private int count = 0;
+
+    public MyCounterView(Context c) {
+        super(c);
+    }
+
+    public void onCounterButtonClicked(View v) {
+        count++;
+    }
+
+    public ViewNode view() {
+        return
+            v(LinearLayout.class,
+                orientation(LinearLayout.VERTICAL),
+
+                v(TextView.class,
+                    text(&quot;Count is &quot; + this.count)),
+
+                v(Button.class,
+                    text(&quot;Click me&quot;),
+                    onClick(this::onCounterButtonClicked)));
+    }
+}
+</code></pre><p>That&rsquo;s it. When the button is clicked - onCounterButtonClicked method is
+called, which increases the count and then Anvil.render() is performed to
+update the UI. At this point the new virtual layout will differ in one place
+only - the text() attribute of the TextView will be &ldquo;Count is 1&rdquo; instead of
+&ldquo;Count is 0&rdquo;. That&rsquo;s why the attribute node will update the TextView by calling
+its setText() method.</p><h2 id=anvil-the-renderer>Anvil, the Renderer</h2><p>The fundamental class is <code>Anvil</code>. It&rsquo;s a renderer that keeps a list of current
+<code>Renderables</code> and provides you with the <code>render()</code> method. This method smartly
+updates all the visible renderables (views, fragments). So if you want to force
+the UI update (for example when you received some data from the
+HttpUrlConenction) - you just call Anvil.render() on the UI thread.</p><h2 id=renderable>Renderable</h2><p>Renderable is an interface that holds some root ViewGroup (into which the
+layout will be rendered) and has a view() method returning the virtual layout
+corresponding to the current application state.</p><p>Activities and Fragments can implement Renderable interface, but most likely
+you would use RenderableViews. RenderableView is a syntax sugar for a
+Renderable FrameLayout, so you only have to override the view() method and
+you&rsquo;re done. Also, you can save/restore view state in
+onLoad(Bundle)/onStore(Bundle) methods. This helps a lot to split your app into
+components and never worry about screen rotation and related problems:</p><pre><code>public MyView extends RenderableView {
+    public MyView(Context c) {
+        super(c);
+    }
+
+    private int count = 0;
+
+    public ViewNode view() {
+        return
+            v(Button.class,
+                text(&quot;Clicked &quot; + count),
+                onClick(v -&gt; count++));
+    }
+
+    // Count will be kept when the screen is rotated
+    public void onLoad(Bundle b) {
+        b.putInt(&quot;count&quot;, count);
+    }
+
+    public void onSave(Bundle b) {
+        count = b.getInt(&quot;count&quot;);
+    }
+}
+</code></pre><h2 id=adapters>Adapters</h2><p>One may argue that Android has very nice MVC implemented with Adapters. I totally agree, I like Adapters a lot, and Anvil makes them even better:</p><pre><code>RenderableArrayAdapter myAdapter =
+    new RenderableArrayAdapter(String[]{&quot;John&quot;, &quot;Jane&quot;, &quot;Jack&quot;, &quot;Jade&quot;}) {
+
+    public void onItemClick(AdapterView a, View v, int pos, long id) {
+        Log.d(tag, &quot;You clicked on item &quot; + pos);
+    }
+
+    // Background will be different for odd and even items
+    public ViewNode itemView(int pos) {
+        return v(TextView.class,
+            backgroundColor(pos % 2 == 0 ? MyStyle.WHITE : MyStyle.GREY),
+            onItemClicked(this::onItemClicked),
+            text(getItem(pos)));
+    }
+};
+
+public ViewNode view() {
+    return
+        v(ListView.class,
+            adapter(myAdapter));
+}
+</code></pre><p>Also, a renderable base adapter exists to give you more flexibility.</p><h2 id=styling-your-views>Styling your views</h2><p>If some views share the same style - just move it to another method as you would do in any programming language to avoid code duplication:</p><pre><code>public AttrNode textStyle() {
+    return attrs(
+        textColor(Color.BLACK),
+        textSize(27),
+        gravity(CENTER));
+}
+
+...
+
+v(TextView.class,
+    textStyle(),
+    text(&quot;Hello&quot;))
+</code></pre><p>You can even override some styles, the latter one has priority, since java method arguments are evaluates left to right:</p><pre><code>v(TextView.class,
+    textBaseStyle(),
+    textStyle(), // may override some properties in textBaseStyle
+    text(&quot;Hello&quot;))
+</code></pre><p>Now, the fonts. I really like good typography and here&rsquo;s how to make it less painful in Android:</p><pre><code>v(TextView.class,
+    // use &quot;assets/RobotoCondensed-Light.ttf&quot; typeface
+    typeface(&quot;RobotoCondensed-Light.ttf&quot;),
+    text(&quot;Hello, Roboto!&quot;));
+</code></pre><p>And now something completely different&mldr;</p><p><strong>Icons</strong>! You can use <a href=http://fortawesome.github.io/Font-Awesome/icons/>Font Awesome</a> icons inside your textviews. They can be any color, they fit every screen size, no extra work is needed:</p><pre><code>private AttrNode materialIcon(String s) {
+    return attrs(
+            size(dip(48), dip(48)),
+            gravity(CENTER),
+            textColor(Color.WHITE),
+            typeface(&quot;Material-Design-Icons.ttf&quot;),
+            textSize(36),
+            backgroundResource(R.drawable.icon_button),
+            text(s));
+}
+
+v(TextView.class,
+    materialIcon(&quot;\ue620&quot;), // Icon for remove
+</code></pre><h2 id=i-like-to-move-it-move-it>I like to move it move it</h2><p>Animations are great. But how hard can it be to tie them to the app logic&mldr; Anvil tries to simplify it (still work in progress, so the API may be changed soon):</p><pre><code>private boolean isShown = false;
+
+...
+
+v(TextView.class,
+    anim(!isShown).of(&quot;alpha&quot;, 0f).duration(250),
+    anim(isShown).of(&quot;alpha&quot;, 1f).duration(250).listener(() -&gt; {
+        // animation has ended
+    }));
+
+...
+
+// Here's how to show the view with animation:
+isShown = true
+// Here's how to hide the view with animation:
+isShown = false
+</code></pre><p>Also, you can use an existing Animator class (e.g. inflated from animation XMLs):</p><pre><code>v(TextView.class,
+    anim(isShown, myAnimation));
+</code></pre><h2 id=single-activity-applications>Single-activity applications</h2><p>With Anvil it&rsquo;s very easy to componentize your app. Each component will be an
+isolated renderable view. Now, how to do the navigation between them if they
+are all in the same activity?</p><p>Anvil provides a simple helper in the Backstack class:</p><pre><code>private Backstack mBackstack = new Backstack(this, (v) -&gt; {
+    setContentView(v);
+});
+
+@Override
+public void onCreate(Bundle b) {
+    super.onCreate(b);
+    if (b != null) {
+        mBackstack.load(b);
+    } else {
+        mBackstack.navigate(new MyDefaultView(this));
+    }
+}
+
+@Override
+public void onBackPressed() {
+    if (!mBackstack.back()) {
+        finish();
+    }
+}
+</code></pre><p>You can use backstack navigate method anywhere inside your views. You can also
+save the stack of the views to Bundle inside onSaveInstanceState() in your
+activity.</p><h2 id=kotlin>Kotlin!</h2><p>Anvil work fine with good old Java 6. With Java 8 + Retrolambda you would be
+able to use method references and lambdas making your code much more compact.</p><p>But <a href=/posts/anvil-kotlin/>Kotlin makes it even better</a>!</p><h2 id=are-here-any-real-apps-written-with-anvil>Are here any real apps written with Anvil?</h2><p>Yes. First, you can check the example that comes with Anvil. Next, I&rsquo;ve
+published a couple of simple games on Google Play (sources will be released
+later) - <a href="http://play.google.com/store/apps/details?id=trikita.spot">Spot</a> and
+<a href="http://play.google.com/store/apps/details?id=trikita.quilt">Quilt</a>. Both
+written exclusively with Anvil.</p><h2 id=bright-future-you-say>Bright future you say?</h2><p>Currently Anvil is good enough to be used. I wonder if Anvil can be integrated
+with some event bus implementations, so onClick() would take an event object
+instead of taking a listener. This will simplify the syntax of Java without
+lambdas. Also, animations could be implemented in better way I think.
+Performance could be optimized by caching the attribute nodes. Helpers could be
+added for colors (like darken()/lighten() etc), for touch events, for support
+libraries. Tutorials could be written for newcomers.</p><p>Lots of things to do. Stay tuned.</p><p>I hope you’ve enjoyed this article. You can follow – and contribute to – on <a href=https://github.com/zserge>Github</a>, <a href=https://mastodon.social/@zserge>Mastodon</a>, <a href=https://twitter.com/zsergo>Twitter</a> or subscribe via <a href=/rss.xml>rss</a>.</p><p class=date style=text-align:right><em>Apr 16, 2015</em></p><p>See also:
+<a href=/posts/anvil-1/>Anvil: the story of automatic rendering</a> and <a href=/posts/>more</a>.</p></div><footer><p>&copy;2012&ndash;2026 &#183;
+<a class=h-card rel=me href=https://zserge.com/>Serge Zaitsev</a> &#183;
+<a href=mailto:hello@zserge.com rel=me>hello@zserge.com</a> &#183;
+<a href=https://mastodon.social/@zserge rel=me>@zserge@mastodon.social</a></p></footer><script>new Image().src='https://nullitics.com/file.gif?u='+encodeURI(location.href)+'&r='+encodeURI(document.referrer)+'&d='+screen.width</script><noscript><img src=https://nullitics.com/file.gif></noscript></body></html>
